@@ -1,0 +1,245 @@
+
+<html>
+<head>
+<title>shock.lol • dashboard</title>
+<link rel="icon" type="image/png" href="https://shock.lol/favicon.ico">
+<link rel="stylesheet" type="text/css" href="https://shock.lol/src/dashv2.css?1714757392">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,">
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha512-lbwH47l/tPXJYG9AcFNoJaTMhGvYWhVM9YI43CT+uteTRRaiLCui8snIgyAN8XWgNjNhCqlAUdzZptso6OCoFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css" integrity="sha512-oe8OpYjBaDWPt2VmSFR+qYOdnTjeV9QPLJUeqZyprDEQvQLJ9C5PCFclxwNuvb/GQgQngdCXzKSFltuHD3eCxA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.3.2/dist/jBox.all.min.js"></script>
+<link href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.3.2/dist/jBox.all.min.css" rel="stylesheet">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+<meta content="shock.lol" property="og:title" />
+<meta content="private bio pages" property="og:description" />
+<meta content="https://shock.lol/" property="og:url" />
+<meta content="#5d9cff" data-react-helmet="true" name="theme-color" />
+<meta content="https://shock.lol/favicon.ico" property="og:image" />
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://kit.fontawesome.com/ced8338e4b.js" crossorigin="anonymous"></script>
+</head>
+<body onload="document.body.style.opacity='1'">
+<html>
+<head>
+<title>shock.lol • dashboard"?></title>
+<link rel="icon" type="image/png" href="https://shock.lol/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,">
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha512-lbwH47l/tPXJYG9AcFNoJaTMhGvYWhVM9YI43CT+uteTRRaiLCui8snIgyAN8XWgNjNhCqlAUdzZptso6OCoFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css" integrity="sha512-oe8OpYjBaDWPt2VmSFR+qYOdnTjeV9QPLJUeqZyprDEQvQLJ9C5PCFclxwNuvb/GQgQngdCXzKSFltuHD3eCxA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.3.2/dist/jBox.all.min.js"></script>
+<link href="https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.3.2/dist/jBox.all.min.css" rel="stylesheet">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+<meta content="shock.lol" property="og:title" />
+<meta content="private bio pages" property="og:description" />
+<meta content="https://shock.lol/" property="og:url" />
+<meta content="#5d9cff" data-react-helmet="true" name="theme-color" />
+<meta content="https://shock.lol/favicon.ico" property="og:image" />
+<script src="https://kit.fontawesome.com/ced8338e4b.js" crossorigin="anonymous"></script>
+</head>
+<body onload="document.body.style.opacity='1'">
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&display=swap');
+
+        :root {
+            --background: #000000;
+            --header: #ee54ff;
+            --smaller: #faceff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Rubik Wet Paint", system-ui;
+            font-weight: 400;
+            font-style: normal;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            box-sizing: unset !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 2px;
+            height: 2px;
+        }
+
+        ::-webkit-scrollbar-track {
+            display: none;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #5353535e;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+
+        @-webkit-keyframes flicker
+        {
+            0% {opacity:0;}
+            9% {opacity:0;}
+            10% {opacity:.5;}
+            11% {opacity:0;}
+            12% {opacity:.5;}
+            15% {opacity:1;}
+        }
+        
+        body {
+            background-color: var(--background);
+        }
+        
+        .main-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -webkit-animation: flicker 5s infinite;
+            height: fit-content;
+            width: 300px;
+        }
+
+        .header {
+            color: var(--header);
+            text-shadow: 0px 0 62px var(--header);
+            font-size: 40px;
+            text-align: center;
+        }
+
+        .smaller {
+            color: var(--smaller);
+            text-shadow: 0px 0 62px var(--header);
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .inputs {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .input {
+            font-size: 14px;
+            transition: 0.3s;
+            flex: auto;
+            padding: 15px;
+            color: var(--header);
+            text-align: center;
+            border-radius: 9px;
+            width: 100%;
+            margin: 10px;
+            border: solid 1px var(--header);
+            background-color: #00000000;
+            box-shadow: 0px 0px 262px 0px var(--header);
+            outline: none;
+        }
+
+        .input:hover {
+            transition: 0.3s;
+            background-color: #ffffff0d;
+            color: #ffffff;
+            border: solid 1px #ffffff;
+            box-shadow: 0px 0px 262px 0px #fbd5ff;
+        }
+
+        .button {
+            font-size: 14px;
+            transition: 0.3s;
+            padding: 15px;
+            color: var(--header);
+            text-align: center;
+            border-radius: 9px;
+            margin: 10px;
+            border: solid 1px var(--header);
+            background-color: #00000000;
+            box-shadow: 0px 0px 262px 0px var(--header);
+            width: 100%;
+        }
+
+        .button:hover {
+            transition: 0.3s;
+            background-color: #ffffff0d;
+            color: #ffffff;
+            border: solid 1px #ffffff;
+            box-shadow: 0px 0px 262px 0px #fbd5ff;
+            cursor: pointer;
+        }
+
+        .other:hover {
+            cursor: pointer;
+        }
+    </style>
+<div class="main-container">
+<p class="smaller">enter an invite to complete your registration</p>
+<div class="inputs">
+<input class="input invite cinvite" type="text" name="invite" id="invite" autocomplete="off" value placeholder="shock_xxxxxxxxxx" maxlength="28">
+<div class="button" onclick="register();"><i class="fa-solid fa-arrow-right"></i></div>
+<p class="smaller" style="margin-top: 0px; font-size: 15px;">get an invite <span class="other" style="color: var(--header);" onclick="location.href='https://shock.lol/discord/'">here</span></p>
+</div>
+</div>
+</body>
+<script>
+        function register() {
+            toastr["info"]("Checking your invite", "Info");
+            var invite = $('.cinvite').val();
+            
+            var data = new FormData();
+            data.append('invite', invite);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://shock.lol/api/auth/register/");
+            xhr.onload = function () {
+                var rt = JSON.parse(xhr.responseText);
+                toastr[rt.toast](rt.message, rt.title);
+                if (rt.toast == "success") {
+                    toastr["info"]("Refreshing dashboard", "Info");
+                    window.setTimeout(function(){
+                        location.reload();
+                    }, 2000);
+                };
+            };
+            xhr.send(data);
+            return false;
+            
+        };
+        function setup() {
+            toastr["info"]("", "Creating your bio");
+            var username = $('.setupusername').val();
+            var displayname = $('.setupdisplayname').val();
+            
+            var data = new FormData();
+            data.append('username', username);
+            data.append('displayname', displayname);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://shock.lol/api/bio/create/");
+            xhr.onload = function () {
+                var rt = JSON.parse(xhr.responseText);
+                toastr[rt.toast](rt.message, rt.title);
+                if (rt.toast == "success") {
+                    toastr["info"]("Refreshing dashboard", "Info");
+                    window.setTimeout(function(){
+                        location.reload();
+                    }, 2000);
+                };
+            };
+            xhr.send(data);
+            return false;
+            
+        };
+    </script>
+</html>
