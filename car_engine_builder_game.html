@@ -1,419 +1,1647 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REDLINE — Racing Game</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); color: var(--color-text-primary); }
-.game { padding: 1rem 0; }
-.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.tab { padding: 8px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 13px; background: var(--color-background-primary); color: var(--color-text-secondary); transition: all 0.15s; }
-.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
-.section { display: none; }
-.section.active { display: block; }
-.car-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
-.car-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; background: var(--color-background-primary); transition: all 0.15s; position: relative; }
-.car-card:hover { border-color: var(--color-border-primary); background: var(--color-background-secondary); }
-.car-card.selected { border: 2px solid #378ADD; }
-.car-icon { font-size: 32px; margin-bottom: 8px; }
-.car-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-.car-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px; }
-.badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
-.badge-red { background: #FCEBEB; color: #A32D2D; }
-.badge-blue { background: #E6F1FB; color: #185FA5; }
-.badge-amber { background: #FAEEDA; color: #854F0B; }
-.badge-green { background: #EAF3DE; color: #3B6D11; }
-.badge-purple { background: #EEEDFE; color: #534AB7; }
-.garage { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.panel { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; background: var(--color-background-primary); }
-.panel h3 { font-size: 15px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
-.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
-.stat-row:last-child { border-bottom: none; }
-.stat-bar-wrap { flex: 1; margin: 0 12px; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
-.stat-bar { height: 100%; border-radius: 3px; transition: width 0.4s; }
-.mod-list { display: flex; flex-direction: column; gap: 8px; }
-.mod-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; }
-.mod-item.equipped { background: #EAF3DE; border-color: #3B6D11; }
-.mod-btn { padding: 4px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 12px; background: var(--color-background-primary); color: var(--color-text-primary); }
-.mod-btn:hover { background: var(--color-background-secondary); }
-.race-section { text-align: center; }
-.race-track { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 2rem; margin: 1rem 0; position: relative; overflow: hidden; min-height: 120px; }
-.race-car { font-size: 28px; position: absolute; transition: left 1.5s ease-in; top: 50%; transform: translateY(-50%); }
-.race-car2 { font-size: 28px; position: absolute; transition: left 2s ease-in; top: 20%; transform: translateY(-50%); }
-.big-btn { padding: 12px 32px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); cursor: pointer; font-size: 15px; font-weight: 500; background: var(--color-background-primary); color: var(--color-text-primary); }
-.big-btn:hover { background: var(--color-background-secondary); }
-.result-box { padding: 1rem; border-radius: var(--border-radius-md); font-size: 14px; margin-top: 1rem; display: none; }
-.win { background: #EAF3DE; color: #3B6D11; }
-.lose { background: #FCEBEB; color: #A32D2D; }
-.currency { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
-.shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-.shop-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; background: var(--color-background-primary); }
-.shop-card h4 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-.shop-card p { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
-.price-tag { font-size: 13px; font-weight: 500; color: #854F0B; }
-.hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 12px 16px; background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); }
-.engine-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
-.eng-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; background: var(--color-background-primary); }
-.eng-card:hover { background: var(--color-background-secondary); }
-.eng-card.selected { border: 2px solid #378ADD; }
-.eng-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-.eng-spec { font-size: 11px; color: var(--color-text-secondary); }
-.selected-label { position: absolute; top: 8px; right: 8px; font-size: 10px; background: #E6F1FB; color: #185FA5; padding: 2px 6px; border-radius: 4px; }
+/* ── RESET & TOKENS ────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080810;--bg2:#0f0f1a;--bg3:#16162a;
+  --panel:#12121e;--panel2:#1a1a2e;--panel3:#22223a;
+  --border:#252540;--border2:#353560;--border3:#484880;
+  --red:#e8293a;--red2:#ff4560;--red3:rgba(232,41,58,.12);
+  --amber:#f59e0b;--amber2:#fbbf24;--amber3:rgba(245,158,11,.12);
+  --blue:#3b82f6;--blue2:#60a5fa;--blue3:rgba(59,130,246,.12);
+  --green:#22c55e;--green2:#4ade80;--green3:rgba(34,197,94,.12);
+  --purple:#a855f7;--purple2:#c084fc;--purple3:rgba(168,85,247,.12);
+  --cyan:#06b6d4;--cyan3:rgba(6,182,212,.12);
+  --text:#eeeef8;--text2:#9090b8;--text3:#5050a0;--text4:#333360;
+  --mono:'Share Tech Mono',monospace;
+  --disp:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+  --r:8px;--r2:12px;
+  --glow-red:0 0 20px rgba(232,41,58,.25);
+  --glow-amber:0 0 20px rgba(245,158,11,.25);
+}
+body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+button{font-family:var(--body);cursor:pointer;}
+input,select,textarea{font-family:var(--body);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+a{color:inherit;text-decoration:none;}
+
+/* ── AUTH SCREEN ─────────────────────────────── */
+#auth-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+.auth-box{
+  width:100%;max-width:420px;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:var(--r2);
+  padding:40px;
+  box-shadow:var(--glow-red);
+}
+.auth-logo{
+  font-family:var(--disp);font-weight:900;font-size:42px;
+  letter-spacing:6px;text-align:center;margin-bottom:8px;
+  color:var(--red);text-shadow:0 0 30px rgba(232,41,58,.4);
+}
+.auth-sub{text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:2px;margin-bottom:32px;}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.auth-tab{flex:1;padding:10px;text-align:center;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:transparent;border:none;color:var(--text3);transition:all .15s;}
+.auth-tab.active{background:var(--red);color:white;}
+.form-group{margin-bottom:16px;}
+.form-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;}
+.form-input{
+  width:100%;padding:10px 14px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:6px;color:var(--text);font-size:14px;
+  outline:none;transition:border-color .15s;
+}
+.form-input:focus{border-color:var(--red);}
+.btn-auth{
+  width:100%;padding:12px;
+  background:var(--red);border:none;border-radius:6px;
+  color:white;font-family:var(--disp);font-size:16px;
+  font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;margin-top:8px;
+}
+.btn-auth:hover{background:var(--red2);box-shadow:var(--glow-red);}
+.auth-err{font-size:12px;color:var(--red2);font-family:var(--mono);margin-top:12px;text-align:center;display:none;}
+
+/* ── GAME WRAPPER ─────────────────────────────── */
+#game{display:none;min-height:100vh;}
+
+/* ── HEADER ─────────────────────────────────────── */
+.header{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;
+  height:58px;position:sticky;top:0;z-index:200;
+}
+.logo{font-family:var(--disp);font-weight:900;font-size:30px;letter-spacing:5px;color:var(--red);text-shadow:0 0 20px rgba(232,41,58,.35);}
+.logo span{color:var(--text);}
+.hud{display:flex;gap:8px;align-items:center;}
+.hud-pill{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:5px 12px;text-align:center;min-width:70px;
+}
+.hud-pill .lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
+.hud-pill .val{font-family:var(--disp);font-size:16px;font-weight:700;}
+.val-cash{color:var(--amber);}
+.val-level{color:var(--cyan);}
+.val-wins{color:var(--green);}
+.hud-avatar{
+  width:34px;height:34px;border-radius:50%;background:var(--red3);
+  border:1px solid var(--red);display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-weight:700;font-size:14px;color:var(--red);cursor:pointer;
+  position:relative;
+}
+.hud-menu{
+  position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--panel2);border:1px solid var(--border2);
+  border-radius:var(--r);min-width:160px;z-index:300;display:none;
+}
+.hud-menu.open{display:block;}
+.hud-menu-item{padding:10px 16px;font-size:13px;cursor:pointer;transition:background .1s;}
+.hud-menu-item:hover{background:var(--panel3);}
+.hud-menu-item.danger{color:var(--red2);}
+
+/* ── NAV ─────────────────────────────────────── */
+.nav{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;padding:0 16px;
+}
+.nav-tab{
+  padding:13px 18px;font-family:var(--disp);font-weight:700;font-size:14px;
+  letter-spacing:1px;text-transform:uppercase;color:var(--text3);
+  cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;
+  white-space:nowrap;user-select:none;flex-shrink:0;background:none;border-left:none;border-right:none;border-top:none;
+}
+.nav-tab:hover{color:var(--text2);}
+.nav-tab.active{color:var(--red);border-bottom-color:var(--red);}
+
+/* ── MAIN ─────────────────────────────────────── */
+.main{padding:20px;max-width:1300px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* ── SECTION HEADER ─────────────────────────────────── */
+.sec-head{margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;}
+.sec-title{font-family:var(--disp);font-size:30px;font-weight:900;text-transform:uppercase;letter-spacing:2px;line-height:1;}
+.sec-sub{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:1px;margin-top:4px;}
+
+/* ── GRID LAYOUTS ─────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+/* ── PANEL ─────────────────────────────────────── */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:20px;}
+.panel-sm{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.panel h3{font-family:var(--disp);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.panel-header h3{margin-bottom:0;}
+
+/* ── BADGES ─────────────────────────────────────── */
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;}
+.badge-red{background:var(--red3);color:var(--red2);border:1px solid rgba(232,41,58,.2);}
+.badge-amber{background:var(--amber3);color:var(--amber2);border:1px solid rgba(245,158,11,.2);}
+.badge-blue{background:var(--blue3);color:var(--blue2);border:1px solid rgba(59,130,246,.2);}
+.badge-green{background:var(--green3);color:var(--green2);border:1px solid rgba(34,197,94,.2);}
+.badge-purple{background:var(--purple3);color:var(--purple2);border:1px solid rgba(168,85,247,.2);}
+.badge-cyan{background:var(--cyan3);color:var(--cyan);border:1px solid rgba(6,182,212,.2);}
+.badge-mythic{background:linear-gradient(135deg,var(--purple3),var(--red3));color:#f0a0ff;border:1px solid rgba(200,100,255,.3);}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+.btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .12s;font-family:var(--disp);letter-spacing:.5px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;}
+.btn-red{background:var(--red);color:white;}.btn-red:hover{background:var(--red2);box-shadow:var(--glow-red);}
+.btn-ghost{background:var(--panel3);color:var(--text2);border:1px solid var(--border2);}.btn-ghost:hover{border-color:var(--border3);color:var(--text);}
+.btn-green{background:var(--green3);color:var(--green2);border:1px solid rgba(34,197,94,.25);}.btn-green:hover{background:rgba(34,197,94,.2);}
+.btn-amber{background:var(--amber3);color:var(--amber2);border:1px solid rgba(245,158,11,.25);}.btn-amber:hover{background:rgba(245,158,11,.2);}
+.btn-blue{background:var(--blue3);color:var(--blue2);border:1px solid rgba(59,130,246,.25);}.btn-blue:hover{background:rgba(59,130,246,.2);}
+.btn-purple{background:var(--purple3);color:var(--purple2);border:1px solid rgba(168,85,247,.25);}.btn-purple:hover{background:rgba(168,85,247,.2);}
+.btn-lg{padding:11px 28px;font-size:15px;letter-spacing:2px;border-radius:var(--r);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── STAT BARS ─────────────────────────────────── */
+.stat-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.stat-row:last-child{border-bottom:none;}
+.stat-lbl{width:90px;font-family:var(--mono);font-size:10px;letter-spacing:.5px;color:var(--text3);flex-shrink:0;}
+.stat-bar-wrap{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.stat-bar{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.stat-val{width:60px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--text);}
+
+/* ── CAR CARD ─────────────────────────────────── */
+.car-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r2);padding:16px;cursor:pointer;
+  transition:all .15s;position:relative;overflow:hidden;
+}
+.car-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red);opacity:0;transition:opacity .15s;}
+.car-card:hover{border-color:var(--border2);background:var(--panel2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.car-card:hover::after,.car-card.selected::after{opacity:1;}
+.car-card.selected{border-color:var(--red);}
+.car-card.locked{opacity:.4;}
+.car-emoji{font-size:38px;margin-bottom:10px;line-height:1;}
+.car-name{font-family:var(--disp);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;line-height:1.1;}
+.car-brand{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;}
+.car-stats-mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.mini-stat{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.mini-stat span{color:var(--text2);}
+.sel-tag{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px;background:var(--red);color:white;padding:2px 6px;border-radius:3px;}
+.lock-tag{position:absolute;top:10px;right:10px;font-size:16px;}
+.rarity-strip{position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rarity-common{background:var(--text3);}
+.rarity-rare{background:var(--blue);}
+.rarity-epic{background:var(--purple);}
+.rarity-legendary{background:var(--amber);}
+.rarity-mythic{background:linear-gradient(90deg,var(--red),var(--purple),var(--amber));}
+.rarity-limited{background:linear-gradient(90deg,var(--cyan),var(--green));}
+
+/* ── FILTER BAR ─────────────────────────────────── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.filter-btn{padding:5px 12px;border-radius:20px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.5px;cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--text3);transition:all .12s;text-transform:uppercase;}
+.filter-btn.active,.filter-btn:hover{border-color:var(--red);color:var(--red);background:var(--red3);}
+.filter-search{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--text);outline:none;font-family:var(--mono);width:180px;}
+.filter-search:focus{border-color:var(--red);}
+
+/* ── GARAGE SIDEBAR LAYOUT ─────────────────────────────── */
+.garage-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;}
+@media(max-width:900px){.garage-layout{grid-template-columns:1fr;}}
+
+/* ── UPGRADE GRID ─────────────────────────────────── */
+.upgrade-list{display:flex;flex-direction:column;gap:8px;}
+.upgrade-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;}
+.upgrade-meta{font-size:12px;color:var(--text2);}
+.upgrade-name{font-weight:600;font-size:13px;margin-bottom:2px;}
+.upgrade-level-dots{display:flex;gap:3px;margin-top:5px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+.dot.filled{background:var(--amber);}
+
+/* ── AUCTION CARD ─────────────────────────────────── */
+.auction-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px;transition:all .15s;
+}
+.auction-card:hover{border-color:var(--border2);}
+.auction-timer{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:700;}
+.auction-timer.urgent{color:var(--red2);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.auction-price{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--text);}
+.auction-bids{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.bid-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.bid-row:last-child{border-bottom:none;}
+.bid-amount{font-family:var(--mono);color:var(--amber);}
+
+/* ── RACE SECTION ─────────────────────────────────── */
+.race-events{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
+.race-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px;transition:all .15s;cursor:pointer;
+}
+.race-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5);}
+.race-card.locked-race{opacity:.5;cursor:not-allowed;}
+.diff-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-transform:uppercase;margin-bottom:10px;}
+.diff-easy{background:var(--green3);color:var(--green2);}
+.diff-medium{background:var(--amber3);color:var(--amber2);}
+.diff-hard{background:var(--red3);color:var(--red2);}
+.diff-elite{background:var(--purple3);color:var(--purple2);}
+.race-emoji{font-size:32px;margin-bottom:8px;line-height:1;}
+.race-name{font-family:var(--disp);font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.race-desc{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+.race-footer{display:flex;justify-content:space-between;align-items:center;}
+.race-reward{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:700;}
+
+/* ── RACE ARENA ─────────────────────────────────── */
+.race-arena{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:24px;margin-bottom:16px;
+  display:none;
+}
+.arena-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.arena-title{font-family:var(--disp);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--red);}
+.phase-display{font-family:var(--disp);font-size:52px;font-weight:900;text-align:center;letter-spacing:6px;text-transform:uppercase;padding:20px 0;display:none;}
+.phase-countdown{color:var(--red);text-shadow:0 0 30px rgba(232,41,58,.5);}
+.phase-go{color:var(--green);text-shadow:0 0 30px rgba(34,197,94,.5);}
+.speed-bars{margin-bottom:20px;}
+.speed-row{margin-bottom:12px;}
+.speed-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;margin-bottom:6px;}
+.speed-lbl-name{color:var(--text3);}
+.speed-lbl-score{color:var(--text2);}
+.speed-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.speed-fill{height:100%;border-radius:3px;width:0%;transition:width 2.2s cubic-bezier(.25,.46,.45,.94);}
+.fill-player{background:linear-gradient(90deg,var(--red),var(--red2));}
+.fill-opp{background:linear-gradient(90deg,var(--blue),var(--blue2));}
+.track-lanes{display:flex;flex-direction:column;gap:10px;}
+.track-lane{
+  background:var(--bg3);border-radius:6px;height:54px;
+  position:relative;overflow:hidden;border:1px solid var(--border);
+}
+.lane-name{position:absolute;left:8px;top:4px;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.5px;z-index:3;}
+.road-mark{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:36px;height:3px;background:var(--border2);border-radius:2px;
+  animation:roadAnim .65s linear infinite;
+}
+@keyframes roadAnim{from{left:110%;}to{left:-10%;}}
+.track-car{
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-size:26px;transition:left 2.2s cubic-bezier(.25,.46,.45,.94);
+  z-index:2;left:3%;line-height:1;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.7));
+}
+.track-opp{transition-duration:2.6s;}
+.track-finish{position:absolute;right:0;top:0;bottom:0;width:28px;background:repeating-conic-gradient(#1a1a2e 0% 25%,#2a2a4a 0% 50%) 0 0/14px 14px;opacity:.6;z-index:1;}
+.result-box{border-radius:var(--r2);padding:22px 28px;display:none;text-align:center;}
+.result-win{background:var(--green3);border:1px solid rgba(34,197,94,.3);}
+.result-lose{background:var(--red3);border:1px solid rgba(232,41,58,.3);}
+.result-title{font-family:var(--disp);font-size:36px;font-weight:900;letter-spacing:3px;text-transform:uppercase;}
+.result-win .result-title{color:var(--green2);}
+.result-lose .result-title{color:var(--red2);}
+.result-detail{font-family:var(--mono);font-size:12px;color:var(--text2);margin-top:8px;}
+
+/* ── LEADERBOARD ─────────────────────────────────── */
+.lb-table{width:100%;border-collapse:collapse;}
+.lb-table th{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.lb-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;}
+.lb-table tr:last-child td{border-bottom:none;}
+.lb-rank{font-family:var(--mono);font-size:11px;color:var(--text3);width:40px;}
+.lb-rank.top1{color:var(--amber);}
+.lb-rank.top2{color:var(--text2);}
+.lb-rank.top3{color:var(--red2);}
+.lb-val{font-family:var(--mono);font-size:12px;color:var(--amber);text-align:right;}
+
+/* ── MARKET ─────────────────────────────────── */
+.market-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.market-row:last-child{border-bottom:none;}
+.market-emoji{font-size:24px;width:36px;text-align:center;}
+.market-info{flex:1;}
+.market-name{font-size:13px;font-weight:600;}
+.market-brand{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.market-price{font-family:var(--disp);font-size:18px;font-weight:700;color:var(--amber);}
+.market-delta{font-family:var(--mono);font-size:11px;}
+.delta-up{color:var(--green2);}
+.delta-down{color:var(--red2);}
+
+/* ── PROFILE ─────────────────────────────────── */
+.profile-hero{
+  background:linear-gradient(135deg,var(--panel) 0%,var(--panel2) 100%);
+  border:1px solid var(--border);border-radius:var(--r2);
+  padding:28px;margin-bottom:20px;
+  display:flex;align-items:center;gap:24px;
+  position:relative;overflow:hidden;
+}
+.profile-hero::before{
+  content:'';position:absolute;right:-40px;top:-40px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(232,41,58,.08) 0%,transparent 70%);
+}
+.profile-avatar-big{
+  width:70px;height:70px;border-radius:50%;
+  background:var(--red3);border:2px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-weight:900;font-size:28px;color:var(--red);
+  flex-shrink:0;
+}
+.profile-name{font-family:var(--disp);font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:2px;}
+.profile-level{font-family:var(--mono);font-size:12px;color:var(--text3);margin:4px 0;}
+.xp-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:8px;width:200px;}
+.xp-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px;transition:width .6s;}
+.profile-stats{display:flex;gap:24px;margin-left:auto;}
+.profile-stat{text-align:center;}
+.profile-stat .num{font-family:var(--disp);font-size:28px;font-weight:700;}
+.profile-stat .lbl2{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+
+/* ── TOAST ─────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--panel2);border:1px solid var(--border2);
+  border-radius:var(--r);padding:12px 18px;font-size:13px;z-index:9000;
+  transform:translateY(60px);opacity:0;transition:all .25s;
+  pointer-events:none;max-width:300px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.t-success{border-color:rgba(34,197,94,.4);}
+.toast.t-error{border-color:rgba(232,41,58,.4);}
+.toast.t-info{border-color:rgba(59,130,246,.4);}
+
+/* ── MODAL ─────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:5000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  display:none;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:28px;width:100%;max-width:520px;
+  max-height:80vh;overflow-y:auto;position:relative;
+}
+.modal-title{font-family:var(--disp);font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;}
+.modal-close{position:absolute;top:16px;right:16px;font-size:20px;cursor:pointer;color:var(--text3);background:none;border:none;}
+
+/* ── EMPTY STATE ─────────────────────────────────── */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-family:var(--mono);font-size:12px;letter-spacing:.5px;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* ── LOADING SPINNER ─────────────────────────────────── */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-screen{display:flex;align-items:center;justify-content:center;height:200px;gap:12px;font-family:var(--mono);font-size:13px;color:var(--text3);}
+
+/* ── XP NOTIFICATION ─────────────────────────────────── */
+.xp-pop{
+  position:fixed;top:80px;right:24px;z-index:8000;
+  font-family:var(--disp);font-size:18px;font-weight:700;
+  color:var(--amber);pointer-events:none;
+  animation:xpFloat 2s ease forwards;
+}
+@keyframes xpFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-60px);}}
+
+/* ── REALTIME INDICATOR ─────────────────────────────────── */
+.rt-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  display:inline-block;margin-right:6px;
+  box-shadow:0 0 6px var(--green);animation:rtPulse 2s infinite;
+}
+@keyframes rtPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── COUNTDOWN ─────────────────────────────────── */
+.countdown-digits{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber);letter-spacing:2px;}
 </style>
+</head>
+<body>
 
-<div class="game">
-  <h2 class="sr-only">Car and engine building game featuring RAM TRX, Dodge Hellcat, Ford, Chevy, and more</h2>
-  <div class="hud">
-    <div>
-      <span style="font-size:13px;color:var(--color-text-secondary);">Garage</span>
-      <div class="car-name" id="hud-car">No car selected</div>
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">REDLINE</div>
+    <div class="auth-sub">RACING GAME ECONOMY</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">Create Account</button>
     </div>
-    <div style="text-align:center;">
-      <span style="font-size:13px;color:var(--color-text-secondary);">Engine</span>
-      <div class="car-name" id="hud-eng">—</div>
+    <div id="auth-login">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="login-email" placeholder="driver@redline.gg"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn-auth" onclick="doLogin()">Start Engine</button>
     </div>
-    <div style="text-align:right;">
-      <span style="font-size:13px;color:var(--color-text-secondary);">Cash</span>
-      <div class="currency">$<span id="cash-display">12,500</span></div>
+    <div id="auth-signup" style="display:none">
+      <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text" id="signup-user" placeholder="YourRacerTag" maxlength="20"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="signup-email" placeholder="driver@redline.gg"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="signup-pass" placeholder="Min. 6 characters"></div>
+      <button class="btn-auth" onclick="doSignup()">Join the Grid</button>
     </div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="showTab('cars')"><i class="ti ti-steering-wheel" aria-hidden="true"></i> Cars</div>
-    <div class="tab" onclick="showTab('engine')"><i class="ti ti-engine" aria-hidden="true"></i> Engine</div>
-    <div class="tab" onclick="showTab('mods')"><i class="ti ti-settings" aria-hidden="true"></i> Mods</div>
-    <div class="tab" onclick="showTab('shop')"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Shop</div>
-    <div class="tab" onclick="showTab('race')"><i class="ti ti-flag" aria-hidden="true"></i> Race</div>
-  </div>
-
-  <!-- CARS TAB -->
-  <div class="section active" id="tab-cars">
-    <div class="car-grid" id="car-grid"></div>
-    <div id="car-stats-panel" style="display:none;">
-      <div class="panel">
-        <h3 id="sel-car-name">Selected Car</h3>
-        <div id="sel-car-stats"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ENGINE TAB -->
-  <div class="section" id="tab-engine">
-    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;">Select an engine for your build. Each changes your car's performance profile.</p>
-    <div class="engine-grid" id="eng-grid"></div>
-    <div id="eng-detail" style="display:none;" class="panel">
-      <h3 id="eng-detail-name"></h3>
-      <div id="eng-detail-stats"></div>
-    </div>
-  </div>
-
-  <!-- MODS TAB -->
-  <div class="section" id="tab-mods">
-    <div class="garage">
-      <div class="panel">
-        <h3>Equipped Mods</h3>
-        <div id="equipped-list" class="mod-list"></div>
-      </div>
-      <div class="panel">
-        <h3>Available Mods</h3>
-        <div id="avail-list" class="mod-list"></div>
-      </div>
-    </div>
-    <div class="panel" style="margin-top:1rem;">
-      <h3>Current Build Stats</h3>
-      <div id="build-stats"></div>
-    </div>
-  </div>
-
-  <!-- SHOP TAB -->
-  <div class="section" id="tab-shop">
-    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;">Spend cash to unlock new cars and mods.</p>
-    <div class="shop-grid" id="shop-grid"></div>
-  </div>
-
-  <!-- RACE TAB -->
-  <div class="section" id="tab-race">
-    <div style="text-align:center;margin-bottom:1.5rem;">
-      <p style="font-size:13px;color:var(--color-text-secondary);">Pick a race and put your build to the test.</p>
-    </div>
-    <div class="shop-grid" id="race-events"></div>
-    <div class="race-track" id="race-track" style="display:none;">
-      <div id="my-car" class="race-car" style="left:2%;">🚗</div>
-      <div id="opp-car" class="race-car2" style="left:2%;">🏎️</div>
-      <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:24px;">🏁</div>
-    </div>
-    <div class="result-box" id="race-result"></div>
+    <div class="auth-err" id="auth-err"></div>
   </div>
 </div>
 
-<script>
-let cash = 12500;
-let selectedCar = null;
-let selectedEngine = null;
-let equipped = [];
-let wins = 0;
+<!-- GAME -->
+<div id="game">
 
-const cars = [
-  { id:'trx', name:'RAM 1500 TRX', sub:'2021–2024 Supercharged', badge:'red', badgeTxt:'Truck', hp:702, torque:650, weight:6350, handling:62, top:118, price:0, unlocked:true, emoji:'🛻' },
-  { id:'hellcat', name:'Dodge Charger Hellcat', sub:'SRT Hellcat Widebody', badge:'red', badgeTxt:'Muscle', hp:717, torque:656, weight:4591, handling:74, top:196, price:0, unlocked:true, emoji:'🚗' },
-  { id:'demon', name:'Dodge Challenger Demon', sub:'170 Edition', badge:'purple', badgeTxt:'Drag', hp:1025, torque:945, weight:4280, handling:60, top:203, price:0, unlocked:true, emoji:'😈' },
-  { id:'ghoul', name:'Dodge Durango Ghoul', sub:'SRT 1025 HP', badge:'red', badgeTxt:'SUV', hp:1025, torque:945, weight:5400, handling:65, top:180, price:0, unlocked:true, emoji:'👻' },
-  { id:'raptor', name:'Ford Raptor R', sub:'5.2L Supercharged', badge:'blue', badgeTxt:'Truck', hp:700, torque:640, weight:5950, handling:64, top:115, price:0, unlocked:true, emoji:'🦅' },
-  { id:'gt500', name:'Ford Shelby GT500', sub:'Carbon Fiber Track Pack', badge:'blue', badgeTxt:'Muscle', hp:760, torque:625, weight:4225, handling:82, top:180, price:0, unlocked:true, emoji:'🐍' },
-  { id:'zl1', name:'Chevy Camaro ZL1', sub:'1LE Track Pack', badge:'amber', badgeTxt:'Muscle', hp:650, torque:650, weight:3940, handling:88, top:190, price:0, unlocked:true, emoji:'🐎' },
-  { id:'c8z', name:'Corvette Z06', sub:'LT6 Flat-Plane V8', badge:'amber', badgeTxt:'Supercar', hp:670, torque:460, weight:3366, handling:95, top:196, price:0, unlocked:true, emoji:'🏎️' },
-  { id:'scat', name:'Dodge Charger Scat Pack', sub:'392 Widebody', badge:'red', badgeTxt:'Street', hp:485, torque:475, weight:4156, handling:76, top:175, price:0, unlocked:true, emoji:'🚗' },
-  { id:'silverado', name:'Chevy Silverado ZR2', sub:'Off-Road Performance', badge:'amber', badgeTxt:'Truck', hp:420, torque:460, weight:5400, handling:55, top:105, price:0, unlocked:true, emoji:'🚚' },
-  { id:'ford150', name:'Ford F-150 Tremor', sub:'5.0L V8 Off-Road', badge:'blue', badgeTxt:'Truck', hp:400, torque:410, weight:5200, handling:52, top:108, price:0, unlocked:true, emoji:'🛻' },
-  { id:'lamborghini', name:'Lamborghini Urus', sub:'Pearl Capsule V8TT', badge:'green', badgeTxt:'Super-SUV', hp:657, torque:627, weight:5145, handling:86, top:190, price:15000, unlocked:false, emoji:'🐂' },
-];
-
-const engines = [
-  { id:'hemi68', name:'6.8L Supercharged HEMI', spec:'Hellcat / Demon / TRX', hpBoost:0, torqueBoost:0, badge:'red' },
-  { id:'lt2', name:'6.2L LT2 V8', spec:'Corvette C8 Base', hpBoost:-70, torqueBoost:-50, badge:'amber' },
-  { id:'lt6', name:'5.5L LT6 Flat-Plane V8', spec:'Corvette Z06', hpBoost:-30, torqueBoost:-150, badge:'amber' },
-  { id:'5r', name:'5.2L Predator V8', spec:'GT500 Supercharged', hpBoost:10, torqueBoost:-30, badge:'blue' },
-  { id:'coyote', name:'5.0L Coyote V8', spec:'Ford F-150 / Mustang', hpBoost:-200, torqueBoost:-180, badge:'blue' },
-  { id:'lsa', name:'6.2L LSA Supercharged', spec:'ZL1 Camaro', hpBoost:-50, torqueBoost:0, badge:'amber' },
-  { id:'demon170', name:'6.2L Demon 170 V8', spec:'1025hp Supercharged', hpBoost:50, torqueBoost:100, badge:'purple' },
-  { id:'dmax', name:'3.0L Duramax Diesel', spec:'Silverado / Trucks', hpBoost:-350, torqueBoost:200, badge:'green' },
-];
-
-const allMods = [
-  { id:'nos', name:'Nitrous Kit', effect:'hp', val:80, cost:2200, equipped:false },
-  { id:'supercharger', name:'Aftermarket Supercharger', effect:'hp', val:120, cost:5500, equipped:false },
-  { id:'exhaust', name:'Cat-Back Exhaust', effect:'hp', val:25, cost:800, equipped:false },
-  { id:'tune', name:'ECU Tune', effect:'hp', val:50, cost:1200, equipped:false },
-  { id:'intercooler', name:'Upgraded Intercooler', effect:'hp', val:40, cost:1500, equipped:false },
-  { id:'suspension', name:'Coilover Suspension', effect:'handling', val:12, cost:3000, equipped:false },
-  { id:'tires', name:'Sticky Track Tires', effect:'handling', val:10, cost:1800, equipped:false },
-  { id:'widebody', name:'Widebody Kit', effect:'handling', val:6, cost:2500, equipped:false },
-  { id:'rollcage', name:'Roll Cage', effect:'handling', val:4, cost:1200, equipped:false },
-  { id:'weight', name:'Weight Reduction Package', effect:'torque', val:30, cost:4000, equipped:false },
-];
-
-const shopItems = [
-  { id:'lamborghini', name:'Lamborghini Urus', desc:'Unlock the 657hp Super-SUV', price:15000, type:'car' },
-  { id:'nitroplus', name:'Stage 2 Nitrous', desc:'Unlock a bigger nitrous kit (+150hp)', price:4000, type:'mod_unlock' },
-];
-
-const raceEvents = [
-  { id:'strip', name:'Drag Strip 1/4 Mile', desc:'Pure power wins here. Torque is king.', reward:3000, oppPower:580, emoji:'🏁' },
-  { id:'canyon', name:'Canyon Run', desc:'Handling and cornering matter most.', reward:2500, oppHandling:80, emoji:'🏔️' },
-  { id:'highway', name:'Highway Pull', desc:'Top speed and HP decide the winner.', reward:2000, oppHp:640, emoji:'🛣️' },
-  { id:'offroad', name:'Off-Road Challenge', desc:'Trucks and SUVs get a big bonus.', reward:3500, oppHp:550, emoji:'🌲' },
-  { id:'drift', name:'Drift Competition', desc:'Style + handling = victory.', reward:4000, oppHandling:75, emoji:'💨' },
-  { id:'super', name:'Supercar Invitational', desc:'Supercars only. High stakes.', reward:8000, oppHp:750, emoji:'🏆' },
-];
-
-function showTab(t) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(s => s.classList.remove('active'));
-  document.getElementById('tab-' + t).classList.add('active');
-  event.target.classList.add('active');
-  if(t === 'mods') renderMods();
-  if(t === 'race') renderRace();
-  if(t === 'shop') renderShop();
-}
-
-function getStats() {
-  if(!selectedCar) return null;
-  let c = cars.find(x => x.id === selectedCar);
-  let e = selectedEngine ? engines.find(x => x.id === selectedEngine) : null;
-  let modHp = equipped.reduce((a, id) => { let m = allMods.find(x=>x.id===id); return m && m.effect==='hp' ? a+m.val : a; }, 0);
-  let modTorque = equipped.reduce((a, id) => { let m = allMods.find(x=>x.id===id); return m && m.effect==='torque' ? a+m.val : a; }, 0);
-  let modHandling = equipped.reduce((a, id) => { let m = allMods.find(x=>x.id===id); return m && m.effect==='handling' ? a+m.val : a; }, 0);
-  return {
-    hp: c.hp + (e ? e.hpBoost : 0) + modHp,
-    torque: c.torque + (e ? e.torqueBoost : 0) + modTorque,
-    handling: Math.min(100, c.handling + modHandling),
-    top: c.top,
-    weight: c.weight
-  };
-}
-
-function renderCars() {
-  const grid = document.getElementById('car-grid');
-  grid.innerHTML = cars.map(c => `
-    <div class="car-card ${selectedCar===c.id?'selected':''} ${!c.unlocked?'':''})" onclick="selectCar('${c.id}')" style="${!c.unlocked?'opacity:0.5;':''}">
-      ${selectedCar===c.id ? '<div class="selected-label">Selected</div>' : ''}
-      <div style="font-size:36px;margin-bottom:8px;">${c.emoji}</div>
-      <div class="car-name">${c.name}</div>
-      <div class="car-sub">${c.sub}</div>
-      <span class="badge badge-${c.badge}">${c.badgeTxt}</span>
-      ${!c.unlocked ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px;">🔒 $'+c.price.toLocaleString()+'</div>' : ''}
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">Red<span>line</span></div>
+    <div class="hud">
+      <div class="hud-pill"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
+      <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
+      <div class="hud-pill"><div class="lbl">Wins</div><div class="val val-wins"><span id="hud-wins">0</span></div></div>
+      <div class="hud-pill" style="display:none" id="hud-car-pill"><div class="lbl">Car</div><div class="val" style="font-size:20px;" id="hud-car-emoji">🚗</div></div>
+      <div class="hud-avatar" id="avatar-btn" onclick="toggleHudMenu()">
+        <span id="avatar-initial">R</span>
+        <div class="hud-menu" id="hud-menu">
+          <div class="hud-menu-item" onclick="showTab('profile')">👤 Profile</div>
+          <div class="hud-menu-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
+          <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
+        </div>
+      </div>
     </div>
-  `).join('');
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-tab active" onclick="showTab('garage',this)">🏠 Garage</button>
+    <button class="nav-tab" onclick="showTab('market',this)">🏪 Market</button>
+    <button class="nav-tab" onclick="showTab('auction',this)">🔨 Auction</button>
+    <button class="nav-tab" onclick="showTab('race',this)">🏁 Race</button>
+    <button class="nav-tab" onclick="showTab('leaderboard',this)">🏆 Leaderboard</button>
+    <button class="nav-tab" onclick="showTab('profile',this)">👤 Profile</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- GARAGE TAB -->
+    <div class="section active" id="tab-garage">
+      <div class="sec-head">
+        <div><div class="sec-title">Garage</div><div class="sec-sub">YOUR COLLECTION · <span id="garage-count">0</span> CARS OWNED</div></div>
+        <button class="btn btn-amber btn-lg" onclick="showTab('market')">+ Buy Car</button>
+      </div>
+      <div class="garage-layout">
+        <div>
+          <div id="player-cars-grid" class="grid-cards">
+            <div class="loading-screen"><div class="spinner"></div> Loading garage...</div>
+          </div>
+        </div>
+        <!-- Sidebar: selected car detail + upgrades -->
+        <div id="garage-sidebar" style="display:none;">
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-header">
+              <h3 id="sidebar-car-name">Car</h3>
+              <span id="sidebar-rarity-badge" class="badge"></span>
+            </div>
+            <div style="text-align:center;font-size:64px;margin:16px 0;" id="sidebar-emoji">🚗</div>
+            <div id="sidebar-stats"></div>
+            <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+              <button class="btn btn-red btn-lg" style="flex:1;" id="btn-set-active" onclick="setActiveCar()">Set Active</button>
+              <button class="btn btn-ghost" id="btn-fav-car" onclick="toggleFavCar()">♡ Fav</button>
+              <button class="btn btn-ghost btn-sm" onclick="openSellModal()">💲 Sell</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Upgrades</h3>
+            <div id="upgrade-tabs" style="display:flex;gap:6px;margin-bottom:14px;">
+              <button class="filter-btn active" onclick="showUpgrades('engine',this)">Engine</button>
+              <button class="filter-btn" onclick="showUpgrades('performance',this)">Perf</button>
+              <button class="filter-btn" onclick="showUpgrades('visual',this)">Visual</button>
+            </div>
+            <div id="upgrade-list" class="upgrade-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKET TAB -->
+    <div class="section" id="tab-market">
+      <div class="sec-head">
+        <div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>LIVE PRICES · DEMAND-DRIVEN</div></div>
+      </div>
+      <div class="filter-bar" id="market-filters">
+        <input class="filter-search" id="market-search" placeholder="Search..." oninput="filterMarket()">
+        <button class="filter-btn active" data-filter="all" onclick="setMarketFilter(this)">All</button>
+        <button class="filter-btn" data-filter="Hypercar" onclick="setMarketFilter(this)">Hypercar</button>
+        <button class="filter-btn" data-filter="Sports" onclick="setMarketFilter(this)">Sports</button>
+        <button class="filter-btn" data-filter="Muscle" onclick="setMarketFilter(this)">Muscle</button>
+        <button class="filter-btn" data-filter="EV" onclick="setMarketFilter(this)">EV</button>
+        <button class="filter-btn" data-filter="SUV/Truck" onclick="setMarketFilter(this)">SUV/Truck</button>
+      </div>
+      <div class="grid-cards" id="market-grid">
+        <div class="loading-screen"><div class="spinner"></div> Loading market...</div>
+      </div>
+    </div>
+
+    <!-- AUCTION TAB -->
+    <div class="section" id="tab-auction">
+      <div class="sec-head">
+        <div><div class="sec-title">Auction House</div><div class="sec-sub"><span class="rt-dot"></span>LIVE BIDDING · 5% SELLER FEE</div></div>
+        <button class="btn btn-amber btn-lg" onclick="openCreateAuction()">+ List Car</button>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-afilter="all" onclick="setAuctionFilter(this)">All</button>
+        <button class="filter-btn" data-afilter="hypercar" onclick="setAuctionFilter(this)">Hypercar Weekend</button>
+        <button class="filter-btn" data-afilter="jdm_night" onclick="setAuctionFilter(this)">JDM Night</button>
+        <button class="filter-btn" data-afilter="muscle_madness" onclick="setAuctionFilter(this)">Muscle Madness</button>
+        <button class="filter-btn" data-afilter="rare_weekend" onclick="setAuctionFilter(this)">Rare Weekend</button>
+      </div>
+      <div class="grid-cards" id="auction-grid">
+        <div class="loading-screen"><div class="spinner"></div> Loading auctions...</div>
+      </div>
+    </div>
+
+    <!-- RACE TAB -->
+    <div class="section" id="tab-race">
+      <div class="sec-head">
+        <div><div class="sec-title">Race Events</div><div class="sec-sub">CHOOSE YOUR BATTLE · WIN CASH &amp; XP</div></div>
+      </div>
+      <div id="race-events-grid" class="race-events"></div>
+      <div class="race-arena" id="race-arena">
+        <div class="arena-header">
+          <div class="arena-title" id="arena-title">Race</div>
+          <div id="arena-timer" style="font-family:var(--mono);font-size:13px;color:var(--text3);"></div>
+        </div>
+        <div class="phase-display" id="phase-display"></div>
+        <div class="speed-bars">
+          <div class="speed-row">
+            <div class="speed-label"><span class="speed-lbl-name" id="player-label">YOU</span><span class="speed-lbl-score" id="player-score-lbl">—</span></div>
+            <div class="speed-track"><div class="speed-fill fill-player" id="player-speed-fill"></div></div>
+          </div>
+          <div class="speed-row">
+            <div class="speed-label"><span class="speed-lbl-name">OPPONENT</span><span class="speed-lbl-score" id="opp-score-lbl">—</span></div>
+            <div class="speed-track"><div class="speed-fill fill-opp" id="opp-speed-fill"></div></div>
+          </div>
+        </div>
+        <div class="track-lanes">
+          <div class="track-lane">
+            <div class="lane-name" id="player-lane-name">PLAYER</div>
+            <div class="road-mark" style="animation-delay:-.15s;"></div>
+            <div class="road-mark" style="animation-delay:-.55s;left:55%;"></div>
+            <div class="track-finish"></div>
+            <div class="track-car" id="race-player-car" style="left:3%;">🚗</div>
+          </div>
+          <div class="track-lane">
+            <div class="lane-name">OPPONENT</div>
+            <div class="road-mark" style="animation-delay:-.3s;animation-duration:.7s;"></div>
+            <div class="road-mark" style="animation-delay:-.6s;animation-duration:.7s;left:55%;"></div>
+            <div class="track-finish"></div>
+            <div class="track-car track-opp" id="race-opp-car" style="left:3%;">🏎️</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-box" id="race-result"></div>
+    </div>
+
+    <!-- LEADERBOARD TAB -->
+    <div class="section" id="tab-leaderboard">
+      <div class="sec-head">
+        <div><div class="sec-title">Leaderboard</div><div class="sec-sub"><span class="rt-dot"></span>TOP DRIVERS WORLDWIDE</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>🏆 Top Racers by Wins</h3>
+          <table class="lb-table" id="lb-wins"></table>
+        </div>
+        <div class="panel">
+          <h3>💰 Richest Drivers</h3>
+          <table class="lb-table" id="lb-cash"></table>
+        </div>
+        <div class="panel">
+          <h3>🔥 Win Streaks</h3>
+          <table class="lb-table" id="lb-streak"></table>
+        </div>
+        <div class="panel">
+          <h3>🏎️ Biggest Garages</h3>
+          <table class="lb-table" id="lb-garage"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div class="section" id="tab-profile">
+      <div class="profile-hero">
+        <div class="profile-avatar-big" id="profile-avatar-big">R</div>
+        <div>
+          <div class="profile-name" id="profile-username">Driver</div>
+          <div class="profile-level">LEVEL <span id="profile-level-txt">1</span> · <span id="profile-rep">0</span> REPUTATION</div>
+          <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px;"><span id="xp-curr">0</span> / <span id="xp-next">1000</span> XP</div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><div class="num val-wins" id="ps-wins">0</div><div class="lbl2">Wins</div></div>
+          <div class="profile-stat"><div class="num" style="color:var(--red2)" id="ps-losses">0</div><div class="lbl2">Losses</div></div>
+          <div class="profile-stat"><div class="num val-cash" id="ps-cash">$0</div><div class="lbl2">Cash</div></div>
+          <div class="profile-stat"><div class="num" style="color:var(--amber)" id="ps-streak">0</div><div class="lbl2">Streak</div></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>Race History</h3>
+          <div id="race-history">
+            <div class="loading-screen"><div class="spinner"></div> Loading...</div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Recent Bids</h3>
+          <div id="bid-history">
+            <div class="loading-screen"><div class="spinner"></div> Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-bid">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-bid')">✕</button>
+    <div class="modal-title">Place Bid</div>
+    <div id="bid-car-info" style="margin-bottom:20px;"></div>
+    <div class="form-group">
+      <label class="form-label">Your Bid Amount</label>
+      <input class="form-input" type="number" id="bid-amount" placeholder="0">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:6px;">Current: $<span id="bid-current">0</span> · Your cash: $<span id="bid-cash">0</span></div>
+    </div>
+    <div id="bid-history-list" style="margin:16px 0;max-height:180px;overflow-y:auto;"></div>
+    <button class="btn btn-red btn-lg" style="width:100%" onclick="submitBid()">Place Bid</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-sell">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-sell')">✕</button>
+    <div class="modal-title">Sell Car</div>
+    <div id="sell-car-info" style="margin-bottom:16px;"></div>
+    <div class="form-group">
+      <label class="form-label">Starting Price</label>
+      <input class="form-input" type="number" id="sell-start-price" placeholder="10000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Buyout Price (optional)</label>
+      <input class="form-input" type="number" id="sell-buyout-price" placeholder="Leave blank for no buyout">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Auction Duration</label>
+      <select class="form-input" id="sell-duration">
+        <option value="1">1 hour</option>
+        <option value="3">3 hours</option>
+        <option value="6" selected>6 hours</option>
+        <option value="12">12 hours</option>
+        <option value="24">24 hours</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Event Type</label>
+      <select class="form-input" id="sell-event-type">
+        <option value="standard">Standard Auction</option>
+        <option value="rare_weekend">Rare Car Weekend</option>
+        <option value="hypercar">Hypercar Auction</option>
+        <option value="jdm_night">JDM Night</option>
+        <option value="muscle_madness">Muscle Madness</option>
+      </select>
+    </div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:16px;">⚠ 5% auction fee deducted from final sale price</div>
+    <button class="btn btn-amber btn-lg" style="width:100%" onclick="submitAuction()">List for Auction</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-car-detail">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-car-detail')">✕</button>
+    <div id="car-detail-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// SUPABASE INIT
+// ═══════════════════════════════════════════════
+const SUPABASE_URL = 'https://jupzjwaclgpldqazarmq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1cHpqd2FjbGdwbGRxYXphcm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExOTkxOTIsImV4cCI6MjA5Njc3NTE5Mn0.hS9KBOVW_GZ_f2EBfxaiC3HSpcVDsvTHGAS5_Q_56YU';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ═══════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════
+let currentUser = null;
+let profile = null;
+let allCars = [];
+let playerCars = [];
+let marketPrices = {};
+let selectedPlayerCarId = null;
+let activeRaceId = null;
+let isRacing = false;
+let currentAuctionFilter = 'all';
+let currentMarketFilter = 'all';
+let currentBidAuction = null;
+let currentSellPlayerCar = null;
+let upgradeCatalog = [];
+let currentUpgradeCategory = 'engine';
+let realtimeChannel = null;
+
+// ═══════════════════════════════════════════════
+// RACE CONFIG
+// ═══════════════════════════════════════════════
+const RACE_EVENTS = [
+  { id:'drag', type:'drag', name:'Drag Strip', desc:'Pure horsepower from 0–¼ mile. Torque at launch decides it.', emoji:'🏁', diff:'easy', reward:10000, xp:150, opp:520, formula:(s)=>s.power*0.5+s.acceleration*8 },
+  { id:'street', type:'street', name:'Street Sprint', desc:'Short burst off the line. Acceleration is king.', emoji:'🏙️', diff:'easy', reward:10000, xp:150, opp:540, formula:(s)=>s.acceleration*10+s.power*0.3 },
+  { id:'circuit', type:'circuit', name:'Road Circuit', desc:'Mixed straights and corners. Handling and power balanced.', emoji:'🔄', diff:'medium', reward:25000, xp:300, opp:1100, formula:(s)=>s.handling*8+s.power*0.4+s.top_speed*2 },
+  { id:'highway', type:'street', name:'Highway Pull', desc:'Top speed and sustained power. No corners, just speed.', emoji:'🛣️', diff:'medium', reward:25000, xp:300, opp:1050, formula:(s)=>s.power*0.7+s.top_speed*4 },
+  { id:'ev', type:'ev', name:'EV Battle', desc:'Electric torque vs combustion. Instant power wins the launch.', emoji:'⚡', diff:'medium', reward:25000, xp:300, opp:900, formula:(s,id)=>{const bonus=id==='tesla_p100'||id==='rimac_nevera'||id==='lucid_sapphire'||id==='tesla_roadster'?500:0; return s.power*0.3+s.acceleration*8+bonus;} },
+  { id:'offroad', type:'offroad', name:'Off-Road Rally', desc:'Dirt, rocks, jumps. Trucks and SUVs get a massive edge.', emoji:'🌲', diff:'hard', reward:75000, xp:600, opp:1400, formula:(s,id,cls)=>{const bonus=cls==='SUV/Truck'?600:0; return s.power*0.4+s.handling*5+bonus;} },
+  { id:'drift', type:'circuit', name:'Drift Battle', desc:'Angle, smoke, and style. Handling dominates completely.', emoji:'💨', diff:'hard', reward:75000, xp:600, opp:1500, formula:(s)=>s.handling*15+s.power*0.15 },
+  { id:'midnight', type:'street', name:'Midnight Run', desc:'Full-course endurance. Every stat matters equally.', emoji:'🌙', diff:'elite', reward:200000, xp:1500, opp:2500, formula:(s)=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5 },
+];
+
+const DIFF_CLASS = {easy:'diff-easy',medium:'diff-medium',hard:'diff-hard',elite:'diff-elite'};
+const RARITY_COLORS = {Common:'var(--text3)',Rare:'var(--blue)',Epic:'var(--purple)',Legendary:'var(--amber)',Mythic:'#f0a0ff',Limited:'var(--cyan)'};
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+function switchAuthTab(t) {
+  document.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('auth-login').style.display = t==='login'?'':'none';
+  document.getElementById('auth-signup').style.display = t==='signup'?'':'none';
+  document.getElementById('auth-err').style.display='none';
 }
 
-function selectCar(id) {
-  let c = cars.find(x=>x.id===id);
-  if(!c.unlocked) { alert('Unlock this car in the Shop!'); return; }
-  selectedCar = id;
-  document.getElementById('hud-car').textContent = c.name;
-  document.getElementById('my-car').textContent = c.emoji;
-  renderCars();
-  let panel = document.getElementById('car-stats-panel');
-  panel.style.display = 'block';
-  document.getElementById('sel-car-name').textContent = c.name;
-  document.getElementById('sel-car-stats').innerHTML = statsHTML(c.hp, c.torque, c.handling, c.top);
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  showAuthErr('');
+  const {error} = await sb.auth.signInWithPassword({email,password:pass});
+  if(error) showAuthErr(error.message);
 }
 
-function statsHTML(hp, torque, handling, top) {
+async function doSignup() {
+  const username = document.getElementById('signup-user').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  if(!username||!email||!pass) { showAuthErr('All fields required'); return; }
+  if(pass.length<6) { showAuthErr('Password must be 6+ characters'); return; }
+  showAuthErr('');
+  const {error} = await sb.auth.signUp({email,password:pass,options:{data:{username}}});
+  if(error) showAuthErr(error.message);
+  else showAuthErr('Check your email to confirm, then sign in!',false);
+}
+
+function showAuthErr(msg,isErr=true) {
+  const el = document.getElementById('auth-err');
+  el.textContent = msg;
+  el.style.display = msg?'block':'none';
+  el.style.color = isErr?'var(--red2)':'var(--green2)';
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.reload();
+}
+
+// ═══════════════════════════════════════════════
+// INIT ON AUTH
+// ═══════════════════════════════════════════════
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user) {
+    currentUser = session.user;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+    await initGame();
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('game').style.display = 'none';
+  }
+});
+
+async function initGame() {
+  await Promise.all([loadProfile(), loadAllCars(), loadMarketPrices(), loadUpgradeCatalog()]);
+  await loadPlayerCars();
+  renderHUD();
+  renderRaceEvents();
+  setupRealtime();
+  if (document.querySelector('.nav-tab.active')?.textContent.includes('Garage')) {
+    renderPlayerCars();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// DATA LOADERS
+// ═══════════════════════════════════════════════
+async function loadProfile() {
+  const {data,error} = await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+  if (error || !data) {
+    // Create profile
+    const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
+    await sb.from('profiles').upsert({id:currentUser.id,username,cash:50000}).select().single();
+    profile = {id:currentUser.id,username,cash:50000,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0};
+  } else {
+    profile = data;
+  }
+  // Give starter car if no cars owned
+  const {count} = await sb.from('player_cars').select('*',{count:'exact',head:true}).eq('player_id',currentUser.id);
+  if (count === 0) await giveStarterCar();
+}
+
+async function loadAllCars() {
+  const {data} = await sb.from('cars').select('*').order('base_price');
+  allCars = data || [];
+}
+
+async function loadMarketPrices() {
+  const {data} = await sb.from('market_prices').select('*');
+  if (data) data.forEach(mp => { marketPrices[mp.car_id] = mp; });
+}
+
+async function loadPlayerCars() {
+  const {data} = await sb.from('player_cars').select('*, car:cars(*)').eq('player_id',currentUser.id);
+  playerCars = data || [];
+}
+
+async function loadUpgradeCatalog() {
+  const {data} = await sb.from('upgrade_catalog').select('*').order('level');
+  upgradeCatalog = data || [];
+}
+
+async function giveStarterCar() {
+  // Give Toyota Supra MK5 as starter
+  const supra = allCars.find(c=>c.name==='Toyota Supra MK5');
+  if (!supra) return;
+  await sb.from('player_cars').insert({player_id:currentUser.id,car_id:supra.id,purchase_price:0,is_active:true});
+  toast('🎉 Welcome! You received a Toyota Supra MK5 as your starter car!','t-success');
+}
+
+// ═══════════════════════════════════════════════
+// HUD
+// ═══════════════════════════════════════════════
+function renderHUD() {
+  if (!profile) return;
+  document.getElementById('hud-cash').textContent = fmtCash(profile.cash);
+  document.getElementById('hud-level').textContent = profile.level||1;
+  document.getElementById('hud-wins').textContent = profile.wins||0;
+  const init = (profile.username||'R')[0].toUpperCase();
+  document.getElementById('avatar-initial').textContent = init;
+  document.getElementById('profile-avatar-big').textContent = init;
+
+  const activeCar = playerCars.find(pc=>pc.is_active);
+  if (activeCar?.car) {
+    document.getElementById('hud-car-pill').style.display='';
+    document.getElementById('hud-car-emoji').textContent = activeCar.car.emoji||'🚗';
+    document.getElementById('race-player-car').textContent = activeCar.car.emoji||'🚗';
+  }
+  renderProfile();
+}
+
+function renderProfile() {
+  if (!profile) return;
+  document.getElementById('profile-username').textContent = profile.username;
+  document.getElementById('profile-level-txt').textContent = profile.level||1;
+  document.getElementById('profile-rep').textContent = (profile.reputation||0).toLocaleString();
+  document.getElementById('ps-wins').textContent = profile.wins||0;
+  document.getElementById('ps-losses').textContent = profile.losses||0;
+  document.getElementById('ps-cash').textContent = '$'+fmtCash(profile.cash);
+  document.getElementById('ps-streak').textContent = profile.win_streak||0;
+  const xpForNext = ((profile.level||1)) * 1000;
+  const xpCurr = profile.xp||0;
+  document.getElementById('xp-curr').textContent = xpCurr;
+  document.getElementById('xp-next').textContent = xpForNext;
+  document.getElementById('xp-bar').style.width = Math.min(100,(xpCurr/xpForNext)*100)+'%';
+  document.getElementById('avatar-initial').textContent = (profile.username||'R')[0].toUpperCase();
+  document.getElementById('profile-avatar-big').textContent = (profile.username||'R')[0].toUpperCase();
+  loadRaceHistory();
+  loadBidHistory();
+}
+
+// ═══════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════
+function showTab(t, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  if(el) el.classList.add('active');
+  closeHudMenu();
+  if(t==='garage') renderPlayerCars();
+  if(t==='market') renderMarket();
+  if(t==='auction') loadAuctions();
+  if(t==='leaderboard') loadLeaderboard();
+  if(t==='profile') renderProfile();
+}
+
+function toggleHudMenu() {
+  document.getElementById('hud-menu').classList.toggle('open');
+}
+function closeHudMenu() {
+  document.getElementById('hud-menu').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('avatar-btn').contains(e.target)) closeHudMenu();
+});
+
+// ═══════════════════════════════════════════════
+// GARAGE
+// ═══════════════════════════════════════════════
+function renderPlayerCars() {
+  const grid = document.getElementById('player-cars-grid');
+  document.getElementById('garage-count').textContent = playerCars.length;
+  if (!playerCars.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🏠</div>Your garage is empty.<br>Visit the Market to buy your first car!</div>`;
+    return;
+  }
+  grid.innerHTML = playerCars.map(pc => {
+    const c = pc.car;
+    const isActive = pc.is_active;
+    const isFav = pc.is_favorite;
+    const isSelected = pc.id === selectedPlayerCarId;
+    return `<div class="car-card ${isSelected?'selected':''}" onclick="selectPlayerCar('${pc.id}')">
+      ${isActive?'<div class="sel-tag">ACTIVE</div>':''}
+      ${isFav?'<div style="position:absolute;top:10px;left:10px;font-size:14px;">❤️</div>':''}
+      <div class="car-emoji">${c.emoji||'🚗'}</div>
+      <div class="car-name">${c.name}</div>
+      <div class="car-brand">${c.brand}</div>
+      <span class="badge ${rarityBadgeClass(c.rarity)}">${c.rarity}</span>
+      <div class="rarity-strip rarity-${c.rarity.toLowerCase()}"></div>
+    </div>`;
+  }).join('');
+  if (selectedPlayerCarId) showGarageSidebar(selectedPlayerCarId);
+}
+
+function selectPlayerCar(id) {
+  selectedPlayerCarId = id;
+  renderPlayerCars();
+  showGarageSidebar(id);
+}
+
+function showGarageSidebar(id) {
+  const pc = playerCars.find(x=>x.id===id);
+  if (!pc) return;
+  const c = pc.car;
+  document.getElementById('garage-sidebar').style.display='';
+  document.getElementById('sidebar-car-name').textContent = c.name;
+  document.getElementById('sidebar-rarity-badge').textContent = c.rarity;
+  document.getElementById('sidebar-rarity-badge').className = 'badge '+rarityBadgeClass(c.rarity);
+  document.getElementById('sidebar-emoji').textContent = c.emoji||'🚗';
+  document.getElementById('sidebar-stats').innerHTML = carStatsHTML(c, pc);
+  document.getElementById('btn-fav-car').textContent = pc.is_favorite ? '❤️ Unfav' : '♡ Fav';
+  showUpgrades(currentUpgradeCategory, null);
+}
+
+function carStatsHTML(c, pc) {
+  const pb = pc?.power_boost||0, hb = pc?.handling_boost||0, sb2 = pc?.speed_boost||0;
+  const power = (c.power||300)+pb, handling=(c.handling||50)+hb, speed=(c.top_speed||150)+sb2;
   return `
-    <div class="stat-row"><span>Horsepower</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,hp/11)}%;background:#A32D2D;"></div></div><span>${hp} hp</span></div>
-    <div class="stat-row"><span>Torque</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,torque/10)}%;background:#854F0B;"></div></div><span>${torque} lb-ft</span></div>
-    <div class="stat-row"><span>Handling</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${handling}%;background:#185FA5;"></div></div><span>${handling}/100</span></div>
-    <div class="stat-row"><span>Top Speed</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,top/2)}%;background:#3B6D11;"></div></div><span>${top} mph</span></div>
+    <div class="stat-row"><div class="stat-lbl">POWER</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,power/20)}%;background:#e8293a;"></div></div><div class="stat-val">${power} hp</div></div>
+    <div class="stat-row"><div class="stat-lbl">TOP SPEED</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,speed/2.5)}%;background:#f59e0b;"></div></div><div class="stat-val">${speed} mph</div></div>
+    <div class="stat-row"><div class="stat-lbl">ACCEL</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${c.acceleration||50}%;background:#3b82f6;"></div></div><div class="stat-val">${c.acceleration||50}/100</div></div>
+    <div class="stat-row"><div class="stat-lbl">HANDLING</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${handling}%;background:#22c55e;"></div></div><div class="stat-val">${handling}/100</div></div>
+    <div class="stat-row"><div class="stat-lbl">BRAKING</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${c.braking||50}%;background:#a855f7;"></div></div><div class="stat-val">${c.braking||50}/100</div></div>
+    <div class="stat-row"><div class="stat-lbl">WEIGHT</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,100-c.weight/80)}%;background:#06b6d4;"></div></div><div class="stat-val">${(c.weight||3000).toLocaleString()} lb</div></div>
   `;
 }
 
-function renderEngines() {
-  document.getElementById('eng-grid').innerHTML = engines.map(e => `
-    <div class="eng-card ${selectedEngine===e.id?'selected':''}" onclick="selectEngine('${e.id}')">
-      <div class="eng-name">${e.name}</div>
-      <div class="eng-spec">${e.spec}</div>
-      <div style="margin-top:8px;font-size:11px;color:${e.hpBoost>=0?'#3B6D11':'#A32D2D'};">HP: ${e.hpBoost>=0?'+':''}${e.hpBoost}</div>
-      <div style="font-size:11px;color:${e.torqueBoost>=0?'#3B6D11':'#A32D2D'};">Torque: ${e.torqueBoost>=0?'+':''}${e.torqueBoost}</div>
-    </div>
-  `).join('');
+async function setActiveCar() {
+  if (!selectedPlayerCarId) return;
+  await sb.from('player_cars').update({is_active:false}).eq('player_id',currentUser.id);
+  await sb.from('player_cars').update({is_active:true}).eq('id',selectedPlayerCarId);
+  await loadPlayerCars();
+  renderPlayerCars();
+  renderHUD();
+  toast('Active car updated!','t-success');
 }
 
-function selectEngine(id) {
-  selectedEngine = id;
-  let e = engines.find(x=>x.id===id);
-  document.getElementById('hud-eng').textContent = e.name;
-  renderEngines();
-  let d = document.getElementById('eng-detail');
-  d.style.display = 'block';
-  document.getElementById('eng-detail-name').textContent = e.name + ' — ' + e.spec;
-  let s = getStats();
-  document.getElementById('eng-detail-stats').innerHTML = s ? statsHTML(s.hp, s.torque, s.handling, s.top) : '<p style="font-size:13px;color:var(--color-text-secondary);">Select a car first to see final stats.</p>';
+async function toggleFavCar() {
+  const pc = playerCars.find(x=>x.id===selectedPlayerCarId);
+  if (!pc) return;
+  const newFav = !pc.is_favorite;
+  await sb.from('player_cars').update({is_favorite:newFav}).eq('id',selectedPlayerCarId);
+  await loadPlayerCars();
+  renderPlayerCars();
+  toast(newFav?'Added to favourites ❤️':'Removed from favourites','t-info');
 }
 
-function renderMods() {
-  const eq = document.getElementById('equipped-list');
-  const av = document.getElementById('avail-list');
-  const bs = document.getElementById('build-stats');
-  eq.innerHTML = equipped.length === 0 ? '<p style="font-size:13px;color:var(--color-text-secondary);">No mods equipped.</p>' :
-    equipped.map(id => {
-      let m = allMods.find(x=>x.id===id);
-      return `<div class="mod-item equipped"><span>${m.name} <span style="font-size:11px;color:#3B6D11;">(+${m.val} ${m.effect})</span></span><button class="mod-btn" onclick="removeMod('${id}')">Remove</button></div>`;
-    }).join('');
-  av.innerHTML = allMods.filter(m=>!equipped.includes(m.id)).map(m =>
-    `<div class="mod-item"><span>${m.name} <span style="font-size:11px;color:var(--color-text-secondary);">+${m.val} ${m.effect} | $${m.cost.toLocaleString()}</span></span><button class="mod-btn" onclick="addMod('${m.id}')">Equip</button></div>`
-  ).join('');
-  let s = getStats();
-  bs.innerHTML = s ? statsHTML(s.hp, s.torque, s.handling, s.top) : '<p style="font-size:13px;color:var(--color-text-secondary);">Select a car first.</p>';
-}
-
-function addMod(id) {
-  let m = allMods.find(x=>x.id===id);
-  if(cash < m.cost) { alert('Not enough cash! Race to earn more.'); return; }
-  if(!selectedCar) { alert('Select a car first!'); return; }
-  cash -= m.cost;
-  equipped.push(id);
-  updateCash();
-  renderMods();
-}
-
-function removeMod(id) {
-  equipped = equipped.filter(x=>x!==id);
-  renderMods();
-}
-
-function renderShop() {
-  document.getElementById('shop-grid').innerHTML = shopItems.map(item => {
-    let c = item.type === 'car' ? cars.find(x=>x.id===item.id) : null;
-    let unlocked = c ? c.unlocked : false;
-    return `<div class="shop-card">
-      <h4>${item.name}</h4>
-      <p>${item.desc}</p>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="price-tag">$${item.price.toLocaleString()}</span>
-        <button class="mod-btn" onclick="buyItem('${item.id}')" ${unlocked?'disabled':''}>
-          ${unlocked?'Owned':'Buy'}
-        </button>
+function showUpgrades(cat, btn) {
+  currentUpgradeCategory = cat;
+  if (btn) {
+    document.querySelectorAll('#upgrade-tabs .filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if (!selectedPlayerCarId) return;
+  const pc = playerCars.find(x=>x.id===selectedPlayerCarId);
+  const items = upgradeCatalog.filter(u=>u.category===cat);
+  const ul = document.getElementById('upgrade-list');
+  if (!items.length) { ul.innerHTML='<div class="empty">No upgrades in this category</div>'; return; }
+  ul.innerHTML = items.map(u => {
+    const key = 'upgrade_'+u.upgrade_key;
+    const currentLevel = pc?.[key]||0;
+    const isOwned = currentLevel >= u.level;
+    const canBuy = !isOwned && currentLevel === u.level-1;
+    const dots = Array.from({length:5},(_,i)=>`<div class="dot ${i<currentLevel?'filled':''}"></div>`).join('');
+    return `<div class="upgrade-item">
+      <div>
+        <div class="upgrade-name">${u.name}</div>
+        <div class="upgrade-meta">${u.description||''}</div>
+        ${u.power_boost?`<div class="upgrade-meta" style="color:var(--red2)">+${u.power_boost} power</div>`:''}
+        ${u.handling_boost?`<div class="upgrade-meta" style="color:var(--green2)">+${u.handling_boost} handling</div>`:''}
+        ${u.speed_boost?`<div class="upgrade-meta" style="color:var(--amber)">+${u.speed_boost} speed</div>`:''}
+        <div class="upgrade-level-dots">${dots}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+        ${isOwned
+          ? '<span class="badge badge-green">✓ Owned</span>'
+          : canBuy
+            ? `<div style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:4px;">$${u.cost.toLocaleString()}</div><button class="btn btn-amber btn-sm" onclick="buyUpgrade('${u.id}','${u.upgrade_key}',${u.level},${u.cost},${u.power_boost||0},${u.handling_boost||0},${u.speed_boost||0})">Buy</button>`
+            : '<span style="font-family:var(--mono);font-size:10px;color:var(--text4);">LOCKED</span>'
+        }
       </div>
     </div>`;
   }).join('');
 }
 
-function buyItem(id) {
-  let item = shopItems.find(x=>x.id===id);
-  if(cash < item.price) { alert('Not enough cash! Win races to earn more.'); return; }
-  cash -= item.price;
-  if(item.type === 'car') { let c = cars.find(x=>x.id===id); if(c) c.unlocked = true; renderCars(); }
-  updateCash();
-  renderShop();
+async function buyUpgrade(upgradeId, key, level, cost, pb, hb, sb2) {
+  if (!selectedPlayerCarId) return;
+  if (profile.cash < cost) { toast('Not enough cash!','t-error'); return; }
+  const col = 'upgrade_'+key;
+  const pc = playerCars.find(x=>x.id===selectedPlayerCarId);
+  const newPb = (pc.power_boost||0)+pb;
+  const newHb = (pc.handling_boost||0)+hb;
+  const newSb = (pc.speed_boost||0)+sb2;
+  await sb.from('player_cars').update({[col]:level,power_boost:newPb,handling_boost:newHb,speed_boost:newSb}).eq('id',selectedPlayerCarId);
+  await sb.from('profiles').update({cash:profile.cash-cost}).eq('id',currentUser.id);
+  profile.cash -= cost;
+  await loadPlayerCars();
+  showGarageSidebar(selectedPlayerCarId);
+  renderHUD();
+  toast(`Upgrade installed! +${pb||hb||sb2} boost 🔧`,'t-success');
 }
 
-function renderRace() {
-  document.getElementById('race-events').innerHTML = raceEvents.map(r =>
-    `<div class="shop-card">
-      <div style="font-size:28px;margin-bottom:8px;">${r.emoji}</div>
-      <h4>${r.name}</h4>
-      <p>${r.desc}</p>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-        <span class="price-tag">Win: $${r.reward.toLocaleString()}</span>
-        <button class="mod-btn" onclick="startRace('${r.id}')">Race ↗</button>
+// ═══════════════════════════════════════════════
+// MARKET
+// ═══════════════════════════════════════════════
+function renderMarket() {
+  const grid = document.getElementById('market-grid');
+  let filtered = allCars.filter(c => {
+    const matchClass = currentMarketFilter==='all' || c.class===currentMarketFilter;
+    const q = document.getElementById('market-search')?.value?.toLowerCase()||'';
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.brand.toLowerCase().includes(q);
+    return matchClass && matchQ;
+  });
+  if (!filtered.length) { grid.innerHTML='<div class="empty">No cars match your filter.</div>'; return; }
+  const ownedIds = new Set(playerCars.map(pc=>pc.car_id));
+  grid.innerHTML = filtered.map(c => {
+    const mp = marketPrices[c.id];
+    const price = mp?.current_price || c.base_price;
+    const basePrice = mp?.base_price || c.base_price;
+    const delta = price - basePrice;
+    const owned = ownedIds.has(c.id);
+    return `<div class="car-card ${owned?'':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <span class="badge ${rarityBadgeClass(c.rarity)}">${c.rarity}</span>
+        <span class="badge badge-blue">${c.class}</span>
       </div>
-    </div>`
-  ).join('');
-  document.getElementById('race-track').style.display = 'none';
-  document.getElementById('race-result').style.display = 'none';
+      <div class="car-emoji">${c.emoji||'🚗'}</div>
+      <div class="car-name">${c.name}</div>
+      <div class="car-brand">${c.brand}</div>
+      <div style="font-size:11px;color:var(--text3);margin:6px 0 12px;">${c.description||''}</div>
+      <div class="car-stats-mini">
+        <span class="mini-stat">⚡<span>${c.power}hp</span></span>
+        <span class="mini-stat">🏎️<span>${c.top_speed}mph</span></span>
+        <span class="mini-stat">🎯<span>${c.handling}/100</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+        <div>
+          <div style="font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber);">$${fmtCash(price)}</div>
+          ${delta!==0?`<div class="market-delta ${delta>0?'delta-up':'delta-down'}" style="font-size:10px;">${delta>0?'▲':'▼'} $${Math.abs(delta).toLocaleString()} from base</div>`:''}
+        </div>
+        ${owned
+          ? '<span class="badge badge-green">✓ Owned</span>'
+          : `<button class="btn btn-red" onclick="buyCar('${c.id}',${price})">Buy</button>`
+        }
+      </div>
+      <div class="rarity-strip rarity-${c.rarity.toLowerCase()}"></div>
+    </div>`;
+  }).join('');
 }
 
-function startRace(id) {
-  if(!selectedCar) { alert('Select a car first!'); return; }
-  let r = raceEvents.find(x=>x.id===id);
-  let s = getStats();
-  let c = cars.find(x=>x.id===selectedCar);
-  
-  let myScore = 0;
-  let oppScore = 0;
-  
-  if(r.id === 'strip') { myScore = s.hp + s.torque * 0.5; oppScore = r.oppPower * 1.5; }
-  else if(r.id === 'canyon' || r.id === 'drift') { myScore = s.handling * 10 + s.hp * 0.2; oppScore = r.oppHandling * 10 + 100; }
-  else if(r.id === 'highway') { myScore = s.hp + s.top * 2; oppScore = r.oppHp + 330; }
-  else if(r.id === 'offroad') {
-    let bonus = ['trx','raptor','silverado','ford150','ghoul'].includes(selectedCar) ? 200 : 0;
-    myScore = s.hp + bonus; oppScore = r.oppHp;
+function setMarketFilter(btn) {
+  currentMarketFilter = btn.dataset.filter;
+  document.querySelectorAll('#market-filters .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMarket();
+}
+
+function filterMarket() { renderMarket(); }
+
+async function buyCar(carId, price) {
+  if (profile.cash < price) { toast('Not enough cash! Win races to earn more.','t-error'); return; }
+  const ownedIds = new Set(playerCars.map(pc=>pc.car_id));
+  if (ownedIds.has(carId)) { toast('You already own this car!','t-error'); return; }
+  const {error} = await sb.from('player_cars').insert({player_id:currentUser.id,car_id:carId,purchase_price:price});
+  if (error) { toast('Purchase failed: '+error.message,'t-error'); return; }
+  await sb.from('profiles').update({cash:profile.cash-price}).eq('id',currentUser.id);
+  profile.cash -= price;
+  // Update demand score
+  const mp = marketPrices[carId];
+  if (mp) {
+    const newPrice = Math.round(mp.current_price * 1.03); // demand drives price up
+    await sb.from('market_prices').update({current_price:newPrice,demand_score:Math.min(100,(mp.demand_score||50)+5),sales_last_24h:(mp.sales_last_24h||0)+1}).eq('car_id',carId);
   }
-  else if(r.id === 'super') {
-    let bonus = ['c8z','lamborghini','demon','demon170'].includes(selectedCar) ? 300 : 0;
-    myScore = s.hp + s.handling * 5 + bonus; oppScore = r.oppHp + 400;
+  await loadPlayerCars();
+  await loadMarketPrices();
+  renderMarket();
+  renderHUD();
+  const c = allCars.find(x=>x.id===carId);
+  toast(`🚗 Purchased: ${c?.name}!`,'t-success');
+}
+
+// ═══════════════════════════════════════════════
+// AUCTION HOUSE
+// ═══════════════════════════════════════════════
+async function loadAuctions() {
+  const grid = document.getElementById('auction-grid');
+  grid.innerHTML = '<div class="loading-screen"><div class="spinner"></div> Loading auctions...</div>';
+  let query = sb.from('auctions').select('*, car:cars(*), seller:profiles(username), bids(count)').eq('status','active').gt('ends_at',new Date().toISOString()).order('ends_at');
+  if (currentAuctionFilter !== 'all') query = query.eq('event_type',currentAuctionFilter);
+  const {data, error} = await query;
+  if (error || !data?.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div>No active auctions right now.<br>List your car to start one!</div>`;
+    // Seed some demo auctions if empty
+    await seedDemoAuctions();
+    return;
   }
-  
-  let won = myScore > oppScore;
-  
-  let track = document.getElementById('race-track');
-  track.style.display = 'block';
-  let myCarEl = document.getElementById('my-car');
-  let oppCarEl = document.getElementById('opp-car');
-  myCarEl.style.left = '2%'; oppCarEl.style.left = '2%';
-  
-  setTimeout(() => {
-    if(won) { myCarEl.style.left = '82%'; oppCarEl.style.left = '60%'; }
-    else { myCarEl.style.left = '55%'; oppCarEl.style.left = '82%'; }
-  }, 100);
-  
-  setTimeout(() => {
-    let res = document.getElementById('race-result');
-    res.style.display = 'block';
-    if(won) {
-      cash += r.reward; wins++;
-      res.className = 'result-box win';
-      res.innerHTML = `🏆 You won! +$${r.reward.toLocaleString()} | Total wins: ${wins} | Cash: $${cash.toLocaleString()}`;
-    } else {
-      res.className = 'result-box lose';
-      res.innerHTML = `❌ You lost! Your score: ${Math.round(myScore)} vs opponent: ${Math.round(oppScore)}. Upgrade your build and try again!`;
+  renderAuctions(data);
+}
+
+async function seedDemoAuctions() {
+  // Create a few NPC-style auctions from the car database
+  const rareCars = allCars.filter(c=>['Legendary','Mythic'].includes(c.rarity)).slice(0,3);
+  if (!rareCars.length) return;
+  const now = new Date();
+  for (const c of rareCars) {
+    const ends = new Date(now.getTime() + 6*60*60*1000);
+    const exists = await sb.from('auctions').select('id').eq('car_id',c.id).eq('status','active').single();
+    if (!exists.data) {
+      await sb.from('auctions').insert({
+        seller_id:currentUser.id, car_id:c.id,
+        title:`${c.name} — ${c.rarity} Auction`,
+        starting_price:Math.round(c.base_price*0.7), current_price:Math.round(c.base_price*0.7),
+        buyout_price:Math.round(c.base_price*1.1), ends_at:ends.toISOString(), event_type:'standard'
+      });
     }
-    updateCash();
-  }, 2200);
+  }
+  setTimeout(loadAuctions, 1000);
 }
 
-function updateCash() {
-  document.getElementById('cash-display').textContent = cash.toLocaleString();
+function renderAuctions(auctions) {
+  const grid = document.getElementById('auction-grid');
+  grid.innerHTML = auctions.map(a => {
+    const c = a.car;
+    const endTime = new Date(a.ends_at);
+    const minsLeft = Math.max(0, Math.round((endTime-Date.now())/60000));
+    const urgent = minsLeft < 30;
+    const bidCount = a.bids?.[0]?.count || 0;
+    const isMyAuction = a.seller_id === currentUser.id;
+    const EVENT_LABELS = {standard:'',rare_weekend:'⭐ RARE WEEKEND',hypercar:'🏆 HYPERCAR',jdm_night:'🎌 JDM NIGHT',muscle_madness:'💪 MUSCLE MADNESS'};
+    return `<div class="auction-card">
+      ${a.event_type!=='standard'?`<div class="diff-badge diff-elite" style="margin-bottom:8px;">${EVENT_LABELS[a.event_type]||a.event_type}</div>`:''}
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span class="badge ${rarityBadgeClass(c?.rarity)}">${c?.rarity||'?'}</span>
+        <span class="auction-timer ${urgent?'urgent':''}">${formatCountdown(endTime)}</span>
+      </div>
+      <div style="font-size:32px;margin:8px 0;">${c?.emoji||'🚗'}</div>
+      <div class="car-name" style="margin-bottom:2px;">${c?.name||'Unknown'}</div>
+      <div class="car-brand" style="margin-bottom:12px;">${c?.brand||''} · by ${a.seller?.username||'?'}</div>
+      <div class="auction-price">$${fmtCash(a.current_price)}</div>
+      <div class="auction-bids">${bidCount} bid${bidCount!==1?'s':''} · Buyout: ${a.buyout_price?'$'+fmtCash(a.buyout_price):'None'}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        ${isMyAuction
+          ? `<button class="btn btn-ghost" style="flex:1;" disabled>Your Listing</button>`
+          : `<button class="btn btn-red" style="flex:1;" onclick="openBidModal('${a.id}')">Bid Now</button>`
+        }
+        <button class="btn btn-ghost btn-sm" onclick="viewCarDetail('${c?.id}')">Info</button>
+      </div>
+    </div>`;
+  }).join('');
+  startAuctionTimers();
 }
 
-renderCars();
-renderEngines();
+function setAuctionFilter(btn) {
+  currentAuctionFilter = btn.dataset.afilter;
+  document.querySelectorAll('[data-afilter]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadAuctions();
+}
+
+function startAuctionTimers() {
+  clearInterval(window._auctionTimer);
+  window._auctionTimer = setInterval(() => {
+    document.querySelectorAll('.auction-timer').forEach(el => {
+      if (el._endTime) {
+        const remaining = formatCountdown(el._endTime);
+        el.textContent = remaining;
+      }
+    });
+  }, 1000);
+}
+
+function formatCountdown(endTime) {
+  const diff = new Date(endTime) - Date.now();
+  if (diff <= 0) return 'ENDED';
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  if (h>0) return `${h}h ${m}m`;
+  if (m>0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+// Bid Modal
+async function openBidModal(auctionId) {
+  const {data:auction} = await sb.from('auctions').select('*, car:cars(*), bids(amount,bidder:profiles(username),created_at)').eq('id',auctionId).single();
+  if (!auction) return;
+  currentBidAuction = auction;
+  const c = auction.car;
+  document.getElementById('bid-car-info').innerHTML = `
+    <div style="display:flex;gap:14px;align-items:center;">
+      <div style="font-size:40px;">${c?.emoji||'🚗'}</div>
+      <div><div class="car-name">${c?.name}</div><div class="car-brand">${c?.brand}</div></div>
+    </div>`;
+  document.getElementById('bid-current').textContent = fmtCash(auction.current_price);
+  document.getElementById('bid-cash').textContent = fmtCash(profile.cash);
+  document.getElementById('bid-amount').value = auction.current_price + 1000;
+  const bids = auction.bids?.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,5)||[];
+  document.getElementById('bid-history-list').innerHTML = bids.length
+    ? bids.map(b=>`<div class="bid-row"><span>${b.bidder?.username||'?'}</span><span class="bid-amount">$${fmtCash(b.amount)}</span></div>`).join('')
+    : '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);">No bids yet. Be first!</div>';
+  openModal('modal-bid');
+}
+
+async function submitBid() {
+  if (!currentBidAuction) return;
+  const amount = parseInt(document.getElementById('bid-amount').value);
+  if (isNaN(amount) || amount <= 0) { toast('Enter a valid bid amount','t-error'); return; }
+  const {data, error} = await sb.rpc('place_bid',{p_auction_id:currentBidAuction.id, p_amount:amount});
+  if (error||data?.error) { toast(error?.message||data?.error,'t-error'); return; }
+  closeModal('modal-bid');
+  profile.cash -= amount;
+  renderHUD();
+  toast(`Bid placed: $${fmtCash(amount)} 🎯`,'t-success');
+  loadAuctions();
+}
+
+function openCreateAuction() {
+  if (!playerCars.length) { toast('You need to own a car to auction!','t-error'); return; }
+  currentSellPlayerCar = selectedPlayerCarId ? playerCars.find(x=>x.id===selectedPlayerCarId) : playerCars[0];
+  if (!currentSellPlayerCar) return;
+  const c = currentSellPlayerCar.car;
+  document.getElementById('sell-car-info').innerHTML = `
+    <div style="display:flex;gap:14px;align-items:center;padding:12px;background:var(--panel2);border-radius:6px;">
+      <div style="font-size:36px;">${c?.emoji||'🚗'}</div>
+      <div><div class="car-name">${c?.name}</div><span class="badge ${rarityBadgeClass(c?.rarity)}">${c?.rarity}</span></div>
+    </div>`;
+  document.getElementById('sell-start-price').value = Math.round((c?.base_price||10000)*0.6);
+  document.getElementById('sell-buyout-price').value = '';
+  openModal('modal-sell');
+}
+
+async function submitAuction() {
+  if (!currentSellPlayerCar) return;
+  const start = parseInt(document.getElementById('sell-start-price').value);
+  const buyout = document.getElementById('sell-buyout-price').value;
+  const hours = parseInt(document.getElementById('sell-duration').value);
+  const eventType = document.getElementById('sell-event-type').value;
+  if (!start || start < 100) { toast('Enter a valid starting price','t-error'); return; }
+  const endsAt = new Date(Date.now() + hours*3600000).toISOString();
+  const {error} = await sb.from('auctions').insert({
+    seller_id:currentUser.id, car_id:currentSellPlayerCar.car_id,
+    player_car_id:currentSellPlayerCar.id,
+    title:`${currentSellPlayerCar.car?.name} Auction`,
+    starting_price:start, current_price:start,
+    buyout_price:buyout?parseInt(buyout):null,
+    ends_at:endsAt, event_type:eventType, status:'active'
+  });
+  if (error) { toast('Failed to create auction: '+error.message,'t-error'); return; }
+  closeModal('modal-sell');
+  toast('Car listed for auction! 🔨','t-success');
+  loadAuctions();
+}
+
+// Car detail modal
+async function viewCarDetail(carId) {
+  const c = allCars.find(x=>x.id===carId);
+  if (!c) return;
+  const mp = marketPrices[c.id];
+  document.getElementById('car-detail-content').innerHTML = `
+    <div style="text-align:center;font-size:64px;margin:8px 0;">${c.emoji||'🚗'}</div>
+    <div class="modal-title">${c.name}</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <span class="badge ${rarityBadgeClass(c.rarity)}">${c.rarity}</span>
+      <span class="badge badge-blue">${c.class}</span>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">${c.description||''}</p>
+    ${carStatsHTML(c, null)}
+    <div style="margin-top:16px;padding:12px;background:var(--panel2);border-radius:6px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:4px;">MARKET PRICE</div>
+      <div style="font-family:var(--disp);font-size:24px;font-weight:700;color:var(--amber);">$${fmtCash(mp?.current_price||c.base_price)}</div>
+    </div>`;
+  openModal('modal-car-detail');
+}
+
+// ═══════════════════════════════════════════════
+// SELL MODAL
+// ═══════════════════════════════════════════════
+function openSellModal() {
+  if (!selectedPlayerCarId) { toast('Select a car first','t-error'); return; }
+  openCreateAuction();
+}
+
+// ═══════════════════════════════════════════════
+// RACING
+// ═══════════════════════════════════════════════
+function renderRaceEvents() {
+  const grid = document.getElementById('race-events-grid');
+  grid.innerHTML = RACE_EVENTS.map(r => `
+    <div class="race-card" onclick="startRace('${r.id}')">
+      <div class="race-emoji">${r.emoji}</div>
+      <span class="diff-badge ${DIFF_CLASS[r.diff]}">${r.diff.toUpperCase()}</span>
+      <div class="race-name">${r.name}</div>
+      <div class="race-desc">${r.desc}</div>
+      <div class="race-footer">
+        <span class="race-reward">+$${r.reward.toLocaleString()} · ${r.xp} XP</span>
+        <span class="btn btn-red btn-sm">RACE ▶</span>
+      </div>
+    </div>`).join('');
+}
+
+async function startRace(raceId) {
+  if (isRacing) return;
+  const r = RACE_EVENTS.find(x=>x.id===raceId);
+  if (!r) return;
+  const activePc = playerCars.find(pc=>pc.is_active) || playerCars[0];
+  if (!activePc) { toast('Select an active car from your Garage!','t-error'); return; }
+  const c = activePc.car;
+  const carStats = {
+    power:(c.power||300)+(activePc.power_boost||0),
+    top_speed:(c.top_speed||150)+(activePc.speed_boost||0),
+    acceleration:c.acceleration||50,
+    handling:(c.handling||50)+(activePc.handling_boost||0),
+    braking:c.braking||50
+  };
+
+  isRacing = true;
+  const myScore = r.formula(carStats, c.id||'', c.class||'');
+  const oppScore = r.opp + (Math.random()*120-60);
+  const won = myScore > oppScore;
+  const close = Math.abs(myScore-oppScore) < 80;
+
+  // Show arena
+  document.getElementById('race-arena').style.display='block';
+  document.getElementById('race-result').style.display='none';
+  document.getElementById('arena-title').textContent = r.name;
+  document.getElementById('player-label').textContent = (profile.username||'YOU').toUpperCase();
+  document.getElementById('player-lane-name').textContent = c.name||'YOUR CAR';
+  document.getElementById('race-player-car').textContent = c.emoji||'🚗';
+
+  // Reset
+  const pFill = document.getElementById('player-speed-fill');
+  const oFill = document.getElementById('opp-speed-fill');
+  const pCar = document.getElementById('race-player-car');
+  const oCar = document.getElementById('race-opp-car');
+  [pFill,oFill].forEach(el=>{el.style.transition='none';el.style.width='0%';});
+  [pCar,oCar].forEach(el=>{el.style.transition='none';el.style.left='3%';});
+
+  // Countdown
+  const phase = document.getElementById('phase-display');
+  phase.style.display='block';
+  const countdowns = ['3','2','1','GO!'];
+  for (let i=0; i<countdowns.length; i++) {
+    await sleep(600);
+    phase.textContent = countdowns[i];
+    phase.className = 'phase-display '+(i===3?'phase-go':'phase-countdown');
+  }
+  await sleep(200);
+  phase.style.display='none';
+
+  // Race
+  const maxScore = Math.max(myScore, oppScore, 100);
+  const pPct = Math.round((myScore/maxScore)*86);
+  const oPct = Math.round((oppScore/maxScore)*86);
+  [pFill,oFill,pCar,oCar].forEach(el=>el.style.transition='');
+  pFill.style.transition='width 2.2s cubic-bezier(.25,.46,.45,.94)';
+  oFill.style.transition='width 2.6s cubic-bezier(.25,.46,.45,.94)';
+  pCar.style.transition='left 2.2s cubic-bezier(.25,.46,.45,.94)';
+  oCar.style.transition='left 2.6s cubic-bezier(.25,.46,.45,.94)';
+  pFill.style.width=pPct+'%';
+  oFill.style.width=oPct+'%';
+  pCar.style.left=pPct+'%';
+  oCar.style.left=oPct+'%';
+  document.getElementById('player-score-lbl').textContent = 'Score: '+Math.round(myScore);
+  document.getElementById('opp-score-lbl').textContent = 'Score: '+Math.round(oppScore);
+
+  await sleep(2800);
+
+  // Save race
+  const {data:raceRecord} = await sb.from('races').insert({
+    race_type:r.type, difficulty:r.diff,
+    player1_id:currentUser.id, player1_car_id:activePc.id,
+    player1_score:Math.round(myScore), player2_score:Math.round(oppScore),
+    winner_id:won?currentUser.id:null, reward:won?r.reward:0, status:'completed'
+  }).select().single();
+
+  // Update profile
+  const cashDelta = won ? r.reward : 0;
+  const newWins = (profile.wins||0) + (won?1:0);
+  const newLosses = (profile.losses||0) + (won?0:1);
+  const newStreak = won ? (profile.win_streak||0)+1 : 0;
+  const newBestStreak = Math.max(profile.best_win_streak||0, newStreak);
+  const newXp = (profile.xp||0) + r.xp;
+  const newCash = (profile.cash||0) + cashDelta;
+  const newLevel = Math.floor(newXp/1000)+1;
+  const leveledUp = newLevel > (profile.level||1);
+  await sb.from('profiles').update({
+    cash:newCash, wins:newWins, losses:newLosses,
+    win_streak:newStreak, best_win_streak:newBestStreak,
+    xp:newXp, level:newLevel, reputation:(profile.reputation||0)+(won?10:2)
+  }).eq('id',currentUser.id);
+  profile = {...profile, cash:newCash, wins:newWins, losses:newLosses, win_streak:newStreak, best_win_streak:newBestStreak, xp:newXp, level:newLevel};
+  renderHUD();
+
+  // Result
+  const res = document.getElementById('race-result');
+  res.style.display='block';
+  res.className='result-box '+(won?'result-win':'result-lose');
+  let resultMsg='';
+  if (won) {
+    resultMsg = `<div class="result-title">🏆 VICTORY!</div><div class="result-detail">+$${r.reward.toLocaleString()} · +${r.xp} XP${close?' · Close race!':''}${newStreak>1?` · 🔥 ${newStreak} win streak`:''}</div>`;
+    if(leveledUp) { resultMsg+=`<div class="result-detail" style="color:var(--amber);margin-top:6px;">⬆️ LEVEL UP → Level ${newLevel}!</div>`; showXpPop('+LEVEL UP! 🎉'); }
+    else showXpPop(`+${r.xp} XP`);
+    toast(`Victory! +$${r.reward.toLocaleString()}`, 't-success');
+  } else {
+    resultMsg = `<div class="result-title">❌ DEFEAT</div><div class="result-detail">Your score: ${Math.round(myScore)} vs ${Math.round(oppScore)} · ${getRaceTip(r)}</div>`;
+    toast('Defeat. Upgrade your build!','t-error');
+  }
+  res.innerHTML = resultMsg + `<button class="btn btn-ghost" style="margin-top:12px;" onclick="resetRace()">Race Again</button>`;
+  isRacing = false;
+}
+
+function getRaceTip(r) {
+  const tips={drag:'Tip: More HP & Torque wins drags.',circuit:'Tip: Handling + HP = circuit dominance.',street:'Tip: Acceleration upgrades help sprints.',highway:'Tip: Max power and top speed.',offroad:'Tip: SUV/Truck class gets a big bonus.',drift:'Tip: Max handling for drifts.',midnight:'Tip: Balance ALL stats for endurance.',ev:'Tip: Tesla Plaid or Rimac Nevera dominate.'};
+  return tips[r.id]||'Tip: Upgrade your car in the Garage.';
+}
+
+function resetRace() {
+  document.getElementById('race-arena').style.display='none';
+  document.getElementById('race-result').style.display='none';
+}
+
+function showXpPop(msg) {
+  const el = document.createElement('div');
+  el.className='xp-pop';
+  el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2000);
+}
+
+// ═══════════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════════
+async function loadLeaderboard() {
+  const [wins, cash, streak, garage] = await Promise.all([
+    sb.from('profiles').select('username,wins').order('wins',{ascending:false}).limit(10),
+    sb.from('profiles').select('username,cash').order('cash',{ascending:false}).limit(10),
+    sb.from('profiles').select('username,best_win_streak').order('best_win_streak',{ascending:false}).limit(10),
+    sb.rpc ? sb.from('player_cars').select('player_id, profiles(username)').limit(200) : {data:[]},
+  ]);
+  renderLbTable('lb-wins', wins.data||[], 'wins', 'wins');
+  renderLbTable('lb-cash', cash.data||[], 'cash', 'cash', v=>'$'+fmtCash(v));
+  renderLbTable('lb-streak', streak.data||[], 'best_win_streak', 'streak', v=>v+' 🔥');
+  // Garage count
+  const garageCounts = {};
+  (garage.data||[]).forEach(pc=>{ const u=pc.profiles?.username; if(u) garageCounts[u]=(garageCounts[u]||0)+1; });
+  const sorted = Object.entries(garageCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  renderLbTable('lb-garage', sorted.map(([username,count])=>({username,count})), 'count', 'cars');
+}
+
+function renderLbTable(id, data, key, label, fmt=v=>v) {
+  const rankClass = i=> i===0?'top1':i===1?'top2':i===2?'top3':'';
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById(id).innerHTML = data.map((row,i)=>`
+    <tr>
+      <td class="lb-rank ${rankClass(i)}">${medals[i]||i+1}</td>
+      <td><strong>${row.username||'—'}</strong>${row.id===currentUser?.id?' <span style="font-size:10px;color:var(--red2);">(you)</span>':''}</td>
+      <td class="lb-val">${fmt(row[key]||0)}</td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// RACE HISTORY & BIDS
+// ═══════════════════════════════════════════════
+async function loadRaceHistory() {
+  const {data} = await sb.from('races').select('*').eq('player1_id',currentUser.id).order('created_at',{ascending:false}).limit(10);
+  const el = document.getElementById('race-history');
+  if (!data?.length) { el.innerHTML='<div class="empty">No races yet. Hit the track!</div>'; return; }
+  el.innerHTML = data.map(r=>{
+    const won = r.winner_id===currentUser.id;
+    return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      <div>
+        <span style="font-weight:600;text-transform:capitalize;">${r.race_type} · ${r.difficulty}</span>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">${new Date(r.created_at).toLocaleDateString()}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="color:${won?'var(--green2)':'var(--red2)'};font-weight:700;">${won?'WIN':'LOSS'}</div>
+        ${won?`<div style="font-family:var(--mono);font-size:11px;color:var(--amber);">+$${fmtCash(r.reward)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadBidHistory() {
+  const {data} = await sb.from('bids').select('*, auction:auctions(current_price, status, car:cars(name,emoji))').eq('bidder_id',currentUser.id).order('created_at',{ascending:false}).limit(10);
+  const el = document.getElementById('bid-history');
+  if (!data?.length) { el.innerHTML='<div class="empty">No bids placed yet. Check the Auction House!</div>'; return; }
+  el.innerHTML = data.map(b=>{
+    const a = b.auction;
+    return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      <div>
+        <span>${a?.car?.emoji||'🚗'} ${a?.car?.name||'?'}</span>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">${new Date(b.created_at).toLocaleDateString()}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:var(--mono);color:var(--amber);">$${fmtCash(b.amount)}</div>
+        <div style="font-size:10px;color:var(--text3);">${a?.status||'?'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// REALTIME
+// ═══════════════════════════════════════════════
+function setupRealtime() {
+  if (realtimeChannel) sb.removeChannel(realtimeChannel);
+  realtimeChannel = sb.channel('redline-realtime')
+    .on('postgres_changes',{event:'*',schema:'public',table:'auctions'},()=>{ if(document.getElementById('tab-auction').classList.contains('active')) loadAuctions(); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'bids'},async (payload)=>{
+      if(payload.new?.bidder_id===currentUser.id) return;
+      if(currentBidAuction?.id===payload.new?.auction_id) {
+        toast(`New bid: $${fmtCash(payload.new.amount)} 🔥`,'t-info');
+        document.getElementById('bid-current').textContent = fmtCash(payload.new.amount);
+      }
+      if(document.getElementById('tab-auction').classList.contains('active')) loadAuctions();
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:`id=eq.${currentUser.id}`},payload=>{
+      profile = {...profile,...payload.new};
+      renderHUD();
+    })
+    .subscribe();
+}
+
+// ═══════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function fmtCash(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(0)+'k';
+  return n.toLocaleString();
+}
+
+function rarityBadgeClass(r) {
+  const map={Common:'badge-blue',Rare:'badge-blue',Epic:'badge-purple',Legendary:'badge-amber',Mythic:'badge-mythic',Limited:'badge-cyan'};
+  return map[r]||'badge-blue';
+}
+
+function toast(msg, type='t-info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show '+type;
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>{ t.className='toast'; }, 3200);
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
 </script>
+</body>
+</html>
