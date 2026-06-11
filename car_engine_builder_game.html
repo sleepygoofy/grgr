@@ -1,0 +1,419 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); color: var(--color-text-primary); }
+.game { padding: 1rem 0; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.tab { padding: 8px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 13px; background: var(--color-background-primary); color: var(--color-text-secondary); transition: all 0.15s; }
+.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.section { display: none; }
+.section.active { display: block; }
+.car-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.car-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; background: var(--color-background-primary); transition: all 0.15s; position: relative; }
+.car-card:hover { border-color: var(--color-border-primary); background: var(--color-background-secondary); }
+.car-card.selected { border: 2px solid #378ADD; }
+.car-icon { font-size: 32px; margin-bottom: 8px; }
+.car-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.car-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px; }
+.badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
+.badge-red { background: #FCEBEB; color: #A32D2D; }
+.badge-blue { background: #E6F1FB; color: #185FA5; }
+.badge-amber { background: #FAEEDA; color: #854F0B; }
+.badge-green { background: #EAF3DE; color: #3B6D11; }
+.badge-purple { background: #EEEDFE; color: #534AB7; }
+.garage { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.panel { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; background: var(--color-background-primary); }
+.panel h3 { font-size: 15px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+.stat-row:last-child { border-bottom: none; }
+.stat-bar-wrap { flex: 1; margin: 0 12px; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
+.stat-bar { height: 100%; border-radius: 3px; transition: width 0.4s; }
+.mod-list { display: flex; flex-direction: column; gap: 8px; }
+.mod-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; }
+.mod-item.equipped { background: #EAF3DE; border-color: #3B6D11; }
+.mod-btn { padding: 4px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 12px; background: var(--color-background-primary); color: var(--color-text-primary); }
+.mod-btn:hover { background: var(--color-background-secondary); }
+.race-section { text-align: center; }
+.race-track { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 2rem; margin: 1rem 0; position: relative; overflow: hidden; min-height: 120px; }
+.race-car { font-size: 28px; position: absolute; transition: left 1.5s ease-in; top: 50%; transform: translateY(-50%); }
+.race-car2 { font-size: 28px; position: absolute; transition: left 2s ease-in; top: 20%; transform: translateY(-50%); }
+.big-btn { padding: 12px 32px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); cursor: pointer; font-size: 15px; font-weight: 500; background: var(--color-background-primary); color: var(--color-text-primary); }
+.big-btn:hover { background: var(--color-background-secondary); }
+.result-box { padding: 1rem; border-radius: var(--border-radius-md); font-size: 14px; margin-top: 1rem; display: none; }
+.win { background: #EAF3DE; color: #3B6D11; }
+.lose { background: #FCEBEB; color: #A32D2D; }
+.currency { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.shop-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; background: var(--color-background-primary); }
+.shop-card h4 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.shop-card p { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
+.price-tag { font-size: 13px; font-weight: 500; color: #854F0B; }
+.hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 12px 16px; background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); }
+.engine-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.eng-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; background: var(--color-background-primary); }
+.eng-card:hover { background: var(--color-background-secondary); }
+.eng-card.selected { border: 2px solid #378ADD; }
+.eng-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.eng-spec { font-size: 11px; color: var(--color-text-secondary); }
+.selected-label { position: absolute; top: 8px; right: 8px; font-size: 10px; background: #E6F1FB; color: #185FA5; padding: 2px 6px; border-radius: 4px; }
+</style>
+
+<div class="game">
+  <h2 class="sr-only">Car and engine building game featuring RAM TRX, Dodge Hellcat, Ford, Chevy, and more</h2>
+  <div class="hud">
+    <div>
+      <span style="font-size:13px;color:var(--color-text-secondary);">Garage</span>
+      <div class="car-name" id="hud-car">No car selected</div>
+    </div>
+    <div style="text-align:center;">
+      <span style="font-size:13px;color:var(--color-text-secondary);">Engine</span>
+      <div class="car-name" id="hud-eng">—</div>
+    </div>
+    <div style="text-align:right;">
+      <span style="font-size:13px;color:var(--color-text-secondary);">Cash</span>
+      <div class="currency">$<span id="cash-display">12,500</span></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('cars')"><i class="ti ti-steering-wheel" aria-hidden="true"></i> Cars</div>
+    <div class="tab" onclick="showTab('engine')"><i class="ti ti-engine" aria-hidden="true"></i> Engine</div>
+    <div class="tab" onclick="showTab('mods')"><i class="ti ti-settings" aria-hidden="true"></i> Mods</div>
+    <div class="tab" onclick="showTab('shop')"><i class="ti ti-shopping-cart" aria-hidden="true"></i> Shop</div>
+    <div class="tab" onclick="showTab('race')"><i class="ti ti-flag" aria-hidden="true"></i> Race</div>
+  </div>
+
+  <!-- CARS TAB -->
+  <div class="section active" id="tab-cars">
+    <div class="car-grid" id="car-grid"></div>
+    <div id="car-stats-panel" style="display:none;">
+      <div class="panel">
+        <h3 id="sel-car-name">Selected Car</h3>
+        <div id="sel-car-stats"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENGINE TAB -->
+  <div class="section" id="tab-engine">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;">Select an engine for your build. Each changes your car's performance profile.</p>
+    <div class="engine-grid" id="eng-grid"></div>
+    <div id="eng-detail" style="display:none;" class="panel">
+      <h3 id="eng-detail-name"></h3>
+      <div id="eng-detail-stats"></div>
+    </div>
+  </div>
+
+  <!-- MODS TAB -->
+  <div class="section" id="tab-mods">
+    <div class="garage">
+      <div class="panel">
+        <h3>Equipped Mods</h3>
+        <div id="equipped-list" class="mod-list"></div>
+      </div>
+      <div class="panel">
+        <h3>Available Mods</h3>
+        <div id="avail-list" class="mod-list"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:1rem;">
+      <h3>Current Build Stats</h3>
+      <div id="build-stats"></div>
+    </div>
+  </div>
+
+  <!-- SHOP TAB -->
+  <div class="section" id="tab-shop">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;">Spend cash to unlock new cars and mods.</p>
+    <div class="shop-grid" id="shop-grid"></div>
+  </div>
+
+  <!-- RACE TAB -->
+  <div class="section" id="tab-race">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <p style="font-size:13px;color:var(--color-text-secondary);">Pick a race and put your build to the test.</p>
+    </div>
+    <div class="shop-grid" id="race-events"></div>
+    <div class="race-track" id="race-track" style="display:none;">
+      <div id="my-car" class="race-car" style="left:2%;">🚗</div>
+      <div id="opp-car" class="race-car2" style="left:2%;">🏎️</div>
+      <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:24px;">🏁</div>
+    </div>
+    <div class="result-box" id="race-result"></div>
+  </div>
+</div>
+
+<script>
+let cash = 12500;
+let selectedCar = null;
+let selectedEngine = null;
+let equipped = [];
+let wins = 0;
+
+const cars = [
+  { id:'trx', name:'RAM 1500 TRX', sub:'2021–2024 Supercharged', badge:'red', badgeTxt:'Truck', hp:702, torque:650, weight:6350, handling:62, top:118, price:0, unlocked:true, emoji:'🛻' },
+  { id:'hellcat', name:'Dodge Charger Hellcat', sub:'SRT Hellcat Widebody', badge:'red', badgeTxt:'Muscle', hp:717, torque:656, weight:4591, handling:74, top:196, price:0, unlocked:true, emoji:'🚗' },
+  { id:'demon', name:'Dodge Challenger Demon', sub:'170 Edition', badge:'purple', badgeTxt:'Drag', hp:1025, torque:945, weight:4280, handling:60, top:203, price:0, unlocked:true, emoji:'😈' },
+  { id:'ghoul', name:'Dodge Durango Ghoul', sub:'SRT 1025 HP', badge:'red', badgeTxt:'SUV', hp:1025, torque:945, weight:5400, handling:65, top:180, price:0, unlocked:true, emoji:'👻' },
+  { id:'raptor', name:'Ford Raptor R', sub:'5.2L Supercharged', badge:'blue', badgeTxt:'Truck', hp:700, torque:640, weight:5950, handling:64, top:115, price:0, unlocked:true, emoji:'🦅' },
+  { id:'gt500', name:'Ford Shelby GT500', sub:'Carbon Fiber Track Pack', badge:'blue', badgeTxt:'Muscle', hp:760, torque:625, weight:4225, handling:82, top:180, price:0, unlocked:true, emoji:'🐍' },
+  { id:'zl1', name:'Chevy Camaro ZL1', sub:'1LE Track Pack', badge:'amber', badgeTxt:'Muscle', hp:650, torque:650, weight:3940, handling:88, top:190, price:0, unlocked:true, emoji:'🐎' },
+  { id:'c8z', name:'Corvette Z06', sub:'LT6 Flat-Plane V8', badge:'amber', badgeTxt:'Supercar', hp:670, torque:460, weight:3366, handling:95, top:196, price:0, unlocked:true, emoji:'🏎️' },
+  { id:'scat', name:'Dodge Charger Scat Pack', sub:'392 Widebody', badge:'red', badgeTxt:'Street', hp:485, torque:475, weight:4156, handling:76, top:175, price:0, unlocked:true, emoji:'🚗' },
+  { id:'silverado', name:'Chevy Silverado ZR2', sub:'Off-Road Performance', badge:'amber', badgeTxt:'Truck', hp:420, torque:460, weight:5400, handling:55, top:105, price:0, unlocked:true, emoji:'🚚' },
+  { id:'ford150', name:'Ford F-150 Tremor', sub:'5.0L V8 Off-Road', badge:'blue', badgeTxt:'Truck', hp:400, torque:410, weight:5200, handling:52, top:108, price:0, unlocked:true, emoji:'🛻' },
+  { id:'lamborghini', name:'Lamborghini Urus', sub:'Pearl Capsule V8TT', badge:'green', badgeTxt:'Super-SUV', hp:657, torque:627, weight:5145, handling:86, top:190, price:15000, unlocked:false, emoji:'🐂' },
+];
+
+const engines = [
+  { id:'hemi68', name:'6.8L Supercharged HEMI', spec:'Hellcat / Demon / TRX', hpBoost:0, torqueBoost:0, badge:'red' },
+  { id:'lt2', name:'6.2L LT2 V8', spec:'Corvette C8 Base', hpBoost:-70, torqueBoost:-50, badge:'amber' },
+  { id:'lt6', name:'5.5L LT6 Flat-Plane V8', spec:'Corvette Z06', hpBoost:-30, torqueBoost:-150, badge:'amber' },
+  { id:'5r', name:'5.2L Predator V8', spec:'GT500 Supercharged', hpBoost:10, torqueBoost:-30, badge:'blue' },
+  { id:'coyote', name:'5.0L Coyote V8', spec:'Ford F-150 / Mustang', hpBoost:-200, torqueBoost:-180, badge:'blue' },
+  { id:'lsa', name:'6.2L LSA Supercharged', spec:'ZL1 Camaro', hpBoost:-50, torqueBoost:0, badge:'amber' },
+  { id:'demon170', name:'6.2L Demon 170 V8', spec:'1025hp Supercharged', hpBoost:50, torqueBoost:100, badge:'purple' },
+  { id:'dmax', name:'3.0L Duramax Diesel', spec:'Silverado / Trucks', hpBoost:-350, torqueBoost:200, badge:'green' },
+];
+
+const allMods = [
+  { id:'nos', name:'Nitrous Kit', effect:'hp', val:80, cost:2200, equipped:false },
+  { id:'supercharger', name:'Aftermarket Supercharger', effect:'hp', val:120, cost:5500, equipped:false },
+  { id:'exhaust', name:'Cat-Back Exhaust', effect:'hp', val:25, cost:800, equipped:false },
+  { id:'tune', name:'ECU Tune', effect:'hp', val:50, cost:1200, equipped:false },
+  { id:'intercooler', name:'Upgraded Intercooler', effect:'hp', val:40, cost:1500, equipped:false },
+  { id:'suspension', name:'Coilover Suspension', effect:'handling', val:12, cost:3000, equipped:false },
+  { id:'tires', name:'Sticky Track Tires', effect:'handling', val:10, cost:1800, equipped:false },
+  { id:'widebody', name:'Widebody Kit', effect:'handling', val:6, cost:2500, equipped:false },
+  { id:'rollcage', name:'Roll Cage', effect:'handling', val:4, cost:1200, equipped:false },
+  { id:'weight', name:'Weight Reduction Package', effect:'torque', val:30, cost:4000, equipped:false },
+];
+
+const shopItems = [
+  { id:'lamborghini', name:'Lamborghini Urus', desc:'Unlock the 657hp Super-SUV', price:15000, type:'car' },
+  { id:'nitroplus', name:'Stage 2 Nitrous', desc:'Unlock a bigger nitrous kit (+150hp)', price:4000, type:'mod_unlock' },
+];
+
+const raceEvents = [
+  { id:'strip', name:'Drag Strip 1/4 Mile', desc:'Pure power wins here. Torque is king.', reward:3000, oppPower:580, emoji:'🏁' },
+  { id:'canyon', name:'Canyon Run', desc:'Handling and cornering matter most.', reward:2500, oppHandling:80, emoji:'🏔️' },
+  { id:'highway', name:'Highway Pull', desc:'Top speed and HP decide the winner.', reward:2000, oppHp:640, emoji:'🛣️' },
+  { id:'offroad', name:'Off-Road Challenge', desc:'Trucks and SUVs get a big bonus.', reward:3500, oppHp:550, emoji:'🌲' },
+  { id:'drift', name:'Drift Competition', desc:'Style + handling = victory.', reward:4000, oppHandling:75, emoji:'💨' },
+  { id:'super', name:'Supercar Invitational', desc:'Supercars only. High stakes.', reward:8000, oppHp:750, emoji:'🏆' },
+];
+
+function showTab(t) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  event.target.classList.add('active');
+  if(t === 'mods') renderMods();
+  if(t === 'race') renderRace();
+  if(t === 'shop') renderShop();
+}
+
+function getStats() {
+  if(!selectedCar) return null;
+  let c = cars.find(x => x.id === selectedCar);
+  let e = selectedEngine ? engines.find(x => x.id === selectedEngine) : null;
+  let modHp = equipped.reduce((a, id) => { let m = allMods.find(x=>x.id===id); return m && m.effect==='hp' ? a+m.val : a; }, 0);
+  let modTorque = equipped.reduce((a, id) => { let m = allMods.find(x=>x.id===id); return m && m.effect==='torque' ? a+m.val : a; }, 0);
+  let modHandling = equipped.reduce((a, id) => { let m = allMods.find(x=>x.id===id); return m && m.effect==='handling' ? a+m.val : a; }, 0);
+  return {
+    hp: c.hp + (e ? e.hpBoost : 0) + modHp,
+    torque: c.torque + (e ? e.torqueBoost : 0) + modTorque,
+    handling: Math.min(100, c.handling + modHandling),
+    top: c.top,
+    weight: c.weight
+  };
+}
+
+function renderCars() {
+  const grid = document.getElementById('car-grid');
+  grid.innerHTML = cars.map(c => `
+    <div class="car-card ${selectedCar===c.id?'selected':''} ${!c.unlocked?'':''})" onclick="selectCar('${c.id}')" style="${!c.unlocked?'opacity:0.5;':''}">
+      ${selectedCar===c.id ? '<div class="selected-label">Selected</div>' : ''}
+      <div style="font-size:36px;margin-bottom:8px;">${c.emoji}</div>
+      <div class="car-name">${c.name}</div>
+      <div class="car-sub">${c.sub}</div>
+      <span class="badge badge-${c.badge}">${c.badgeTxt}</span>
+      ${!c.unlocked ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px;">🔒 $'+c.price.toLocaleString()+'</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function selectCar(id) {
+  let c = cars.find(x=>x.id===id);
+  if(!c.unlocked) { alert('Unlock this car in the Shop!'); return; }
+  selectedCar = id;
+  document.getElementById('hud-car').textContent = c.name;
+  document.getElementById('my-car').textContent = c.emoji;
+  renderCars();
+  let panel = document.getElementById('car-stats-panel');
+  panel.style.display = 'block';
+  document.getElementById('sel-car-name').textContent = c.name;
+  document.getElementById('sel-car-stats').innerHTML = statsHTML(c.hp, c.torque, c.handling, c.top);
+}
+
+function statsHTML(hp, torque, handling, top) {
+  return `
+    <div class="stat-row"><span>Horsepower</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,hp/11)}%;background:#A32D2D;"></div></div><span>${hp} hp</span></div>
+    <div class="stat-row"><span>Torque</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,torque/10)}%;background:#854F0B;"></div></div><span>${torque} lb-ft</span></div>
+    <div class="stat-row"><span>Handling</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${handling}%;background:#185FA5;"></div></div><span>${handling}/100</span></div>
+    <div class="stat-row"><span>Top Speed</span><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,top/2)}%;background:#3B6D11;"></div></div><span>${top} mph</span></div>
+  `;
+}
+
+function renderEngines() {
+  document.getElementById('eng-grid').innerHTML = engines.map(e => `
+    <div class="eng-card ${selectedEngine===e.id?'selected':''}" onclick="selectEngine('${e.id}')">
+      <div class="eng-name">${e.name}</div>
+      <div class="eng-spec">${e.spec}</div>
+      <div style="margin-top:8px;font-size:11px;color:${e.hpBoost>=0?'#3B6D11':'#A32D2D'};">HP: ${e.hpBoost>=0?'+':''}${e.hpBoost}</div>
+      <div style="font-size:11px;color:${e.torqueBoost>=0?'#3B6D11':'#A32D2D'};">Torque: ${e.torqueBoost>=0?'+':''}${e.torqueBoost}</div>
+    </div>
+  `).join('');
+}
+
+function selectEngine(id) {
+  selectedEngine = id;
+  let e = engines.find(x=>x.id===id);
+  document.getElementById('hud-eng').textContent = e.name;
+  renderEngines();
+  let d = document.getElementById('eng-detail');
+  d.style.display = 'block';
+  document.getElementById('eng-detail-name').textContent = e.name + ' — ' + e.spec;
+  let s = getStats();
+  document.getElementById('eng-detail-stats').innerHTML = s ? statsHTML(s.hp, s.torque, s.handling, s.top) : '<p style="font-size:13px;color:var(--color-text-secondary);">Select a car first to see final stats.</p>';
+}
+
+function renderMods() {
+  const eq = document.getElementById('equipped-list');
+  const av = document.getElementById('avail-list');
+  const bs = document.getElementById('build-stats');
+  eq.innerHTML = equipped.length === 0 ? '<p style="font-size:13px;color:var(--color-text-secondary);">No mods equipped.</p>' :
+    equipped.map(id => {
+      let m = allMods.find(x=>x.id===id);
+      return `<div class="mod-item equipped"><span>${m.name} <span style="font-size:11px;color:#3B6D11;">(+${m.val} ${m.effect})</span></span><button class="mod-btn" onclick="removeMod('${id}')">Remove</button></div>`;
+    }).join('');
+  av.innerHTML = allMods.filter(m=>!equipped.includes(m.id)).map(m =>
+    `<div class="mod-item"><span>${m.name} <span style="font-size:11px;color:var(--color-text-secondary);">+${m.val} ${m.effect} | $${m.cost.toLocaleString()}</span></span><button class="mod-btn" onclick="addMod('${m.id}')">Equip</button></div>`
+  ).join('');
+  let s = getStats();
+  bs.innerHTML = s ? statsHTML(s.hp, s.torque, s.handling, s.top) : '<p style="font-size:13px;color:var(--color-text-secondary);">Select a car first.</p>';
+}
+
+function addMod(id) {
+  let m = allMods.find(x=>x.id===id);
+  if(cash < m.cost) { alert('Not enough cash! Race to earn more.'); return; }
+  if(!selectedCar) { alert('Select a car first!'); return; }
+  cash -= m.cost;
+  equipped.push(id);
+  updateCash();
+  renderMods();
+}
+
+function removeMod(id) {
+  equipped = equipped.filter(x=>x!==id);
+  renderMods();
+}
+
+function renderShop() {
+  document.getElementById('shop-grid').innerHTML = shopItems.map(item => {
+    let c = item.type === 'car' ? cars.find(x=>x.id===item.id) : null;
+    let unlocked = c ? c.unlocked : false;
+    return `<div class="shop-card">
+      <h4>${item.name}</h4>
+      <p>${item.desc}</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="price-tag">$${item.price.toLocaleString()}</span>
+        <button class="mod-btn" onclick="buyItem('${item.id}')" ${unlocked?'disabled':''}>
+          ${unlocked?'Owned':'Buy'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buyItem(id) {
+  let item = shopItems.find(x=>x.id===id);
+  if(cash < item.price) { alert('Not enough cash! Win races to earn more.'); return; }
+  cash -= item.price;
+  if(item.type === 'car') { let c = cars.find(x=>x.id===id); if(c) c.unlocked = true; renderCars(); }
+  updateCash();
+  renderShop();
+}
+
+function renderRace() {
+  document.getElementById('race-events').innerHTML = raceEvents.map(r =>
+    `<div class="shop-card">
+      <div style="font-size:28px;margin-bottom:8px;">${r.emoji}</div>
+      <h4>${r.name}</h4>
+      <p>${r.desc}</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span class="price-tag">Win: $${r.reward.toLocaleString()}</span>
+        <button class="mod-btn" onclick="startRace('${r.id}')">Race ↗</button>
+      </div>
+    </div>`
+  ).join('');
+  document.getElementById('race-track').style.display = 'none';
+  document.getElementById('race-result').style.display = 'none';
+}
+
+function startRace(id) {
+  if(!selectedCar) { alert('Select a car first!'); return; }
+  let r = raceEvents.find(x=>x.id===id);
+  let s = getStats();
+  let c = cars.find(x=>x.id===selectedCar);
+  
+  let myScore = 0;
+  let oppScore = 0;
+  
+  if(r.id === 'strip') { myScore = s.hp + s.torque * 0.5; oppScore = r.oppPower * 1.5; }
+  else if(r.id === 'canyon' || r.id === 'drift') { myScore = s.handling * 10 + s.hp * 0.2; oppScore = r.oppHandling * 10 + 100; }
+  else if(r.id === 'highway') { myScore = s.hp + s.top * 2; oppScore = r.oppHp + 330; }
+  else if(r.id === 'offroad') {
+    let bonus = ['trx','raptor','silverado','ford150','ghoul'].includes(selectedCar) ? 200 : 0;
+    myScore = s.hp + bonus; oppScore = r.oppHp;
+  }
+  else if(r.id === 'super') {
+    let bonus = ['c8z','lamborghini','demon','demon170'].includes(selectedCar) ? 300 : 0;
+    myScore = s.hp + s.handling * 5 + bonus; oppScore = r.oppHp + 400;
+  }
+  
+  let won = myScore > oppScore;
+  
+  let track = document.getElementById('race-track');
+  track.style.display = 'block';
+  let myCarEl = document.getElementById('my-car');
+  let oppCarEl = document.getElementById('opp-car');
+  myCarEl.style.left = '2%'; oppCarEl.style.left = '2%';
+  
+  setTimeout(() => {
+    if(won) { myCarEl.style.left = '82%'; oppCarEl.style.left = '60%'; }
+    else { myCarEl.style.left = '55%'; oppCarEl.style.left = '82%'; }
+  }, 100);
+  
+  setTimeout(() => {
+    let res = document.getElementById('race-result');
+    res.style.display = 'block';
+    if(won) {
+      cash += r.reward; wins++;
+      res.className = 'result-box win';
+      res.innerHTML = `🏆 You won! +$${r.reward.toLocaleString()} | Total wins: ${wins} | Cash: $${cash.toLocaleString()}`;
+    } else {
+      res.className = 'result-box lose';
+      res.innerHTML = `❌ You lost! Your score: ${Math.round(myScore)} vs opponent: ${Math.round(oppScore)}. Upgrade your build and try again!`;
+    }
+    updateCash();
+  }, 2200);
+}
+
+function updateCash() {
+  document.getElementById('cash-display').textContent = cash.toLocaleString();
+}
+
+renderCars();
+renderEngines();
+</script>
