@@ -4,6 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>REDLINE — Racing Game</title>
+<!-- SCHEMA ADDITIONS (run in Supabase SQL Editor):
+
+-- Add role + ban columns to profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'player'
+  CHECK (role IN ('player','moderator','admin','owner'));
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS ban_reason TEXT;
+
+-- Activity log table
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES profiles(id),
+  username TEXT,
+  action TEXT NOT NULL,
+  details JSONB,
+  ip_hint TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
+-- Only admins/owner see all logs; players see own
+CREATE POLICY "Own logs" ON activity_logs FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Admins see all logs" ON activity_logs FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id=auth.uid() AND role IN ('admin','owner','moderator'))
+);
+CREATE POLICY "Insert own log" ON activity_logs FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- RLS: Admins can update any profile role/ban (owner only can set owner role)
+CREATE POLICY "Admin update profiles" ON profiles FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id=auth.uid() AND role IN ('admin','owner'))
+);
+-->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -401,7 +432,21 @@ a{color:inherit;text-decoration:none;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-screen{display:flex;align-items:center;justify-content:center;height:200px;gap:12px;font-family:var(--mono);font-size:13px;color:var(--text3);}
 
-/* ── XP NOTIFICATION ─────────────────────────────────── */
+/* ── TICKER ─────────────────────────────────── */
+#market-ticker-bar { position:relative; }
+#market-ticker-text {
+  display:inline-block;
+  animation: tickerScroll 40s linear infinite;
+}
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+#market-ticker-bar:hover #market-ticker-text { animation-play-state: paused; }
+
+/* ── MARKET CARD PRICE FLASH ─────────────────────────────────── */
+.market-live-price { transition: color 1.2s; }
+.market-car-card { position: relative; }
 .xp-pop{
   position:fixed;top:80px;right:24px;z-index:8000;
   font-family:var(--disp);font-size:18px;font-weight:700;
@@ -525,7 +570,11 @@ a{color:inherit;text-decoration:none;}
     <!-- MARKET TAB -->
     <div class="section" id="tab-market">
       <div class="sec-head">
-        <div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>LIVE PRICES · DEMAND-DRIVEN</div></div>
+        <div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>LIVE PRICES · DEMAND-DRIVEN · AUTO-UPDATES EVERY 90s</div></div>
+      </div>
+      <!-- Live ticker banner -->
+      <div id="market-ticker-bar" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-family:var(--mono);font-size:11px;color:var(--text3);overflow:hidden;white-space:nowrap;">
+        <span class="rt-dot"></span> <span id="market-ticker-text">Loading live market data...</span>
       </div>
       <div class="filter-bar" id="market-filters">
         <input class="filter-search" id="market-search" placeholder="Search..." oninput="filterMarket()">
@@ -837,6 +886,19 @@ async function initGame() {
   if (document.querySelector('.nav-tab.active')?.textContent.includes('Garage')) {
     renderPlayerCars();
   }
+
+  // ── Run initial NPC seed + market tick on load ──
+  await seedDemoAuctions();   // populate auction house immediately
+  runMarketTick();            // kick off first market price update
+
+  // ── Background tickers ──
+  // Market prices drift every 90 seconds
+  clearInterval(window._marketTicker);
+  window._marketTicker = setInterval(runMarketTick, 90_000);
+
+  // Auction health-check every 5 minutes: expire old, seed new NPC auctions
+  clearInterval(window._auctionTicker);
+  window._auctionTicker = setInterval(runAuctionTick, 300_000);
 }
 
 // ═══════════════════════════════════════════════
@@ -932,14 +994,16 @@ function renderProfile() {
 function showTab(t, el) {
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
+  const tabEl = document.getElementById('tab-'+t);
+  if (tabEl) tabEl.classList.add('active');
   if(el) el.classList.add('active');
   closeHudMenu();
   if(t==='garage') renderPlayerCars();
-  if(t==='market') renderMarket();
+  if(t==='market') { renderMarket(); runMarketTick(); }
   if(t==='auction') loadAuctions();
   if(t==='leaderboard') loadLeaderboard();
   if(t==='profile') renderProfile();
+  if(t==='admin' && typeof loadAdminPanel==='function') loadAdminPanel();
 }
 
 function toggleHudMenu() {
@@ -1106,8 +1170,12 @@ function renderMarket() {
     const price = mp?.current_price || c.base_price;
     const basePrice = mp?.base_price || c.base_price;
     const delta = price - basePrice;
+    const deltaPct = basePrice > 0 ? ((delta/basePrice)*100).toFixed(1) : '0.0';
     const owned = ownedIds.has(c.id);
-    return `<div class="car-card ${owned?'':''}">
+    const demand = mp?.demand_score || 50;
+    const demandBar = Math.round(demand);
+    const demandColor = demand > 70 ? 'var(--red2)' : demand > 45 ? 'var(--amber)' : 'var(--green2)';
+    return `<div class="car-card market-car-card" id="mcard-${c.id}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
         <span class="badge ${rarityBadgeClass(c.rarity)}">${c.rarity}</span>
         <span class="badge badge-blue">${c.class}</span>
@@ -1115,16 +1183,28 @@ function renderMarket() {
       <div class="car-emoji">${c.emoji||'🚗'}</div>
       <div class="car-name">${c.name}</div>
       <div class="car-brand">${c.brand}</div>
-      <div style="font-size:11px;color:var(--text3);margin:6px 0 12px;">${c.description||''}</div>
+      <div style="font-size:11px;color:var(--text3);margin:5px 0 10px;line-height:1.4;">${c.description||''}</div>
       <div class="car-stats-mini">
         <span class="mini-stat">⚡<span>${c.power}hp</span></span>
         <span class="mini-stat">🏎️<span>${c.top_speed}mph</span></span>
         <span class="mini-stat">🎯<span>${c.handling}/100</span></span>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+      <!-- Demand bar -->
+      <div style="margin:10px 0 4px;">
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:3px;">
+          <span>DEMAND</span><span style="color:${demandColor};">${demandBar}/100</span>
+        </div>
+        <div style="height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${demandBar}%;background:${demandColor};border-radius:2px;transition:width .6s;"></div>
+        </div>
+      </div>
+      <!-- Price -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
         <div>
-          <div style="font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber);">$${fmtCash(price)}</div>
-          ${delta!==0?`<div class="market-delta ${delta>0?'delta-up':'delta-down'}" style="font-size:10px;">${delta>0?'▲':'▼'} $${Math.abs(delta).toLocaleString()} from base</div>`:''}
+          <div class="market-live-price" style="font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber);" id="mprice-${c.id}">$${fmtCash(price)}</div>
+          <div class="market-delta ${delta>0?'delta-up':delta<0?'delta-down':''}" style="font-size:10px;">
+            ${delta>0?`▲ +${deltaPct}%`:delta<0?`▼ ${deltaPct}%`:'— Base price'}
+          </div>
         </div>
         ${owned
           ? '<span class="badge badge-green">✓ Owned</span>'
@@ -1134,6 +1214,27 @@ function renderMarket() {
       <div class="rarity-strip rarity-${c.rarity.toLowerCase()}"></div>
     </div>`;
   }).join('');
+
+  // Re-render only price elements on subsequent market ticks (avoids full re-render flicker)
+  window._lastMarketFilter = currentMarketFilter;
+}
+
+// Called by runMarketTick after DB update — updates only the price DOM elements in-place
+function patchMarketPrices() {
+  allCars.forEach(c => {
+    const el = document.getElementById('mprice-'+c.id);
+    if (!el) return;
+    const mp = marketPrices[c.id];
+    if (!mp) return;
+    const newText = '$'+fmtCash(mp.current_price);
+    if (el.textContent !== newText) {
+      el.textContent = newText;
+      // Flash animation
+      el.style.transition = 'color 0s';
+      el.style.color = mp.current_price > (mp.base_price||0) ? 'var(--green2)' : 'var(--red2)';
+      setTimeout(()=>{ el.style.transition='color 1.2s'; el.style.color='var(--amber)'; }, 100);
+    }
+  });
 }
 
 function setMarketFilter(btn) {
@@ -1173,60 +1274,227 @@ async function buyCar(carId, price) {
 async function loadAuctions() {
   const grid = document.getElementById('auction-grid');
   grid.innerHTML = '<div class="loading-screen"><div class="spinner"></div> Loading auctions...</div>';
-  let query = sb.from('auctions').select('*, car:cars(*), seller:profiles(username), bids(count)').eq('status','active').gt('ends_at',new Date().toISOString()).order('ends_at');
-  if (currentAuctionFilter !== 'all') query = query.eq('event_type',currentAuctionFilter);
-  const {data, error} = await query;
-  if (error || !data?.length) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div>No active auctions right now.<br>List your car to start one!</div>`;
-    // Seed some demo auctions if empty
-    await seedDemoAuctions();
+  // Always ensure NPC auctions are populated first
+  await seedDemoAuctions();
+}
+
+// ═══════════════════════════════════════════════
+// NPC AUCTION ENGINE — auto-generates live auctions
+// ═══════════════════════════════════════════════
+
+// NPC "seller" profiles (virtual drivers). We use the current user's ID as
+// seller so RLS passes, but display a random NPC name in the listing title.
+const NPC_NAMES = [
+  'GhostRacer','NightShift','DriftKing','VelocityX','TurboSam',
+  'SlickWheels','BoostQueen','RedlineRex','ApexHunter','BurnoutBob',
+  'CarbonKid','SlipStream','QuarterKing','NosQueen','FlatOutFinn',
+  'DragMaster','TarmacTed','GearheadGia','FullSend','PinionPete'
+];
+
+// Auction templates: event_type → which car rarities to feature
+const NPC_AUCTION_TEMPLATES = [
+  { event:'standard',       rarities:['Common','Rare'],              count:4, durationHours:[2,4,6],    startPct:0.55, buyoutPct:0.95 },
+  { event:'standard',       rarities:['Epic'],                       count:3, durationHours:[4,6,8],    startPct:0.60, buyoutPct:1.0  },
+  { event:'hypercar',       rarities:['Legendary','Mythic'],         count:3, durationHours:[8,12],     startPct:0.65, buyoutPct:1.1  },
+  { event:'rare_weekend',   rarities:['Rare','Epic'],                count:3, durationHours:[3,6],      startPct:0.58, buyoutPct:0.98 },
+  { event:'jdm_night',      rarities:['Common','Rare','Epic'],       count:3, durationHours:[2,4],      startPct:0.50, buyoutPct:0.90 },
+  { event:'muscle_madness', rarities:['Common','Rare','Epic'],       count:2, durationHours:[3,5],      startPct:0.52, buyoutPct:0.92 },
+];
+
+// Car class → event affinity for NPC selection
+const CLASS_EVENT = {
+  Hypercar:'hypercar', Sports:'jdm_night', Muscle:'muscle_madness',
+  EV:'standard', 'SUV/Truck':'standard'
+};
+
+function npcPick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+async function seedDemoAuctions() {
+  if (!allCars.length || !currentUser) return;
+
+  // Check how many active NPC auctions exist
+  const {count:active} = await sb.from('auctions')
+    .select('*',{count:'exact',head:true})
+    .eq('status','active')
+    .gt('ends_at', new Date().toISOString());
+
+  // Target: keep at least 12 active auctions running at all times
+  const target = 12;
+  if ((active||0) >= target) { renderAuctionsFromDB(); return; }
+
+  const needed = target - (active||0);
+  const now = Date.now();
+  const inserted = [];
+
+  for (let i = 0; i < needed; i++) {
+    const tmpl = npcPick(NPC_AUCTION_TEMPLATES);
+    // Pick a car matching rarity AND optionally class affinity
+    const candidates = allCars.filter(c => tmpl.rarities.includes(c.rarity));
+    if (!candidates.length) continue;
+    const car = npcPick(candidates);
+
+    // Pick event type: if car has a natural affinity, honour it 60% of the time
+    const naturalEvent = CLASS_EVENT[car.class] || 'standard';
+    const eventType = Math.random() < 0.6 ? naturalEvent : tmpl.event;
+
+    const durationHours = npcPick(tmpl.durationHours);
+    // Stagger end times so they don't all expire together
+    const jitterMs = Math.random() * 3600000; // up to 1h random offset
+    const endsAt = new Date(now + durationHours*3600000 + jitterMs).toISOString();
+
+    const basePrice = marketPrices[car.id]?.current_price || car.base_price;
+    const startPrice = Math.round(basePrice * tmpl.startPct);
+    const buyoutPrice = Math.round(basePrice * tmpl.buyoutPct);
+
+    const npcName = npcPick(NPC_NAMES);
+    const title = `${car.name} — ${npcName}`;
+
+    const {error} = await sb.from('auctions').insert({
+      seller_id: currentUser.id,
+      car_id: car.id,
+      player_car_id: null,
+      title,
+      starting_price: startPrice,
+      current_price: startPrice,
+      buyout_price: buyoutPrice,
+      ends_at: endsAt,
+      event_type: eventType,
+      status: 'active'
+    });
+
+    if (!error) inserted.push(car.name);
+  }
+
+  if (inserted.length) console.log(`[NPC Auctions] Seeded ${inserted.length}: ${inserted.join(', ')}`);
+
+  // Now load & render the real data
+  await renderAuctionsFromDB();
+}
+
+async function renderAuctionsFromDB() {
+  const grid = document.getElementById('auction-grid');
+  let query = sb.from('auctions')
+    .select('*, car:cars(*), seller:profiles(username), bids(count)')
+    .eq('status','active')
+    .gt('ends_at', new Date().toISOString())
+    .order('ends_at');
+  if (currentAuctionFilter !== 'all') query = query.eq('event_type', currentAuctionFilter);
+  const {data} = await query;
+  if (!data?.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div>No auctions found. Check back soon!</div>`;
     return;
   }
   renderAuctions(data);
 }
 
-async function seedDemoAuctions() {
-  // Create a few NPC-style auctions from the car database
-  const rareCars = allCars.filter(c=>['Legendary','Mythic'].includes(c.rarity)).slice(0,3);
-  if (!rareCars.length) return;
-  const now = new Date();
-  for (const c of rareCars) {
-    const ends = new Date(now.getTime() + 6*60*60*1000);
-    const exists = await sb.from('auctions').select('id').eq('car_id',c.id).eq('status','active').single();
-    if (!exists.data) {
-      await sb.from('auctions').insert({
-        seller_id:currentUser.id, car_id:c.id,
-        title:`${c.name} — ${c.rarity} Auction`,
-        starting_price:Math.round(c.base_price*0.7), current_price:Math.round(c.base_price*0.7),
-        buyout_price:Math.round(c.base_price*1.1), ends_at:ends.toISOString(), event_type:'standard'
-      });
+// ── Market auto-simulation ─────────────────────────────
+// Periodically adjusts market prices based on demand scores
+// and adds light randomness to make prices feel alive.
+async function runMarketTick() {
+  if (!allCars.length) return;
+  const updates = [];
+  Object.values(marketPrices).forEach(mp => {
+    const car = allCars.find(c=>c.id===mp.car_id);
+    if (!car) return;
+    const demand = mp.demand_score || 50;
+    const demandPush = (demand - 50) * 0.001;
+    const randomWalk = (Math.random() - 0.495) * 0.008;
+    const decayToBase = (mp.base_price - mp.current_price) * 0.02;
+    const newPrice = Math.max(
+      Math.round(car.base_price * 0.3),
+      Math.round(mp.current_price * (1 + demandPush + randomWalk) + decayToBase)
+    );
+    if (newPrice !== mp.current_price) {
+      updates.push({ car_id: mp.car_id, current_price: newPrice,
+        demand_score: Math.max(10, Math.min(100, demand + (Math.random()*4-2))),
+        old_price: mp.current_price, car_name: car.name });
+    }
+  });
+  const batch = updates.sort(()=>Math.random()-.5).slice(0,8);
+  for (const upd of batch) {
+    await sb.from('market_prices')
+      .update({ current_price: upd.current_price, demand_score: Math.round(upd.demand_score), updated_at: new Date().toISOString() })
+      .eq('car_id', upd.car_id);
+    if (marketPrices[upd.car_id]) {
+      marketPrices[upd.car_id].current_price = upd.current_price;
+      marketPrices[upd.car_id].demand_score = Math.round(upd.demand_score);
     }
   }
-  setTimeout(loadAuctions, 1000);
+
+  // Update ticker banner
+  if (batch.length) {
+    const tickerItems = batch.map(u => {
+      const dir = u.current_price > u.old_price ? '▲' : '▼';
+      const col = u.current_price > u.old_price ? '#4ade80' : '#ff4560';
+      const pct = Math.abs(((u.current_price - u.old_price)/u.old_price)*100).toFixed(1);
+      return `<span style="margin-right:28px;"><span style="color:${col};">${dir} ${u.car_name}</span> $${fmtCash(u.current_price)} <span style="color:${col};">(${dir}${pct}%)</span></span>`;
+    }).join('');
+    const tickerEl = document.getElementById('market-ticker-text');
+    if (tickerEl) tickerEl.innerHTML = tickerItems + tickerItems; // doubled for smooth scroll
+  }
+
+  // Refresh market UI if visible
+  if (document.getElementById('tab-market').classList.contains('active')) {
+    const rendered = document.querySelectorAll('.market-live-price').length > 0;
+    if (rendered) patchMarketPrices();
+    else renderMarket();
+  }
+}
+
+// Expire ended auctions and top them back up with new NPC ones
+async function runAuctionTick() {
+  // Mark any expired auctions as 'ended'
+  await sb.from('auctions')
+    .update({status:'ended'})
+    .eq('status','active')
+    .lt('ends_at', new Date().toISOString());
+  // Re-seed
+  await seedDemoAuctions();
+  // Refresh UI if visible
+  if (document.getElementById('tab-auction').classList.contains('active')) loadAuctions();
 }
 
 function renderAuctions(auctions) {
   const grid = document.getElementById('auction-grid');
+  const EVENT_LABELS = {
+    standard:'',
+    rare_weekend:'⭐ RARE WEEKEND',
+    hypercar:'🏆 HYPERCAR AUCTION',
+    jdm_night:'🎌 JDM NIGHT',
+    muscle_madness:'💪 MUSCLE MADNESS'
+  };
+  const EVENT_BADGE_CLASS = {
+    standard:'', rare_weekend:'diff-hard', hypercar:'diff-elite',
+    jdm_night:'diff-medium', muscle_madness:'diff-medium'
+  };
   grid.innerHTML = auctions.map(a => {
     const c = a.car;
     const endTime = new Date(a.ends_at);
-    const minsLeft = Math.max(0, Math.round((endTime-Date.now())/60000));
-    const urgent = minsLeft < 30;
     const bidCount = a.bids?.[0]?.count || 0;
     const isMyAuction = a.seller_id === currentUser.id;
-    const EVENT_LABELS = {standard:'',rare_weekend:'⭐ RARE WEEKEND',hypercar:'🏆 HYPERCAR',jdm_night:'🎌 JDM NIGHT',muscle_madness:'💪 MUSCLE MADNESS'};
+    const eventLabel = EVENT_LABELS[a.event_type]||'';
+    const eventBadge = EVENT_BADGE_CLASS[a.event_type]||'';
+    const urgent = (endTime - Date.now()) < 1800000;
+    // Extract NPC seller name from title if it's an NPC auction
+    const sellerName = a.seller?.username || a.title?.split(' — ')[1] || '?';
     return `<div class="auction-card">
-      ${a.event_type!=='standard'?`<div class="diff-badge diff-elite" style="margin-bottom:8px;">${EVENT_LABELS[a.event_type]||a.event_type}</div>`:''}
+      ${eventLabel ? `<div class="diff-badge ${eventBadge}" style="margin-bottom:8px;">${eventLabel}</div>` : ''}
       <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
         <span class="badge ${rarityBadgeClass(c?.rarity)}">${c?.rarity||'?'}</span>
-        <span class="auction-timer ${urgent?'urgent':''}">${formatCountdown(endTime)}</span>
+        <span class="auction-timer ${urgent?'urgent':''}" data-ends="${a.ends_at}">${formatCountdown(endTime)}</span>
       </div>
       <div style="font-size:32px;margin:8px 0;">${c?.emoji||'🚗'}</div>
       <div class="car-name" style="margin-bottom:2px;">${c?.name||'Unknown'}</div>
-      <div class="car-brand" style="margin-bottom:12px;">${c?.brand||''} · by ${a.seller?.username||'?'}</div>
-      <div class="auction-price">$${fmtCash(a.current_price)}</div>
-      <div class="auction-bids">${bidCount} bid${bidCount!==1?'s':''} · Buyout: ${a.buyout_price?'$'+fmtCash(a.buyout_price):'None'}</div>
-      <div style="display:flex;gap:8px;margin-top:12px;">
+      <div class="car-brand" style="margin-bottom:4px;">${c?.brand||''}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;">by ${sellerName}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+        <div class="auction-price" id="aprice-${a.id}">$${fmtCash(a.current_price)}</div>
+        <div class="auction-bids">${bidCount} bid${bidCount!==1?'s':''}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:12px;">
+        Buyout: ${a.buyout_price ? '$'+fmtCash(a.buyout_price) : 'None'}
+      </div>
+      <div style="display:flex;gap:8px;">
         ${isMyAuction
           ? `<button class="btn btn-ghost" style="flex:1;" disabled>Your Listing</button>`
           : `<button class="btn btn-red" style="flex:1;" onclick="openBidModal('${a.id}')">Bid Now</button>`
@@ -1235,7 +1503,6 @@ function renderAuctions(auctions) {
       </div>
     </div>`;
   }).join('');
-  startAuctionTimers();
 }
 
 function setAuctionFilter(btn) {
@@ -1245,17 +1512,7 @@ function setAuctionFilter(btn) {
   loadAuctions();
 }
 
-function startAuctionTimers() {
-  clearInterval(window._auctionTimer);
-  window._auctionTimer = setInterval(() => {
-    document.querySelectorAll('.auction-timer').forEach(el => {
-      if (el._endTime) {
-        const remaining = formatCountdown(el._endTime);
-        el.textContent = remaining;
-      }
-    });
-  }, 1000);
-}
+// (countdown now handled by setupRealtime's _countdownTick interval)
 
 function formatCountdown(endTime) {
   const diff = new Date(endTime) - Date.now();
@@ -1593,7 +1850,9 @@ async function loadBidHistory() {
 function setupRealtime() {
   if (realtimeChannel) sb.removeChannel(realtimeChannel);
   realtimeChannel = sb.channel('redline-realtime')
-    .on('postgres_changes',{event:'*',schema:'public',table:'auctions'},()=>{ if(document.getElementById('tab-auction').classList.contains('active')) loadAuctions(); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'auctions'},()=>{
+      if(document.getElementById('tab-auction').classList.contains('active')) loadAuctions();
+    })
     .on('postgres_changes',{event:'*',schema:'public',table:'bids'},async (payload)=>{
       if(payload.new?.bidder_id===currentUser.id) return;
       if(currentBidAuction?.id===payload.new?.auction_id) {
@@ -1606,7 +1865,27 @@ function setupRealtime() {
       profile = {...profile,...payload.new};
       renderHUD();
     })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'market_prices'},payload=>{
+      // Update local cache and patch DOM
+      if (payload.new?.car_id) {
+        marketPrices[payload.new.car_id] = {...(marketPrices[payload.new.car_id]||{}), ...payload.new};
+        if (document.getElementById('tab-market').classList.contains('active')) {
+          patchMarketPrices();
+        }
+      }
+    })
     .subscribe();
+
+  // Live countdown refresh for auction timers every second
+  clearInterval(window._countdownTick);
+  window._countdownTick = setInterval(() => {
+    document.querySelectorAll('.auction-timer[data-ends]').forEach(el => {
+      const endTime = new Date(el.dataset.ends);
+      const txt = formatCountdown(endTime);
+      if (el.textContent !== txt) el.textContent = txt;
+      el.classList.toggle('urgent', (endTime - Date.now()) < 1800000);
+    });
+  }, 1000);
 }
 
 // ═══════════════════════════════════════════════
