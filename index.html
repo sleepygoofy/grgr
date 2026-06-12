@@ -463,8 +463,35 @@ a{color:inherit;text-decoration:none;}
 }
 @keyframes rtPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-/* ── COUNTDOWN ─────────────────────────────────── */
-.countdown-digits{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber);letter-spacing:2px;}
+/* ── ROLE BADGES ─────────────────────────────────── */
+.role-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+.role-owner{background:linear-gradient(135deg,#7c3aed,#e8293a);color:#fff;box-shadow:0 0 12px rgba(124,58,237,.4);}
+.role-admin{background:rgba(232,41,58,.2);color:var(--red2);border:1px solid rgba(232,41,58,.35);}
+.role-moderator{background:rgba(245,158,11,.2);color:var(--amber2);border:1px solid rgba(245,158,11,.35);}
+.role-player{background:var(--panel3);color:var(--text3);border:1px solid var(--border);}
+
+/* ── ADMIN PANEL ─────────────────────────────────── */
+.admin-panel-wrap{display:grid;grid-template-columns:200px 1fr;gap:0;min-height:600px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.admin-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:16px 0;}
+.admin-nav-item{padding:10px 20px;font-family:var(--mono);font-size:12px;letter-spacing:.5px;cursor:pointer;color:var(--text3);transition:all .12s;border-left:3px solid transparent;}
+.admin-nav-item:hover{background:var(--panel);color:var(--text2);}
+.admin-nav-item.active{background:var(--panel);color:var(--red2);border-left-color:var(--red);}
+.admin-content{background:var(--panel);padding:20px;overflow-y:auto;max-height:80vh;}
+.admin-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+.admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.admin-stat-val{font-family:var(--disp);font-size:28px;font-weight:700;color:var(--text);}
+.admin-stat-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+.admin-table th{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.admin-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:var(--panel2);}
+.log-action{font-family:var(--mono);font-size:11px;color:var(--blue2);}
+.log-time{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.banned-row td{opacity:.5;}
+.admin-search{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;width:240px;font-family:var(--mono);}
+.admin-search:focus{border-color:var(--red);}
+@media(max-width:700px){.admin-panel-wrap{grid-template-columns:1fr;}.admin-sidebar{display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);padding:8px;}.admin-nav-item{white-space:nowrap;border-left:none;border-bottom:3px solid transparent;padding:8px 14px;}.admin-nav-item.active{border-bottom-color:var(--red);border-left-color:transparent;}}
 </style>
 </head>
 <body>
@@ -478,15 +505,34 @@ a{color:inherit;text-decoration:none;}
       <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
       <button class="auth-tab" onclick="switchAuthTab('signup')">Create Account</button>
     </div>
+    <!-- LOGIN: username + password -->
     <div id="auth-login">
-      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="login-email" placeholder="driver@redline.gg"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••"></div>
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" type="text" id="login-username" placeholder="YourRacerTag" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
       <button class="btn-auth" onclick="doLogin()">Start Engine</button>
     </div>
+    <!-- SIGNUP: username + email + password -->
     <div id="auth-signup" style="display:none">
-      <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text" id="signup-user" placeholder="YourRacerTag" maxlength="20"></div>
-      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="signup-email" placeholder="driver@redline.gg"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="signup-pass" placeholder="Min. 6 characters"></div>
+      <div class="form-group">
+        <label class="form-label">Username <span style="color:var(--text3);font-size:9px;">— your public racer tag</span></label>
+        <input class="form-input" type="text" id="signup-user" placeholder="YourRacerTag" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span style="color:var(--text3);font-size:9px;">— for account recovery</span></label>
+        <input class="form-input" type="email" id="signup-email" placeholder="driver@redline.gg">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signup-pass" placeholder="Min. 6 characters"
+          onkeydown="if(event.key==='Enter')doSignup()">
+      </div>
       <button class="btn-auth" onclick="doSignup()">Join the Grid</button>
     </div>
     <div class="auth-err" id="auth-err"></div>
@@ -507,8 +553,13 @@ a{color:inherit;text-decoration:none;}
       <div class="hud-avatar" id="avatar-btn" onclick="toggleHudMenu()">
         <span id="avatar-initial">R</span>
         <div class="hud-menu" id="hud-menu">
+          <div style="padding:10px 16px 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+            <div style="font-size:13px;font-weight:600;" id="hud-menu-username">Driver</div>
+            <div id="hud-menu-role" style="margin-top:4px;"></div>
+          </div>
           <div class="hud-menu-item" onclick="showTab('profile')">👤 Profile</div>
           <div class="hud-menu-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
+          <div class="hud-menu-item" id="hud-admin-link" style="display:none;" onclick="showTab('admin')">🛡️ Admin Panel</div>
           <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
         </div>
       </div>
@@ -517,12 +568,13 @@ a{color:inherit;text-decoration:none;}
 
   <!-- NAV -->
   <nav class="nav">
-    <button class="nav-tab active" onclick="showTab('garage',this)">🏠 Garage</button>
+    <button class="nav-tab" onclick="showTab('garage',this)">🏠 Garage</button>
     <button class="nav-tab" onclick="showTab('market',this)">🏪 Market</button>
     <button class="nav-tab" onclick="showTab('auction',this)">🔨 Auction</button>
     <button class="nav-tab" onclick="showTab('race',this)">🏁 Race</button>
     <button class="nav-tab" onclick="showTab('leaderboard',this)">🏆 Leaderboard</button>
     <button class="nav-tab" onclick="showTab('profile',this)">👤 Profile</button>
+    <button class="nav-tab" id="admin-nav-tab" style="display:none;color:var(--red2);" onclick="showTab('admin',this)">🛡️ Admin</button>
   </nav>
 
   <main class="main">
@@ -692,6 +744,8 @@ a{color:inherit;text-decoration:none;}
           <div class="profile-stat"><div class="num" style="color:var(--amber)" id="ps-streak">0</div><div class="lbl2">Streak</div></div>
         </div>
       </div>
+      <!-- Profile role display -->
+      <div style="margin-top:4px;" id="profile-role-display"></div>
       <div class="grid-2">
         <div class="panel">
           <h3>Race History</h3>
@@ -704,6 +758,31 @@ a{color:inherit;text-decoration:none;}
           <div id="bid-history">
             <div class="loading-screen"><div class="spinner"></div> Loading...</div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL TAB -->
+    <div class="section" id="tab-admin">
+      <div class="sec-head">
+        <div>
+          <div class="sec-title" style="color:var(--red2);">🛡️ Admin Panel</div>
+          <div class="sec-sub">SYSTEM CONTROL · RESTRICTED ACCESS</div>
+        </div>
+        <span id="admin-role-badge" class="role-badge role-owner"></span>
+      </div>
+      <div class="admin-panel-wrap">
+        <!-- Sidebar nav -->
+        <div class="admin-sidebar">
+          <div class="admin-nav-item active" onclick="adminSection('overview',this)">📊 Overview</div>
+          <div class="admin-nav-item" onclick="adminSection('users',this)">👥 Users</div>
+          <div class="admin-nav-item" onclick="adminSection('logs',this)">📋 Activity Logs</div>
+          <div class="admin-nav-item" onclick="adminSection('market',this)">📈 Market Control</div>
+          <div class="admin-nav-item" onclick="adminSection('auctions',this)">🔨 Auctions</div>
+        </div>
+        <!-- Content area -->
+        <div class="admin-content" id="admin-content">
+          <div class="loading-screen"><div class="spinner"></div> Loading panel...</div>
         </div>
       </div>
     </div>
@@ -820,7 +899,7 @@ const DIFF_CLASS = {easy:'diff-easy',medium:'diff-medium',hard:'diff-hard',elite
 const RARITY_COLORS = {Common:'var(--text3)',Rare:'var(--blue)',Epic:'var(--purple)',Legendary:'var(--amber)',Mythic:'#f0a0ff',Limited:'var(--cyan)'};
 
 // ═══════════════════════════════════════════════
-// AUTH
+// AUTH — username-based sign in
 // ═══════════════════════════════════════════════
 function switchAuthTab(t) {
   document.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));
@@ -831,26 +910,81 @@ function switchAuthTab(t) {
 }
 
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
+  const username = document.getElementById('login-username').value.trim();
   const pass = document.getElementById('login-pass').value;
+  if (!username || !pass) { showAuthErr('Username and password required'); return; }
   showAuthErr('');
-  const {error} = await sb.auth.signInWithPassword({email,password:pass});
-  if(error) showAuthErr(error.message);
+
+  // Look up email by username from profiles table
+  const {data:prof, error:profErr} = await sb
+    .from('profiles')
+    .select('id, username, is_banned, ban_reason')
+    .ilike('username', username)
+    .single();
+
+  if (profErr || !prof) { showAuthErr('No account found with that username'); return; }
+  if (prof.is_banned) { showAuthErr(`Account suspended: ${prof.ban_reason||'Contact support'}`); return; }
+
+  // We need the email — stored in auth.users which we can't query directly with anon key.
+  // Strategy: attempt signInWithPassword using a derived approach.
+  // Since Supabase doesn't expose email by username, we store it in user_metadata at signup.
+  // Try signing in by fetching the stored email from a public profiles_email view or
+  // fall back to asking user for email if username lookup fails.
+  // For simplicity & security: store email hash in profiles, but here we use OTP-free approach:
+  // We use signInWithPassword after resolving email from the profile's auth user.
+
+  // Best practice for username login without exposing emails:
+  // Use a Supabase Edge Function. Here we use a client-side workaround:
+  // The profile 'id' IS the auth user id. We call a custom RPC that returns the email.
+  const {data:emailData, error:emailErr} = await sb.rpc('get_email_by_username', {p_username: username});
+
+  let email = emailData;
+  if (emailErr || !email) {
+    // Fallback: prompt for email (graceful degradation)
+    showAuthErr('Could not resolve account. Try signing in with email instead — run the SQL in the schema comment to enable username login.', false);
+    // Show email fallback
+    document.getElementById('login-username').placeholder = 'Email address';
+    document.getElementById('login-username').type = 'email';
+    const btn = document.querySelector('#auth-login .btn-auth');
+    btn.textContent = 'Sign In with Email';
+    btn.onclick = doLoginEmail;
+    return;
+  }
+
+  const {error} = await sb.auth.signInWithPassword({email, password:pass});
+  if (error) showAuthErr(error.message);
+}
+
+async function doLoginEmail() {
+  // Fallback direct email login
+  const email = document.getElementById('login-username').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const {error} = await sb.auth.signInWithPassword({email, password:pass});
+  if (error) showAuthErr(error.message);
 }
 
 async function doSignup() {
   const username = document.getElementById('signup-user').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const pass = document.getElementById('signup-pass').value;
-  if(!username||!email||!pass) { showAuthErr('All fields required'); return; }
-  if(pass.length<6) { showAuthErr('Password must be 6+ characters'); return; }
+  if (!username||!email||!pass) { showAuthErr('All fields required'); return; }
+  if (pass.length<6) { showAuthErr('Password must be 6+ characters'); return; }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showAuthErr('Username: 3-20 chars, letters/numbers/underscores only'); return; }
+
+  // Check username not taken
+  const {data:taken} = await sb.from('profiles').select('id').ilike('username',username).single();
+  if (taken) { showAuthErr('That username is already taken'); return; }
+
   showAuthErr('');
-  const {error} = await sb.auth.signUp({email,password:pass,options:{data:{username}}});
-  if(error) showAuthErr(error.message);
-  else showAuthErr('Check your email to confirm, then sign in!',false);
+  const {error} = await sb.auth.signUp({
+    email, password:pass,
+    options:{data:{username}}
+  });
+  if (error) showAuthErr(error.message);
+  else showAuthErr('Account created! Check your email to confirm, then sign in.', false);
 }
 
-function showAuthErr(msg,isErr=true) {
+function showAuthErr(msg, isErr=true) {
   const el = document.getElementById('auth-err');
   el.textContent = msg;
   el.style.display = msg?'block':'none';
@@ -858,8 +992,77 @@ function showAuthErr(msg,isErr=true) {
 }
 
 async function doLogout() {
+  await logActivity('logout', {username: profile?.username});
   await sb.auth.signOut();
   window.location.reload();
+}
+
+// ═══════════════════════════════════════════════
+// ACTIVITY LOGGING
+// ═══════════════════════════════════════════════
+async function logActivity(action, details={}) {
+  if (!currentUser) return;
+  try {
+    await sb.from('activity_logs').insert({
+      user_id: currentUser.id,
+      username: profile?.username || currentUser.email,
+      action,
+      details: details||{},
+      created_at: new Date().toISOString()
+    });
+  } catch(e) { /* non-blocking */ }
+}
+
+// ═══════════════════════════════════════════════
+// ROLE SYSTEM
+// ═══════════════════════════════════════════════
+const ROLES = ['owner','admin','moderator','player'];
+const ROLE_HIERARCHY = {owner:4, admin:3, moderator:2, player:1};
+
+function getRole() { return profile?.role || 'player'; }
+function isOwner() { return getRole() === 'owner'; }
+function isAdmin() { return ['owner','admin'].includes(getRole()); }
+function isMod()   { return ['owner','admin','moderator'].includes(getRole()); }
+function canManageRole(targetRole) {
+  // owner can set any role; admin can set moderator/player; mod can't change roles
+  const my = ROLE_HIERARCHY[getRole()]||1;
+  const tgt = ROLE_HIERARCHY[targetRole]||1;
+  if (isOwner()) return true;
+  if (isAdmin()) return tgt < 3; // admin can set up to moderator
+  return false;
+}
+
+function roleBadgeHTML(role) {
+  const labels = {owner:'👑 Owner', admin:'🛡️ Admin', moderator:'⚔️ Mod', player:'🏎️ Player'};
+  return `<span class="role-badge role-${role||'player'}">${labels[role||'player']||role}</span>`;
+}
+
+function applyRoleFeatures() {
+  const role = getRole();
+  const isAdm = isAdmin();
+
+  // Show/hide admin nav tab and menu item
+  document.getElementById('admin-nav-tab').style.display = isAdm ? '' : 'none';
+  document.getElementById('hud-admin-link').style.display = isAdm ? '' : 'none';
+
+  // Update HUD menu
+  document.getElementById('hud-menu-username').textContent = profile?.username || 'Driver';
+  document.getElementById('hud-menu-role').innerHTML = roleBadgeHTML(role);
+
+  // Profile role badge
+  const prd = document.getElementById('profile-role-display');
+  if (prd) prd.innerHTML = roleBadgeHTML(role);
+
+  // Admin badge in admin panel header
+  const arb = document.getElementById('admin-role-badge');
+  if (arb) { arb.textContent = role.toUpperCase(); arb.className = `role-badge role-${role}`; }
+
+  // Style HUD avatar border color by role
+  const avatarBtn = document.getElementById('avatar-btn');
+  if (role==='owner') avatarBtn.style.border='2px solid #a855f7';
+  else if (role==='admin') avatarBtn.style.border='2px solid var(--red)';
+  else if (role==='moderator') avatarBtn.style.border='2px solid var(--amber)';
+  else avatarBtn.style.border='1px solid var(--red)';
 }
 
 // ═══════════════════════════════════════════════
@@ -907,14 +1110,28 @@ async function initGame() {
 async function loadProfile() {
   const {data,error} = await sb.from('profiles').select('*').eq('id',currentUser.id).single();
   if (error || !data) {
-    // Create profile
     const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
-    await sb.from('profiles').upsert({id:currentUser.id,username,cash:50000}).select().single();
-    profile = {id:currentUser.id,username,cash:50000,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0};
+    const {data:newProf} = await sb.from('profiles').upsert({
+      id:currentUser.id, username, cash:50000, role:'player'
+    }).select().single();
+    profile = newProf || {id:currentUser.id,username,cash:50000,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0,role:'player'};
   } else {
     profile = data;
   }
-  // Give starter car if no cars owned
+
+  // Check ban
+  if (profile.is_banned) {
+    await sb.auth.signOut();
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('game').style.display='none';
+    showAuthErr(`Account suspended: ${profile.ban_reason||'Contact support'}`);
+    return;
+  }
+
+  // Log login
+  await logActivity('login', {role: profile.role, level: profile.level});
+
+  // Give starter car if new
   const {count} = await sb.from('player_cars').select('*',{count:'exact',head:true}).eq('player_id',currentUser.id);
   if (count === 0) await giveStarterCar();
 }
@@ -965,6 +1182,8 @@ function renderHUD() {
     document.getElementById('hud-car-emoji').textContent = activeCar.car.emoji||'🚗';
     document.getElementById('race-player-car').textContent = activeCar.car.emoji||'🚗';
   }
+
+  applyRoleFeatures();
   renderProfile();
 }
 
@@ -1265,6 +1484,7 @@ async function buyCar(carId, price) {
   renderMarket();
   renderHUD();
   const c = allCars.find(x=>x.id===carId);
+  await logActivity('buy_car', {car: c?.name, price, car_id: carId});
   toast(`🚗 Purchased: ${c?.name}!`,'t-success');
 }
 
@@ -1555,6 +1775,7 @@ async function submitBid() {
   closeModal('modal-bid');
   profile.cash -= amount;
   renderHUD();
+  await logActivity('bid', {auction_id: currentBidAuction.id, amount, car: currentBidAuction.car?.name});
   toast(`Bid placed: $${fmtCash(amount)} 🎯`,'t-success');
   loadAuctions();
 }
@@ -1735,6 +1956,13 @@ async function startRace(raceId) {
   }).eq('id',currentUser.id);
   profile = {...profile, cash:newCash, wins:newWins, losses:newLosses, win_streak:newStreak, best_win_streak:newBestStreak, xp:newXp, level:newLevel};
   renderHUD();
+
+  // Log race
+  await logActivity('race', {
+    race: r.name, type: r.type, diff: r.diff,
+    car: c.name, result: won?'win':'loss',
+    reward: won?r.reward:0, score: Math.round(myScore), opp_score: Math.round(oppScore)
+  });
 
   // Result
   const res = document.getElementById('race-result');
@@ -1920,7 +2148,302 @@ function toast(msg, type='t-info') {
   window._toastTimer = setTimeout(()=>{ t.className='toast'; }, 3200);
 }
 
-function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+// ═══════════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════════
+let adminCurrentSection = 'overview';
+
+function adminSection(sec, el) {
+  adminCurrentSection = sec;
+  document.querySelectorAll('.admin-nav-item').forEach(b=>b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  loadAdminSection(sec);
+}
+
+async function loadAdminPanel() {
+  if (!isAdmin()) {
+    document.getElementById('admin-content').innerHTML =
+      '<div class="empty"><div class="empty-icon">🚫</div>Access denied. Admin only.</div>';
+    return;
+  }
+  loadAdminSection(adminCurrentSection);
+}
+
+async function loadAdminSection(sec) {
+  const el = document.getElementById('admin-content');
+  el.innerHTML = '<div class="loading-screen"><div class="spinner"></div> Loading...</div>';
+  if (sec === 'overview') await renderAdminOverview(el);
+  else if (sec === 'users') await renderAdminUsers(el);
+  else if (sec === 'logs') await renderAdminLogs(el);
+  else if (sec === 'market') await renderAdminMarket(el);
+  else if (sec === 'auctions') await renderAdminAuctions(el);
+}
+
+async function renderAdminOverview(el) {
+  const [users, races, auctions, bids] = await Promise.all([
+    sb.from('profiles').select('*',{count:'exact',head:true}),
+    sb.from('races').select('*',{count:'exact',head:true}),
+    sb.from('auctions').select('*',{count:'exact',head:true}).eq('status','active'),
+    sb.from('bids').select('*',{count:'exact',head:true}),
+  ]);
+  const {data:recent} = await sb.from('activity_logs')
+    .select('username,action,details,created_at')
+    .order('created_at',{ascending:false}).limit(12);
+  const {data:online} = await sb.from('activity_logs')
+    .select('username')
+    .eq('action','login')
+    .gte('created_at', new Date(Date.now()-3600000).toISOString());
+  const onlineSet = new Set((online||[]).map(x=>x.username));
+
+  el.innerHTML = `
+    <div class="admin-stat-grid">
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--blue2);">${users.count||0}</div><div class="admin-stat-lbl">Total Players</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--green2);">${onlineSet.size}</div><div class="admin-stat-lbl">Active (1h)</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--amber);">${auctions.count||0}</div><div class="admin-stat-lbl">Live Auctions</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2);">${races.count||0}</div><div class="admin-stat-lbl">Total Races</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--purple2);">${bids.count||0}</div><div class="admin-stat-lbl">Total Bids</div></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">RECENT ACTIVITY</div>
+    <table class="admin-table">
+      <thead><tr><th>Player</th><th>Action</th><th>Details</th><th>Time</th></tr></thead>
+      <tbody>${(recent||[]).map(l=>`
+        <tr>
+          <td><strong>${l.username||'?'}</strong></td>
+          <td><span class="log-action">${l.action}</span></td>
+          <td style="font-size:11px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;">${JSON.stringify(l.details||{}).slice(0,80)}</td>
+          <td class="log-time">${timeAgo(l.created_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function renderAdminUsers(el) {
+  const {data:users} = await sb.from('profiles')
+    .select('id,username,cash,level,wins,losses,role,is_banned,ban_reason,created_at,reputation')
+    .order('created_at',{ascending:false});
+
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text3);">${(users||[]).length} total players</div>
+      <input class="admin-search" placeholder="Search players..." oninput="filterAdminUsers(this.value)" id="admin-user-search">
+    </div>
+    <div id="admin-users-table-wrap">
+      ${renderUsersTable(users||[])}
+    </div>`;
+
+  window._adminAllUsers = users||[];
+}
+
+function renderUsersTable(users) {
+  const myRole = getRole();
+  return `<table class="admin-table" id="admin-users-table">
+    <thead><tr><th>Username</th><th>Role</th><th>Level</th><th>Cash</th><th>W/L</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${users.map(u=>`
+      <tr class="${u.is_banned?'banned-row':''}">
+        <td>
+          <strong>${u.username}</strong>
+          ${u.id===currentUser.id?'<span style="font-size:10px;color:var(--text3);"> (you)</span>':''}
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text4);">${u.id}</div>
+        </td>
+        <td>${roleBadgeHTML(u.role)}</td>
+        <td style="font-family:var(--mono);">${u.level||1}</td>
+        <td style="font-family:var(--mono);color:var(--amber);">$${fmtCash(u.cash)}</td>
+        <td style="font-family:var(--mono);font-size:11px;">${u.wins||0}W / ${u.losses||0}L</td>
+        <td>
+          ${u.is_banned
+            ? `<span style="color:var(--red2);font-family:var(--mono);font-size:11px;">🚫 Banned</span>`
+            : `<span style="color:var(--green2);font-family:var(--mono);font-size:11px;">✓ Active</span>`}
+        </td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${u.id!==currentUser.id ? `
+              ${isOwner() || (isAdmin() && u.role!=='owner' && u.role!=='admin') ? `
+                <select class="form-input" style="padding:4px 6px;font-size:11px;width:auto;" onchange="setUserRole('${u.id}','${u.username}',this.value)">
+                  ${ROLES.map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
+                </select>` : ''}
+              ${!u.is_banned
+                ? `<button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(232,41,58,.25);" onclick="banUser('${u.id}','${u.username}')">Ban</button>`
+                : `<button class="btn btn-sm btn-green" onclick="unbanUser('${u.id}','${u.username}')">Unban</button>`}
+              <button class="btn btn-sm btn-amber" onclick="giveCash('${u.id}','${u.username}')">💰 Cash</button>
+            ` : '<span style="font-size:11px;color:var(--text4);">—</span>'}
+          </div>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function filterAdminUsers(q) {
+  const all = window._adminAllUsers||[];
+  const filtered = q ? all.filter(u=>u.username?.toLowerCase().includes(q.toLowerCase())) : all;
+  document.getElementById('admin-users-table-wrap').innerHTML = renderUsersTable(filtered);
+}
+
+async function setUserRole(userId, username, newRole) {
+  if (!canManageRole(newRole)) { toast('You cannot assign this role','t-error'); return; }
+  if (userId===currentUser.id) { toast('Cannot change your own role','t-error'); return; }
+  const {error} = await sb.from('profiles').update({role:newRole}).eq('id',userId);
+  if (error) { toast('Failed: '+error.message,'t-error'); return; }
+  await logActivity('set_role',{target_user:username,new_role:newRole});
+  toast(`${username} is now ${newRole}`, 't-success');
+  loadAdminSection('users');
+}
+
+async function banUser(userId, username) {
+  const reason = prompt(`Ban reason for ${username}:`, 'Violation of terms');
+  if (!reason) return;
+  const {error} = await sb.from('profiles').update({is_banned:true,ban_reason:reason}).eq('id',userId);
+  if (error) { toast('Failed: '+error.message,'t-error'); return; }
+  await logActivity('ban_user',{target:username,reason});
+  toast(`${username} banned`, 't-success');
+  loadAdminSection('users');
+}
+
+async function unbanUser(userId, username) {
+  await sb.from('profiles').update({is_banned:false,ban_reason:null}).eq('id',userId);
+  await logActivity('unban_user',{target:username});
+  toast(`${username} unbanned`, 't-success');
+  loadAdminSection('users');
+}
+
+async function giveCash(userId, username) {
+  const amt = parseInt(prompt(`Give cash to ${username}:`, '10000'));
+  if (!amt || isNaN(amt)) return;
+  const {data:target} = await sb.from('profiles').select('cash').eq('id',userId).single();
+  await sb.from('profiles').update({cash:(target?.cash||0)+amt}).eq('id',userId);
+  await logActivity('give_cash',{target:username,amount:amt});
+  toast(`Gave $${fmtCash(amt)} to ${username}`, 't-success');
+}
+
+async function renderAdminLogs(el) {
+  const {data:logs} = await sb.from('activity_logs')
+    .select('username,action,details,created_at,user_id')
+    .order('created_at',{ascending:false}).limit(100);
+
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text3);">${(logs||[]).length} recent logs</div>
+      <input class="admin-search" placeholder="Filter by action or player..." oninput="filterLogs(this.value)" id="log-search">
+    </div>
+    <div id="log-table-wrap">
+      ${renderLogTable(logs||[])}
+    </div>`;
+  window._adminAllLogs = logs||[];
+}
+
+function renderLogTable(logs) {
+  return `<table class="admin-table">
+    <thead><tr><th>Player</th><th>Action</th><th>Details</th><th>Time</th></tr></thead>
+    <tbody>${logs.map(l=>`<tr>
+      <td><strong>${l.username||'?'}</strong></td>
+      <td><span class="log-action">${l.action}</span></td>
+      <td style="font-size:11px;color:var(--text3);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${JSON.stringify(l.details||{})}</td>
+      <td class="log-time">${timeAgo(l.created_at)}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+}
+
+function filterLogs(q) {
+  const all = window._adminAllLogs||[];
+  const filtered = q ? all.filter(l=>l.action?.includes(q)||l.username?.toLowerCase().includes(q.toLowerCase())) : all;
+  document.getElementById('log-table-wrap').innerHTML = renderLogTable(filtered);
+}
+
+async function renderAdminMarket(el) {
+  const {data:prices} = await sb.from('market_prices').select('*, car:cars(name,emoji,class,rarity)').order('demand_score',{ascending:false});
+  el.innerHTML = `
+    <div style="margin-bottom:14px;display:flex;gap:8px;">
+      <button class="btn btn-amber" onclick="runMarketTick().then(()=>loadAdminSection('market'))">⚡ Force Market Tick</button>
+      <button class="btn btn-ghost" onclick="resetMarketPrices()">↺ Reset All to Base</button>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>Car</th><th>Class</th><th>Rarity</th><th>Base Price</th><th>Current Price</th><th>Demand</th><th>Actions</th></tr></thead>
+      <tbody>${(prices||[]).map(mp=>`<tr>
+        <td>${mp.car?.emoji||'🚗'} <strong>${mp.car?.name||'?'}</strong></td>
+        <td><span class="badge badge-blue">${mp.car?.class||'?'}</span></td>
+        <td><span class="badge ${rarityBadgeClass(mp.car?.rarity)}">${mp.car?.rarity||'?'}</span></td>
+        <td style="font-family:var(--mono);color:var(--text3);">$${fmtCash(mp.base_price)}</td>
+        <td style="font-family:var(--mono);color:var(--amber);">$${fmtCash(mp.current_price)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:60px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:${mp.demand_score||50}%;background:${(mp.demand_score||50)>70?'var(--red2)':(mp.demand_score||50)>45?'var(--amber)':'var(--green2)'};"></div>
+            </div>
+            <span style="font-family:var(--mono);font-size:11px;">${mp.demand_score||50}</span>
+          </div>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-ghost" onclick="adminSetPrice('${mp.car_id}','${mp.car?.name}',${mp.current_price})">Set Price</button>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function adminSetPrice(carId, name, current) {
+  const newPrice = parseInt(prompt(`Set price for ${name}:`, current));
+  if (!newPrice||isNaN(newPrice)) return;
+  await sb.from('market_prices').update({current_price:newPrice}).eq('car_id',carId);
+  if(marketPrices[carId]) marketPrices[carId].current_price=newPrice;
+  await logActivity('admin_set_price',{car:name,price:newPrice});
+  toast(`${name} price set to $${fmtCash(newPrice)}`,'t-success');
+  loadAdminSection('market');
+}
+
+async function resetMarketPrices() {
+  if (!confirm('Reset all market prices to base? This cannot be undone.')) return;
+  const {data:all} = await sb.from('market_prices').select('car_id,base_price');
+  for (const mp of (all||[])) {
+    await sb.from('market_prices').update({current_price:mp.base_price,demand_score:50}).eq('car_id',mp.car_id);
+    if(marketPrices[mp.car_id]) {marketPrices[mp.car_id].current_price=mp.base_price;marketPrices[mp.car_id].demand_score=50;}
+  }
+  await logActivity('admin_reset_market',{});
+  toast('Market prices reset to base','t-success');
+  loadAdminSection('market');
+}
+
+async function renderAdminAuctions(el) {
+  const {data:auctions} = await sb.from('auctions')
+    .select('*, car:cars(name,emoji,rarity), seller:profiles(username)')
+    .order('created_at',{ascending:false}).limit(50);
+  el.innerHTML = `
+    <div style="margin-bottom:14px;">
+      <button class="btn btn-amber" onclick="runAuctionTick().then(()=>loadAdminSection('auctions'))">⚡ Force Auction Tick</button>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>Car</th><th>Seller</th><th>Current Bid</th><th>Status</th><th>Ends</th><th>Actions</th></tr></thead>
+      <tbody>${(auctions||[]).map(a=>`<tr>
+        <td>${a.car?.emoji||'🚗'} <strong>${a.car?.name||'?'}</strong></td>
+        <td>${a.seller?.username||'NPC'}</td>
+        <td style="font-family:var(--mono);color:var(--amber);">$${fmtCash(a.current_price)}</td>
+        <td><span class="badge ${a.status==='active'?'badge-green':a.status==='sold'?'badge-amber':'badge-blue'}">${a.status}</span></td>
+        <td class="log-time">${a.status==='active'?formatCountdown(new Date(a.ends_at)):a.status}</td>
+        <td>
+          ${a.status==='active'?`<button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(232,41,58,.2);" onclick="cancelAuction('${a.id}')">Cancel</button>`:'—'}
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function cancelAuction(id) {
+  if (!confirm('Cancel this auction?')) return;
+  await sb.from('auctions').update({status:'cancelled'}).eq('id',id);
+  await logActivity('admin_cancel_auction',{auction_id:id});
+  toast('Auction cancelled','t-success');
+  loadAdminSection('auctions');
+}
+
+// Time-ago helper
+function timeAgo(ts) {
+  const diff = Date.now() - new Date(ts);
+  const m = Math.floor(diff/60000);
+  if (m<1) return 'just now';
+  if (m<60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if (h<24) return h+'h ago';
+  return Math.floor(h/24)+'d ago';
+}
 </script>
 </body>
 </html>
