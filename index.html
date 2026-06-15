@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+Here's the enhanced version with all your requested features:
+
+User names visible in DB - Admin Users panel shows full usernames, emails, and a detailed view
+Automated NPC activity feed - Live feed shows NPC actions in real-time, no 20-cap limit
+No NPC cap - Removed the 20-account limit entirely
+Better admin panel - More features, better UI, real-time stats
+<meta>
+<meta>
 <title>REDLINE</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -17,6 +21,7 @@
   --green:#258035;--green2:#35a048;--green3:rgba(37,128,53,.1);
   --blue:#1858a0;--blue2:#2878d0;--blue3:rgba(24,88,160,.1);
   --purple:#5828a0;--purple2:#7848c8;--purple3:rgba(88,40,160,.1);
+  --cyan:#0d7a8a;--cyan2:#12a8bf;--cyan3:rgba(13,122,138,.1);
   --text:#d8daea;--text2:#7880a0;--text3:#383d58;--text4:#1c2038;
   --mono:'Share Tech Mono',monospace;
   --disp:'Orbitron',sans-serif;
@@ -25,6 +30,7 @@
   --glow-red:0 0 20px rgba(212,32,32,.3);
   --glow-amber:0 0 16px rgba(200,120,32,.2);
   --glow-steel:0 0 16px rgba(192,200,224,.1);
+  --glow-cyan:0 0 16px rgba(13,122,138,.2);
 }
 body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;}
 button{font-family:var(--body);cursor:pointer;}
@@ -120,6 +126,7 @@ input,select,textarea{font-family:var(--body);}
 .badge-green{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
 .badge-red{background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.3);}
 .badge-steel{background:rgba(64,72,96,.5);color:var(--steel2);border:1px solid var(--border2);}
+.badge-cyan{background:var(--cyan3);color:var(--cyan2);border:1px solid rgba(13,122,138,.3);}
 
 /* BUTTONS */
 .btn{padding:7px 14px;border-radius:var(--r);font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .12s;font-family:var(--disp);letter-spacing:1px;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;}
@@ -131,6 +138,7 @@ input,select,textarea{font-family:var(--body);}
 .btn-green{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
 .btn-purple{background:var(--purple3);color:var(--purple2);border:1px solid rgba(88,40,160,.3);}
 .btn-blue{background:var(--blue3);color:var(--blue2);border:1px solid rgba(24,88,160,.3);}
+.btn-cyan{background:var(--cyan3);color:var(--cyan2);border:1px solid rgba(13,122,138,.3);}
 .btn-lg{padding:11px 24px;font-size:12px;letter-spacing:2px;}
 .btn-sm{padding:4px 9px;font-size:10px;}
 .btn:disabled{opacity:.3;cursor:not-allowed;}
@@ -209,10 +217,10 @@ input,select,textarea{font-family:var(--body);}
 .race-card.elite::before{background:radial-gradient(ellipse at 0% 100%,rgba(88,40,160,.1),transparent 70%);}
 .race-card:hover::before{opacity:1;}
 .race-card:hover{transform:translateY(-3px);}
-.race-card.easy:hover{border-color:rgba(37,128,53,.4);box-shadow:0 8px 28px rgba(37,128,53,.06);}
-.race-card.medium:hover{border-color:rgba(200,120,32,.4);box-shadow:0 8px 28px rgba(200,120,32,.06);}
-.race-card.hard:hover{border-color:rgba(212,32,32,.4);box-shadow:0 8px 28px rgba(212,32,32,.08);}
-.race-card.elite:hover{border-color:rgba(88,40,160,.4);box-shadow:0 8px 28px rgba(88,40,160,.1);}
+.race-card.easy:hover{border-color:rgba(37,128,53,.4);}
+.race-card.medium:hover{border-color:rgba(200,120,32,.4);}
+.race-card.hard:hover{border-color:rgba(212,32,32,.4);}
+.race-card.elite:hover{border-color:rgba(88,40,160,.4);}
 .diff-pip{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 8px;border-radius:3px;text-transform:uppercase;margin-bottom:10px;}
 .pip-easy{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
 .pip-medium{background:var(--amber3);color:var(--amber2);border:1px solid rgba(200,120,32,.3);}
@@ -239,7 +247,7 @@ input,select,textarea{font-family:var(--body);}
 .phase-go{color:var(--green2);}
 .scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
 .score-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;transition:all .4s;}
-.score-box.winner{border-color:var(--green2);background:rgba(37,128,53,.05);box-shadow:0 0 20px rgba(37,128,53,.12);}
+.score-box.winner{border-color:var(--green2);background:rgba(37,128,53,.05);}
 .score-box.loser{border-color:rgba(180,40,40,.4);background:rgba(180,40,40,.04);}
 .score-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
 .score-car{font-size:40px;margin-bottom:6px;line-height:1;}
@@ -256,7 +264,7 @@ input,select,textarea{font-family:var(--body);}
 @keyframes roadAnim{from{left:110%;}to{left:-10%;}}
 .lane-label{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:9px;color:var(--text3);z-index:3;text-transform:uppercase;letter-spacing:1px;}
 .lane-car{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;left:3%;line-height:1;filter:drop-shadow(0 0 8px rgba(212,32,32,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);}
-.lane-car.opp{transition-duration:2.8s;filter:drop-shadow(0 0 8px rgba(200,80,80,.4));}
+.lane-car.opp{transition-duration:2.8s;}
 .lane-finish{position:absolute;right:0;top:0;bottom:0;width:24px;background:repeating-conic-gradient(rgba(255,255,255,.06) 0% 25%,rgba(255,255,255,.01) 0% 50%) 0 0/12px 12px;z-index:2;}
 .speed-bar-section{margin-bottom:20px;}
 .speed-row{margin-bottom:10px;}
@@ -271,8 +279,8 @@ input,select,textarea{font-family:var(--body);}
 .result-win{background:linear-gradient(135deg,rgba(37,128,53,.08),rgba(200,120,32,.04));border:1px solid rgba(37,128,53,.3);}
 .result-lose{background:linear-gradient(135deg,rgba(212,32,32,.08),rgba(88,40,160,.04));border:1px solid rgba(212,32,32,.3);}
 .result-title{font-family:var(--disp);font-size:42px;font-weight:900;letter-spacing:4px;text-transform:uppercase;}
-.result-win .result-title{color:var(--green2);text-shadow:0 0 30px rgba(37,128,53,.4);}
-.result-lose .result-title{color:var(--red2);text-shadow:0 0 30px rgba(212,32,32,.4);}
+.result-win .result-title{color:var(--green2);}
+.result-lose .result-title{color:var(--red2);}
 .result-detail{font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:8px;line-height:1.7;}
 .result-rewards{display:flex;justify-content:center;gap:20px;margin:14px 0;flex-wrap:wrap;}
 .result-rew-item{text-align:center;}
@@ -317,33 +325,98 @@ input,select,textarea{font-family:var(--body);}
 .role-player{background:var(--panel3);color:var(--text3);border:1px solid var(--border);}
 .role-npc{background:rgba(30,32,55,.5);color:var(--text3);border:1px solid var(--border);}
 
-/* ADMIN */
-.admin-layout{display:grid;grid-template-columns:190px 1fr;gap:0;min-height:620px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
-.admin-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 0;}
-.admin-nav-item{padding:10px 16px;font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--text3);transition:all .12s;border-left:2px solid transparent;letter-spacing:1px;text-transform:uppercase;}
+/* ═══ ADMIN PANEL - ENHANCED ═══ */
+.admin-layout{display:grid;grid-template-columns:210px 1fr;gap:0;min-height:700px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.admin-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:0;display:flex;flex-direction:column;}
+.admin-sidebar-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);background:var(--panel3);}
+.admin-sidebar-title{font-family:var(--disp);font-size:11px;font-weight:700;color:var(--steel2);letter-spacing:2px;text-transform:uppercase;}
+.admin-nav-section{padding:8px 0 4px;border-bottom:1px solid var(--border);}
+.admin-nav-label{font-family:var(--mono);font-size:8px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;padding:4px 14px 2px;}
+.admin-nav-item{padding:9px 16px;font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--text3);transition:all .12s;border-left:2px solid transparent;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:7px;}
 .admin-nav-item:hover{background:var(--panel);color:var(--text2);}
 .admin-nav-item.active{background:var(--panel);color:var(--red2);border-left-color:var(--red);}
+.admin-nav-item .nav-icon{font-size:13px;}
 .admin-content{background:var(--panel);padding:20px;overflow-y:auto;max-height:85vh;}
+
+/* Admin stat cards */
 .admin-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
-.admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;position:relative;overflow:hidden;cursor:default;transition:border-color .15s;}
+.admin-stat-card:hover{border-color:var(--border2);}
+.admin-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+.admin-stat-card.stat-red::before{background:var(--red);}
+.admin-stat-card.stat-amber::before{background:var(--amber);}
+.admin-stat-card.stat-green::before{background:var(--green2);}
+.admin-stat-card.stat-blue::before{background:var(--blue2);}
+.admin-stat-card.stat-steel::before{background:var(--steel2);}
+.admin-stat-card.stat-purple::before{background:var(--purple2);}
 .admin-stat-val{font-family:var(--disp);font-size:26px;font-weight:700;}
 .admin-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.admin-stat-delta{font-family:var(--mono);font-size:9px;margin-top:3px;}
+
+/* Admin tables */
 .admin-table{width:100%;border-collapse:collapse;font-size:12px;}
-.admin-table th{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.admin-table th{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);}
 .admin-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .admin-table tr:hover td{background:var(--panel2);}
-.log-action{font-family:var(--mono);font-size:10px;color:var(--red2);}
-.admin-search{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:6px 10px;color:var(--text);font-size:12px;outline:none;width:200px;font-family:var(--mono);}
-.admin-search:focus{border-color:var(--red);}
-.live-activity{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px;max-height:220px;overflow-y:auto;}
-.live-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start;}
-.live-row:last-child{border-bottom:none;}
-.live-time{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;margin-top:1px;flex-shrink:0;}
-@media(max-width:700px){.admin-layout{grid-template-columns:1fr;}.admin-sidebar{display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);padding:6px;}.admin-nav-item{white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:8px 12px;}.admin-nav-item.active{border-bottom-color:var(--red);border-left-color:transparent;}}
+.admin-table tbody tr:last-child td{border-bottom:none;}
 
-/* NPC ACTIVITY FEED */
-.feed-container{position:fixed;bottom:24px;left:24px;z-index:400;pointer-events:none;}
-.feed-item{background:rgba(13,15,24,.95);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;font-family:var(--mono);font-size:11px;color:var(--text2);max-width:280px;backdrop-filter:blur(8px);animation:feedSlide .3s ease;transition:opacity .3s;}
+/* User row styles */
+.user-row-name{display:flex;align-items:center;gap:6px;}
+.user-avatar-sm{width:26px;height:26px;border-radius:50%;background:var(--red3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:10px;font-weight:700;color:var(--red2);flex-shrink:0;}
+.user-name-info{display:flex;flex-direction:column;}
+.user-display-name{font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--text);}
+.user-email-small{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.user-uid-small{font-family:var(--mono);font-size:8px;color:var(--text4);margin-top:1px;}
+
+/* NPC Feed enhanced */
+.npc-feed-panel{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.npc-feed-header{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg3);}
+.npc-feed-title{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px;}
+.npc-feed-body{max-height:280px;overflow-y:auto;padding:4px 0;}
+.npc-feed-row{display:flex;gap:10px;padding:7px 12px;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start;transition:background .1s;}
+.npc-feed-row:hover{background:var(--panel3);}
+.npc-feed-row:last-child{border-bottom:none;}
+.npc-feed-time{font-family:var(--mono);font-size:9px;color:var(--text4);white-space:nowrap;margin-top:1px;flex-shrink:0;width:45px;}
+.npc-feed-type{flex-shrink:0;font-size:14px;margin-top:-1px;}
+.npc-feed-text{flex:1;color:var(--text2);font-family:var(--body);}
+.npc-feed-text strong{color:var(--steel2);}
+.npc-feed-text .hl-cash{color:var(--amber2);font-family:var(--mono);}
+.npc-feed-text .hl-win{color:var(--green2);}
+.npc-feed-text .hl-loss{color:var(--red2);}
+
+/* Log styles */
+.log-action{font-family:var(--mono);font-size:10px;color:var(--red2);}
+.admin-search{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:6px 10px;color:var(--text);font-size:12px;outline:none;font-family:var(--mono);}
+.admin-search:focus{border-color:var(--red);}
+
+/* Live activity */
+.live-activity{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);max-height:220px;overflow-y:auto;}
+.live-row{display:flex;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start;}
+.live-row:last-child{border-bottom:none;}
+.live-time{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;margin-top:1px;flex-shrink:0;width:50px;}
+
+/* Action bar */
+.action-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);}
+
+/* Section header in admin */
+.admin-sec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.admin-sec-title{font-family:var(--disp);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--steel);}
+.admin-sec-sub{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;letter-spacing:1px;}
+
+/* NPC status indicator */
+.npc-status-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:3px;border:1px solid var(--border2);background:var(--panel3);}
+.npc-dot{width:6px;height:6px;border-radius:50%;background:var(--green2);animation:rtPulse 2s infinite;}
+
+@media(max-width:700px){
+  .admin-layout{grid-template-columns:1fr;}
+  .admin-sidebar{flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);}
+  .admin-nav-item{white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:8px 12px;}
+  .admin-nav-item.active{border-bottom-color:var(--red);border-left-color:transparent;}
+}
+
+/* NPC ACTIVITY FEED (floating) */
+.feed-container{position:fixed;bottom:24px;left:24px;z-index:400;pointer-events:none;max-width:300px;}
+.feed-item{background:rgba(13,15,24,.95);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;font-family:var(--mono);font-size:11px;color:var(--text2);backdrop-filter:blur(8px);animation:feedSlide .3s ease;transition:opacity .3s;}
 .feed-item.fade{opacity:0;}
 @keyframes feedSlide{from{transform:translateX(-20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 
@@ -361,7 +434,7 @@ input,select,textarea{font-family:var(--body);}
 .empty-icon{font-size:36px;margin-bottom:10px;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loading-screen{display:flex;align-items:center;justify-content:center;height:180px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--text3);}
+.loading-screen{display:flex;align-items:center;justify-content:height:180px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:30px;justify-content:center;}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;font-size:12px;z-index:9000;transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none;max-width:290px;font-family:var(--mono);box-shadow:0 8px 24px rgba(0,0,0,.6);}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.t-success{border-color:rgba(37,128,53,.5);color:var(--green2);}
@@ -380,11 +453,13 @@ input,select,textarea{font-family:var(--body);}
 .challenge-prog{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden;}
 .challenge-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px;transition:width .5s;}
 .pulse-dot{display:inline-block;width:7px;height:7px;border-radius:50%;animation:rtPulse 2s infinite;}
+.copy-uid{font-family:var(--mono);font-size:8px;color:var(--text4);cursor:pointer;transition:color .15s;padding:1px 4px;border-radius:2px;border:1px solid transparent;}
+.copy-uid:hover{color:var(--cyan2);border-color:var(--cyan3);}
 </style>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+<script></script>
+<script>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDAPdNjRs8TkDymnNyYIdc3YpgtVbthvMc",authDomain:"redline-b4422.firebaseapp.com",projectId:"redline-b4422",storageBucket:"redline-b4422.firebasestorage.app",messagingSenderId:"725052073743",appId:"1:725052073743:web:c8ebd165a59f2fd9bbc07a"});
 const auth=firebase.auth(),db=firebase.firestore();
@@ -394,6 +469,7 @@ let currentUser=null,profile=null,allCars=[],playerCars=[],marketPrices={};
 let selectedPCar=null,isRacing=false,currentMktFilter='all',currentAuctFilter='all';
 let currentBidAuction=null,currentSellPCar=null,currentUpgCat='engine',adminCurSec='overview';
 let auctUnsubs=[];
+let npcActivityLog=[];  // In-memory NPC activity log
 
 const DAILY_AMOUNTS=[5000,8000,12000,18000,25000,35000,75000];
 
@@ -464,26 +540,26 @@ const UPGRADES=[
 ];
 
 const RACE_EVENTS=[
-{id:'drag',name:'Drag Strip',desc:'Raw horsepower from 0 to ¼ mile. Launch control and torque decide it.',emoji:'🏁',diff:'easy',reward:10000,xp:150,opp:520,oppEmoji:'🚗',oppName:'Street Racer',formula:s=>s.power*0.5+s.acceleration*8},
-{id:'street',name:'Street Sprint',desc:'Short burst through traffic. Pure acceleration wins.',emoji:'🏙️',diff:'easy',reward:10000,xp:150,opp:540,oppEmoji:'🚕',oppName:'City Drifter',formula:s=>s.acceleration*10+s.power*0.3},
-{id:'circuit',name:'Road Circuit',desc:'Mixed straights and technical corners. Balanced build required.',emoji:'🔄',diff:'medium',reward:25000,xp:300,opp:1100,oppEmoji:'🏎️',oppName:'Circuit Pro',formula:s=>s.handling*8+s.power*0.4+s.top_speed*2},
-{id:'highway',name:'Highway Pull',desc:'Top speed endurance. No corners. Power is everything.',emoji:'🛣️',diff:'medium',reward:25000,xp:300,opp:1050,oppEmoji:'🚗',oppName:'Highway King',formula:s=>s.power*0.7+s.top_speed*4},
-{id:'ev',name:'EV Battle',desc:'Electric torque vs combustion. Tesla/Rimac get 500pt bonus.',emoji:'⚡',diff:'medium',reward:25000,xp:300,opp:900,oppEmoji:'⚡',oppName:'Volt Striker',formula:(s,c)=>s.power*0.3+s.acceleration*8+(['Tesla Model S Plaid','Tesla Roadster','Rimac Nevera','Lucid Air Sapphire'].includes(c?.name)?500:0)},
-{id:'offroad',name:'Off-Road Rally',desc:'Dirt, rocks and jumps. SUVs and trucks get a massive edge here.',emoji:'🌲',diff:'hard',reward:75000,xp:600,opp:1400,oppEmoji:'🚙',oppName:'Dirt Devil',formula:(s,c)=>s.power*0.4+s.handling*5+(c?.class==='SUV/Truck'?600:0)},
-{id:'drift',name:'Drift Battle',desc:'Angle, smoke, style. Handling stat is everything in this event.',emoji:'💨',diff:'hard',reward:75000,xp:600,opp:1500,oppEmoji:'🚗',oppName:'Smoke King',formula:s=>s.handling*15+s.power*0.15},
-{id:'midnight',name:'Midnight Run',desc:'Full endurance at top speed. Every single stat is equally weighted.',emoji:'🌙',diff:'elite',reward:200000,xp:1500,opp:2500,oppEmoji:'🏎️',oppName:'Ghost Racer',formula:s=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5}
+{id:'drag',name:'Drag Strip',desc:'Raw horsepower from 0 to ¼ mile.',emoji:'🏁',diff:'easy',reward:10000,xp:150,opp:520,oppEmoji:'🚗',oppName:'Street Racer',formula:s=>s.power*0.5+s.acceleration*8},
+{id:'street',name:'Street Sprint',desc:'Short burst through traffic.',emoji:'🏙️',diff:'easy',reward:10000,xp:150,opp:540,oppEmoji:'🚕',oppName:'City Drifter',formula:s=>s.acceleration*10+s.power*0.3},
+{id:'circuit',name:'Road Circuit',desc:'Mixed straights and technical corners.',emoji:'🔄',diff:'medium',reward:25000,xp:300,opp:1100,oppEmoji:'🏎️',oppName:'Circuit Pro',formula:s=>s.handling*8+s.power*0.4+s.top_speed*2},
+{id:'highway',name:'Highway Pull',desc:'Top speed endurance. Power is everything.',emoji:'🛣️',diff:'medium',reward:25000,xp:300,opp:1050,oppEmoji:'🚗',oppName:'Highway King',formula:s=>s.power*0.7+s.top_speed*4},
+{id:'ev',name:'EV Battle',desc:'Electric torque vs combustion.',emoji:'⚡',diff:'medium',reward:25000,xp:300,opp:900,oppEmoji:'⚡',oppName:'Volt Striker',formula:(s,c)=>s.power*0.3+s.acceleration*8+(['Tesla Model S Plaid','Tesla Roadster','Rimac Nevera','Lucid Air Sapphire'].includes(c?.name)?500:0)},
+{id:'offroad',name:'Off-Road Rally',desc:'SUVs and trucks dominate here.',emoji:'🌲',diff:'hard',reward:75000,xp:600,opp:1400,oppEmoji:'🚙',oppName:'Dirt Devil',formula:(s,c)=>s.power*0.4+s.handling*5+(c?.class==='SUV/Truck'?600:0)},
+{id:'drift',name:'Drift Battle',desc:'Angle, smoke, style.',emoji:'💨',diff:'hard',reward:75000,xp:600,opp:1500,oppEmoji:'🚗',oppName:'Smoke King',formula:s=>s.handling*15+s.power*0.15},
+{id:'midnight',name:'Midnight Run',desc:'Full endurance at top speed.',emoji:'🌙',diff:'elite',reward:200000,xp:1500,opp:2500,oppEmoji:'🏎️',oppName:'Ghost Racer',formula:s=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5}
 ];
 
-const NPC_NAMES=['GhostRacer','DriftKing','VelocityX','TurboSam','BoostQueen','RedlineRex','ApexHunter','BurnoutBob','CarbonKid','SlipStream','NosQueen','FlatOutFinn','DragMaster','GearheadGia','FullSend','NightOwl','TarmacTyrant','SmokeSignal','RevHead','PinStripe','OversteerOllie','NitroNadia','DownforceD','ClutchKick','WheelspinWendy'];
+const NPC_NAMES=['GhostRacer','DriftKing','VelocityX','TurboSam','BoostQueen','RedlineRex','ApexHunter','BurnoutBob','CarbonKid','SlipStream','NosQueen','FlatOutFinn','DragMaster','GearheadGia','FullSend','NightOwl','TarmacTyrant','SmokeSignal','RevHead','PinStripe','OversteerOllie','NitroNadia','DownforceD','ClutchKick','WheelspinWendy','SidewaysSue','PitlanePhil','ScreechMark','LapTimeAce','QuarterMileQ'];
 
 const ACHIEVEMENTS=[
 {id:'first_race',name:'First Race',desc:'Complete your first race',icon:'🏁',check:p=>p.wins+p.losses>=1,reward:1000},
 {id:'win5',name:'5 Wins',desc:'Win 5 races',icon:'🏆',check:p=>p.wins>=5,reward:5000},
 {id:'win25',name:'25 Wins',desc:'Win 25 races',icon:'🥇',check:p=>p.wins>=25,reward:25000},
 {id:'win100',name:'Century Club',desc:'Win 100 races',icon:'💯',check:p=>p.wins>=100,reward:100000},
-{id:'streak5',name:'On Fire',desc:'Win 5 races in a row',icon:'🔥',check:p=>p.best_win_streak>=5,reward:10000},
-{id:'streak10',name:'Unstoppable',desc:'Win 10 races in a row',icon:'⚡',check:p=>p.best_win_streak>=10,reward:50000},
-{id:'rich',name:'Millionaire',desc:'Have $1,000,000 cash',icon:'💰',check:p=>p.cash>=1000000,reward:10000},
+{id:'streak5',name:'On Fire',desc:'Win 5 in a row',icon:'🔥',check:p=>p.best_win_streak>=5,reward:10000},
+{id:'streak10',name:'Unstoppable',desc:'Win 10 in a row',icon:'⚡',check:p=>p.best_win_streak>=10,reward:50000},
+{id:'rich',name:'Millionaire',desc:'Have $1,000,000',icon:'💰',check:p=>p.cash>=1000000,reward:10000},
 {id:'cars3',name:'Collector',desc:'Own 3 cars',icon:'🚗',check:(p,pc)=>pc>=3,reward:5000},
 {id:'cars10',name:'Fleet Owner',desc:'Own 10 cars',icon:'🏎️',check:(p,pc)=>pc>=10,reward:50000},
 {id:'daily7',name:'Week Warrior',desc:'7-day login streak',icon:'📅',check:p=>p.daily_streak>=7,reward:25000},
@@ -510,6 +586,10 @@ function timeAgo(d){
   if(s<86400)return Math.floor(s/3600)+'h ago';
   return Math.floor(s/86400)+'d ago';
 }
+function nowStr(){
+  const n=new Date();
+  return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+':'+n.getSeconds().toString().padStart(2,'0');
+}
 let _toastTimer=null;
 function toast(msg,cls='t-info'){
   const el=document.getElementById('toast');
@@ -525,8 +605,8 @@ function showXpPop(txt){
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+function copyToClipboard(text){navigator.clipboard?.writeText(text).then(()=>toast('Copied!','t-info')).catch(()=>{});}
 
-// Close modals on overlay click
 document.addEventListener('click',e=>{
   document.querySelectorAll('.modal-overlay.open').forEach(m=>{if(e.target===m)m.classList.remove('open');});
 });
@@ -654,7 +734,7 @@ function showDailyBonus(){
   const streak=Math.min((profile.daily_streak||0),DAILY_AMOUNTS.length-1);
   const amount=DAILY_AMOUNTS[streak];
   document.getElementById('daily-amount').textContent='$'+fmtCashFull(amount);
-  document.getElementById('daily-streak').textContent=`Day ${streak+1} streak · Come back tomorrow to continue!`;
+  document.getElementById('daily-streak').textContent=`Day ${streak+1} streak · Come back tomorrow!`;
   const days=['M','T','W','T','F','S','S'];
   document.getElementById('daily-days').innerHTML=days.map((d,i)=>`<div class="daily-day ${i<streak?'done':i===streak?'today':''}">${i<streak?'✓':d}</div>`).join('');
   document.getElementById('daily-banner').classList.add('show');
@@ -743,7 +823,7 @@ function renderPlayerCars(){
   const grid=document.getElementById('garage-grid');
   document.getElementById('garage-count').textContent=playerCars.length;
   if(!playerCars.length){
-    grid.innerHTML='<div class="empty"><div class="empty-icon">🏠</div>Your garage is empty!<br><br><button class="btn btn-gold" onclick="showTab(\'market\')">Browse Cars →</button></div>';
+    grid.innerHTML='<div class="empty"><div class="empty-icon">🏠</div>Your garage is empty!<br><br><button class="btn btn-gold" onclick="showTab('market')">Browse Cars →</button></div>';
     return;
   }
   grid.innerHTML=playerCars.map(pc=>`
@@ -902,7 +982,7 @@ function setMktFilter(btn){
 }
 async function buyCar(carName,price){
   if(!profile){toast('Not logged in','t-error');return;}
-  if(profile.cash<price){toast('Not enough cash! Win races or claim your daily bonus.','t-error');return;}
+  if(profile.cash<price){toast('Not enough cash!','t-error');return;}
   if(playerCars.find(p=>p.car_name===carName)){toast('You already own this car!','t-error');return;}
   const car=allCars.find(c=>c.name===carName);if(!car)return;
   await db.collection('player_cars').add({player_id:currentUser.uid,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:price,is_active:playerCars.length===0,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
@@ -998,7 +1078,7 @@ async function renderAuctions(){
       .sort((a,b)=>a.ends_at.toDate()-b.ends_at.toDate());
     if(currentAuctFilter==='ending_soon'){
       auctions=auctions.filter(a=>(a.ends_at.toDate()-now)<7200000);
-    } else if(currentAuctFilter!=='all'){
+    }else if(currentAuctFilter!=='all'){
       auctions=auctions.filter(a=>a.event_type===currentAuctFilter);
     }
     if(!auctions.length){
@@ -1008,1310 +1088,4 @@ async function renderAuctions(){
     const EVT={hypercar:'🏆 HYPERCAR NIGHT',jdm_night:'🎌 JDM NIGHT',muscle_madness:'💪 MUSCLE MADNESS'};
     grid.innerHTML=auctions.map(a=>{
       const end=a.ends_at.toDate();
-      const timeLeft=end-now;
-      const urgent=timeLeft<3600000;
-      const isMe=a.seller_id===currentUser.uid;
-      const isMine=a.highest_bidder_id===currentUser.uid;
-      return `<div class="auction-card">
-        ${EVT[a.event_type]?`<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2px;color:var(--amber2);margin-bottom:8px">${EVT[a.event_type]}</div>`:''}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span class="badge ${rcls(a.car_rarity)}">${a.car_rarity||'?'}</span>
-          <div style="display:flex;align-items:center;gap:6px">
-            ${isMine&&!isMe?'<span style="font-family:var(--mono);font-size:9px;color:var(--green2)">★ Winning</span>':''}
-            <span class="auction-timer ${urgent?'urgent':''}" data-ends="${end.toISOString()}">${fmtCD(end)}</span>
-          </div>
-        </div>
-        <div style="font-size:36px;margin:10px 0;filter:drop-shadow(0 0 6px rgba(212,32,32,.2))">${a.car_emoji||'🚗'}</div>
-        <div class="car-name" style="margin-bottom:2px">${a.car_name||'?'}</div>
-        <div class="car-brand" style="margin-bottom:10px">Listed by <span style="color:var(--text2)">${a.seller_username||'?'}</span></div>
-        <div class="auction-price">$${fmtCash(a.current_price)}</div>
-        <div class="auction-bids">${a.bid_count||0} bids${a.buyout_price?' · Buyout: $'+fmtCash(a.buyout_price):' · No buyout'}</div>
-        <div style="display:flex;gap:6px;margin-top:12px">
-          ${isMe?'<button class="btn btn-ghost" style="flex:1;opacity:.5" disabled>Your Listing</button>':
-            `<button class="btn btn-red" style="flex:1" onclick="openBidModal('${a.id}')">⚡ Bid Now</button>
-             ${a.buyout_price&&profile.cash>=a.buyout_price?`<button class="btn btn-gold btn-sm" onclick="buyoutAuction('${a.id}',${a.buyout_price},'${a.car_name}','${a.car_emoji}','${a.seller_id}')">Buy</button>`:''}`
-          }
-          <button class="btn btn-ghost btn-sm" onclick="viewCar('${a.car_name}')">Info</button>
-        </div>
-      </div>`;
-    }).join('');
-    startCDTick();
-  }catch(e){
-    console.error('renderAuctions error:',e);
-    grid.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>'+e.message+'</div>';
-  }
-}
-function setAuctFilter(btn){
-  currentAuctFilter=btn.dataset.evt;
-  document.querySelectorAll('[data-evt]').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderAuctions();
-}
-function startCDTick(){
-  clearInterval(window._cdTick);
-  window._cdTick=setInterval(()=>{
-    document.querySelectorAll('.auction-timer[data-ends]').forEach(el=>{
-      const t=new Date(el.dataset.ends);el.textContent=fmtCD(t);
-      el.classList.toggle('urgent',(t-Date.now())<3600000);
-    });
-  },1000);
-}
-async function openBidModal(aId){
-  const doc=await db.collection('auctions').doc(aId).get();if(!doc.exists)return;
-  currentBidAuction={id:doc.id,...doc.data()};
-  const a=currentBidAuction;
-  const minBid=Math.round(a.current_price*1.05)||a.current_price+500;
-  document.getElementById('bid-car-info').innerHTML=`<div style="display:flex;gap:12px;align-items:center;padding:12px;background:var(--panel2);border-radius:var(--r);border:1px solid var(--border)"><div style="font-size:40px">${a.car_emoji||'🚗'}</div><div><div class="car-name">${a.car_name}</div><div class="car-brand">${a.car_class} · ${a.car_rarity}</div></div></div>`;
-  document.getElementById('bid-curr').textContent=fmtCash(a.current_price);
-  document.getElementById('bid-mycash').textContent=fmtCash(profile.cash);
-  document.getElementById('bid-min').textContent=fmtCash(minBid);
-  document.getElementById('bid-buyout-disp').textContent=a.buyout_price?'$'+fmtCash(a.buyout_price):'N/A';
-  document.getElementById('bid-input').value=minBid;
-  const bSnap=await db.collection('auctions').doc(aId).collection('bids').orderBy('created_at','desc').limit(5).get();
-  document.getElementById('bid-hist-list').innerHTML=bSnap.empty?'<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px 0">No bids yet — be the first!</div>':bSnap.docs.map(b=>`<div class="bid-row"><span style="font-weight:600">${b.data().bidder_username||'?'}</span><span class="bid-amount">$${fmtCash(b.data().amount)}</span></div>`).join('');
-  openModal('modal-bid');
-}
-async function submitBid(){
-  if(!currentBidAuction)return;
-  const amount=parseInt(document.getElementById('bid-input').value);
-  if(!amount||amount<=0){toast('Enter a valid amount','t-error');return;}
-  if(amount<=currentBidAuction.current_price){toast(`Must exceed $${fmtCash(currentBidAuction.current_price)}`,'t-error');return;}
-  if(profile.cash<amount){toast('Not enough cash!','t-error');return;}
-  if(currentBidAuction.seller_id===currentUser.uid){toast("Can't bid on your own listing",'t-error');return;}
-  if(currentBidAuction.highest_bidder_id&&currentBidAuction.highest_bidder_id!==currentUser.uid)
-    db.collection('profiles').doc(currentBidAuction.highest_bidder_id).update({cash:firebase.firestore.FieldValue.increment(currentBidAuction.current_price)}).catch(()=>{});
-  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-amount)});
-  profile.cash-=amount;
-  await db.collection('auctions').doc(currentBidAuction.id).update({current_price:amount,highest_bidder_id:currentUser.uid,highest_bidder_username:profile.username,bid_count:firebase.firestore.FieldValue.increment(1)});
-  await db.collection('auctions').doc(currentBidAuction.id).collection('bids').add({bidder_id:currentUser.uid,bidder_username:profile.username,amount,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  closeModal('modal-bid');renderHUD();
-  logActivity('bid',{car:currentBidAuction.car_name,amount}).catch(()=>{});
-  toast(`Bid placed: $${fmtCash(amount)} 🎯`,'t-success');
-  renderAuctions();
-}
-async function buyoutAuction(aId,price,carName,carEmoji,sellerId){
-  if(!confirm(`Buy out for $${fmtCash(price)}?`))return;
-  if(profile.cash<price){toast('Not enough cash!','t-error');return;}
-  const doc=await db.collection('auctions').doc(aId).get();
-  const a=doc.data();
-  if(a.highest_bidder_id&&a.highest_bidder_id!==currentUser.uid)
-    db.collection('profiles').doc(a.highest_bidder_id).update({cash:firebase.firestore.FieldValue.increment(a.current_price)}).catch(()=>{});
-  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-price)});
-  const fee=Math.round(price*0.05);
-  await db.collection('profiles').doc(sellerId).update({cash:firebase.firestore.FieldValue.increment(price-fee)}).catch(()=>{});
-  await db.collection('auctions').doc(aId).update({status:'sold',current_price:price});
-  const car=allCars.find(c=>c.name===carName)||{};
-  await db.collection('player_cars').add({player_id:currentUser.uid,car_name:carName,car_class:car.class||'',car_emoji:carEmoji||'🚗',purchase_price:price,is_active:false,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
-  profile.cash-=price;
-  await loadPlayerCars();renderHUD();renderAuctions();
-  logActivity('buyout',{car:carName,price}).catch(()=>{});
-  toast(`🏆 ${carName} bought out! Added to garage.`,'t-success');
-  checkAchievements();
-}
-function openListModal(){
-  if(!playerCars.length){toast('Own a car first!','t-error');return;}
-  currentSellPCar=selectedPCar?playerCars.find(x=>x.id===selectedPCar):playerCars[0];
-  if(!currentSellPCar)return;
-  const car=allCars.find(c=>c.name===currentSellPCar.car_name);
-  document.getElementById('sell-car-info').innerHTML=`<div style="display:flex;gap:12px;align-items:center;padding:12px;background:var(--panel2);border-radius:var(--r);border:1px solid var(--border)"><div style="font-size:32px">${currentSellPCar.car_emoji||'🚗'}</div><div><div class="car-name">${currentSellPCar.car_name}</div><div class="car-brand">${car?.rarity||''} ${car?.class||''}</div></div></div>`;
-  document.getElementById('sell-start').value=Math.round((car?.base_price||10000)*0.6);
-  document.getElementById('sell-buyout').value='';
-  openModal('modal-sell');
-}
-async function submitAuction(){
-  if(!currentSellPCar)return;
-  const start=parseInt(document.getElementById('sell-start').value);
-  const buyout=document.getElementById('sell-buyout').value;
-  const hours=parseInt(document.getElementById('sell-dur').value);
-  const evt=document.getElementById('sell-evt').value;
-  if(!start||start<100){toast('Enter a valid starting price','t-error');return;}
-  const car=allCars.find(c=>c.name===currentSellPCar.car_name);
-  await db.collection('auctions').add({seller_id:currentUser.uid,seller_username:profile.username,car_name:currentSellPCar.car_name,car_emoji:currentSellPCar.car_emoji,car_class:car?.class||'',car_rarity:car?.rarity||'Common',player_car_id:currentSellPCar.id,event_type:evt,starting_price:start,current_price:start,buyout_price:buyout?parseInt(buyout):null,highest_bidder_id:null,highest_bidder_username:null,bid_count:0,status:'active',ends_at:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+hours*3600000)),created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  closeModal('modal-sell');
-  toast('Car listed for auction! 🔨','t-success');
-  logActivity('list_auction',{car:currentSellPCar.car_name,start}).catch(()=>{});
-  renderAuctions();
-}
-function openSell(){if(!selectedPCar){toast('Select a car first','t-error');return;}openListModal();}
-function viewCar(name){
-  const c=allCars.find(x=>x.name===name);if(!c)return;
-  const mp=marketPrices[c.name];
-  const owned=playerCars.find(pc=>pc.car_name===name);
-  const price=mp?.current_price||c.base_price;
-  document.getElementById('modal-car-body').innerHTML=`
-    <div style="text-align:center;font-size:60px;margin:8px 0;filter:drop-shadow(0 0 12px rgba(212,32,32,.3))">${c.emoji}</div>
-    <div class="modal-title">${c.name}</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-      <span class="badge ${rcls(c.rarity)}">${c.rarity}</span>
-      <span class="badge badge-steel">${c.class}</span>
-      <span class="badge badge-steel">${c.brand}</span>
-    </div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">${c.description}</p>
-    ${statsHTML(c.power,c.top_speed,c.acceleration,c.handling,c.braking,c.weight)}
-    <div style="margin-top:14px;padding:12px;background:var(--panel2);border-radius:var(--r);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase">Market Price</div>
-        <div style="font-family:var(--disp);font-size:22px;font-weight:700;color:var(--amber2)">$${fmtCash(price)}</div>
-      </div>
-      ${owned?'<span class="badge badge-green" style="font-size:11px">✓ In Garage</span>':profile.cash>=price?`<button class="btn btn-red" onclick="closeModal('modal-car');buyCar('${name}',${price})">Buy Now</button>`:`<span class="badge badge-red">Need $${fmtCash(price-profile.cash)} more</span>`}
-    </div>`;
-  openModal('modal-car');
-}
-
-// ═══ RACING ═══
-function renderRaceEvents(){
-  const DIFF={easy:'pip-easy',medium:'pip-medium',hard:'pip-hard',elite:'pip-elite'};
-  document.getElementById('race-grid').innerHTML=RACE_EVENTS.map(r=>`
-    <div class="race-card ${r.diff}" onclick="startRace('${r.id}')">
-      <div style="font-size:32px;margin-bottom:8px;line-height:1">${r.emoji}</div>
-      <span class="diff-pip ${DIFF[r.diff]}">${r.diff.toUpperCase()}</span>
-      <div class="race-name">${r.name}</div>
-      <div class="race-desc">${r.desc}</div>
-      <div class="race-footer">
-        <div>
-          <div class="race-reward">+$${r.reward.toLocaleString()}</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">+${r.xp} XP earned</div>
-        </div>
-        <button class="btn btn-red btn-sm" onclick="event.stopPropagation();startRace('${r.id}')">RACE ▶</button>
-      </div>
-    </div>`).join('');
-}
-const RACE_TIPS={drag:'More HP + Turbo upgrades win drags.',circuit:'Handling + HP = circuit king.',street:'Acceleration upgrades are key.',highway:'Max power and top speed builds.',offroad:'SUV/Truck gets a massive +600 bonus.',drift:'Max handling upgrades for drifts.',midnight:'Balance ALL stats for endurance.',ev:'Tesla, Rimac, Lucid get 500pt bonus.'};
-
-async function startRace(rid){
-  if(isRacing)return;
-  const r=RACE_EVENTS.find(x=>x.id===rid);if(!r)return;
-  const pc=playerCars.find(p=>p.is_active)||playerCars[0];
-  if(!pc){toast('You need to set an active car in your Garage first!','t-error');return;}
-  const c=pc.car||{};
-  const s={power:(c.power||300)+(pc.power_boost||0),top_speed:(c.top_speed||150)+(pc.speed_boost||0),acceleration:c.acceleration||50,handling:(c.handling||50)+(pc.handling_boost||0),braking:c.braking||50};
-  isRacing=true;
-
-  const arena=document.getElementById('race-arena');
-  arena.style.display='block';
-  document.getElementById('race-result').style.display='none';
-  document.getElementById('scoreboard').style.display='none';
-  document.getElementById('arena-title').textContent=r.name;
-  setArenaBadge('ready','READY');
-  document.getElementById('p-lbl').textContent=(profile.username||'YOU').toUpperCase();
-  document.getElementById('opp-lbl').textContent=r.oppName.toUpperCase();
-  document.getElementById('player-lane-lbl').textContent=(profile.username||'YOU').slice(0,8).toUpperCase();
-  document.getElementById('opp-lane-label').textContent=r.oppName.split(' ')[0].toUpperCase();
-  document.getElementById('score-car-p').textContent=pc.car_emoji||'🚗';
-  document.getElementById('score-name-p').textContent=(profile.username||'YOU').toUpperCase();
-  document.getElementById('opp-emoji').textContent=r.oppEmoji||'🏎️';
-  document.getElementById('opp-name').textContent=r.oppName;
-  document.getElementById('r-player').textContent=pc.car_emoji||'🚗';
-  document.getElementById('r-opp').textContent=r.oppEmoji||'🏎️';
-
-  ['p-fill','o-fill'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.width='0%';});
-  ['r-player','r-opp'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.left='3%';});
-  document.getElementById('p-score').textContent='';
-  document.getElementById('o-score').textContent='';
-  document.getElementById('score-val-p').textContent='—';
-  document.getElementById('score-val-o').textContent='—';
-  document.getElementById('score-box-p').className='score-box';
-  document.getElementById('score-box-o').className='score-box';
-
-  const ph=document.getElementById('phase-disp');
-  ph.style.display='block';
-  setArenaBadge('countdown','COUNTDOWN');
-  for(const[i,txt]of['3','2','1','GO!'].entries()){
-    await sleep(650);
-    ph.textContent=txt;
-    ph.className='phase-display '+(i===3?'phase-go':'phase-cd');
-    ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
-  }
-  await sleep(250);ph.style.display='none';
-  setArenaBadge('racing','RACING');
-
-  const myScore=r.formula(s,c);
-  const variance=r.opp*0.13;
-  const oppScore=r.opp+(Math.random()*variance*2-variance);
-  const won=myScore>oppScore;
-  const close=Math.abs(myScore-oppScore)<r.opp*0.06;
-  const mx=Math.max(myScore,oppScore,100);
-  const pp=Math.min(88,Math.round((myScore/mx)*88));
-  const op=Math.min(88,Math.round((oppScore/mx)*88));
-
-  await sleep(100);
-  document.getElementById('p-fill').style.cssText=`transition:width 2.4s cubic-bezier(.2,.6,.3,1);width:${pp}%`;
-  document.getElementById('o-fill').style.cssText=`transition:width 2.8s cubic-bezier(.2,.6,.3,1);width:${op}%`;
-  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(212,32,32,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
-  document.getElementById('r-opp').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(200,80,80,.4));transition:left 2.8s cubic-bezier(.2,.6,.3,1);left:${op}%`;
-  document.getElementById('p-score').textContent='Score: '+Math.round(myScore);
-  document.getElementById('o-score').textContent='Score: '+Math.round(oppScore);
-  await sleep(2900);
-
-  setArenaBadge(won?'victory':'defeat',won?'VICTORY!':'DEFEAT');
-  document.getElementById('scoreboard').style.display='grid';
-  document.getElementById('score-val-p').textContent=Math.round(myScore);
-  document.getElementById('score-val-o').textContent=Math.round(oppScore);
-  document.getElementById('score-box-p').className='score-box '+(won?'winner':'loser');
-  document.getElementById('score-box-o').className='score-box '+(won?'loser':'winner');
-
-  const cashGain=won?r.reward:0;
-  const newCash=profile.cash+cashGain;
-  const newWins=(profile.wins||0)+(won?1:0);
-  const newLosses=(profile.losses||0)+(won?0:1);
-  const newStreak=won?(profile.win_streak||0)+1:0;
-  const newBestStreak=Math.max(profile.best_win_streak||0,newStreak);
-  const newXp=(profile.xp||0)+r.xp;
-  const newLevel=Math.floor(newXp/1000)+1;
-  const levUp=newLevel>(profile.level||1);
-  const newRep=(profile.reputation||0)+(won?12:3);
-  await db.collection('profiles').doc(currentUser.uid).update({cash:newCash,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep});
-  profile={...profile,cash:newCash,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
-  db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),reward:cashGain,xp:r.xp,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-  logActivity('race',{race:r.name,result:won?'win':'loss',reward:cashGain}).catch(()=>{});
-  renderHUD();
-
-  await sleep(400);
-  const resultBox=document.getElementById('race-result');
-  resultBox.style.display='block';
-  resultBox.className='result-box '+(won?'result-win':'result-lose');
-  const streakMsg=newStreak>2?` · 🔥 ${newStreak}-race streak!`:'';
-  const closeMsg=close?' · Dead Heat — close call!':'';
-  resultBox.innerHTML=won?`
-    <div style="font-size:52px;margin-bottom:10px">🏆</div>
-    <div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(cashGain)}</div><div class="result-rew-lbl">Cash</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--purple2)">+12</div><div class="result-rew-lbl">Rep</div></div>
-    </div>
-    <div class="result-detail">${streakMsg||closeMsg||'Well driven!'}</div>
-    ${levUp?`<div style="margin-top:10px;padding:8px 14px;background:var(--amber3);border:1px solid rgba(200,120,32,.3);border-radius:var(--r);font-family:var(--disp);font-size:14px;font-weight:700;color:var(--amber2);letter-spacing:2px">⬆️ LEVEL UP → ${newLevel}!</div>`:''}`
-  :`<div style="font-size:52px;margin-bottom:10px">💥</div>
-    <div class="result-title">DEFEAT</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-    </div>
-    <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
-    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]||'Upgrade your car!'}</div>`;
-  resultBox.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn btn-ghost" onclick="resetArena()">↺ Race Again</button><button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button></div>`;
-
-  if(won){toast(`Victory! +$${fmtCash(cashGain)}`,'t-success');showXpPop(`+${r.xp} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
-  else toast('Defeat — check tips!','t-error');
-  isRacing=false;
-  checkAchievements();
-}
-function setArenaBadge(type,text){
-  const el=document.getElementById('arena-badge');
-  el.textContent=text;el.className='arena-badge '+type;
-}
-function resetArena(){
-  document.getElementById('race-arena').style.display='none';
-  document.getElementById('race-result').style.display='none';
-  document.getElementById('scoreboard').style.display='none';
-}
-
-// ═══ CHALLENGES & ACHIEVEMENTS ═══
-async function renderChallenges(){
-  const dailyChallenges=[
-    {id:'race3',name:'Complete 3 Races',desc:'Win or lose',icon:'🏁',target:3,get:p=>Math.min(3,(p.wins||0)+(p.losses||0)),reward:8000},
-    {id:'win2',name:'Win 2 Races Today',desc:'Back-to-back victories',icon:'🏆',target:2,get:p=>Math.min(2,p.wins||0),reward:15000},
-    {id:'bid1',name:'Place a Bid',desc:'Bid on any auction',icon:'🔨',target:1,get:()=>0,reward:5000},
-    {id:'upgrade1',name:'Buy an Upgrade',desc:'Upgrade any car',icon:'🔧',target:1,get:()=>0,reward:5000},
-  ];
-  document.getElementById('daily-challenges').innerHTML=dailyChallenges.map(ch=>{
-    const prog=ch.get(profile);
-    const pct=Math.min(100,(prog/ch.target)*100);
-    const done=prog>=ch.target;
-    return `<div class="challenge-item">
-      <div class="challenge-icon">${ch.icon}</div>
-      <div class="challenge-info">
-        <div class="challenge-name">${ch.name}</div>
-        <div style="font-size:11px;color:var(--text2)">${ch.desc}</div>
-        <div class="challenge-prog"><div class="challenge-fill" style="width:${pct}%"></div></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px">${prog}/${ch.target} · Reward: $${fmtCash(ch.reward)}</div>
-      </div>
-      ${done?'<span class="badge badge-green">✓ Done</span>':''}
-    </div>`;
-  }).join('');
-
-  const weeklyMissions=[
-    {name:'Win 15 Races',icon:'🏆',target:15,get:p=>Math.min(15,p.wins||0),reward:50000},
-    {name:'Buy 2 Cars',icon:'🚗',target:2,get:(p,pc)=>Math.min(2,pc),reward:30000},
-    {name:'Reach Lv.5',icon:'⭐',target:5,get:p=>Math.min(5,p.level||1),reward:25000},
-    {name:'Earn $100k',icon:'💰',target:100000,get:p=>Math.min(100000,p.cash||0),reward:20000},
-  ];
-  document.getElementById('weekly-challenges').innerHTML=weeklyMissions.map(m=>{
-    const prog=m.get(profile,playerCars.length);
-    const pct=Math.min(100,(prog/m.target)*100);
-    const done=prog>=m.target;
-    return `<div class="challenge-item">
-      <div class="challenge-icon">${m.icon}</div>
-      <div class="challenge-info">
-        <div class="challenge-name">${m.name}</div>
-        <div class="challenge-prog"><div class="challenge-fill" style="width:${pct}%"></div></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px">${m.target>999?'$'+fmtCash(prog)+' / $'+fmtCash(m.target):prog+'/'+m.target} · Reward: $${fmtCash(m.reward)}</div>
-      </div>
-      ${done?'<span class="badge badge-green">✓ Done</span>':''}
-    </div>`;
-  }).join('');
-
-  document.getElementById('achievements-grid').innerHTML=ACHIEVEMENTS.map(a=>{
-    const earned=(profile.achievements||[]).includes(a.id)||(a.check(profile,playerCars.length));
-    return `<div class="ach-card ${earned?'earned':''}">
-      <div class="ach-icon">${a.icon}</div>
-      <div>
-        <div class="ach-name" style="${earned?'color:var(--amber2)':''}">${a.name}</div>
-        <div class="ach-desc">${a.desc}</div>
-        ${earned?'<div style="font-family:var(--mono);font-size:9px;color:var(--green2);margin-top:3px">✓ Earned!</div>':`<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px">$${fmtCash(a.reward)} reward</div>`}
-      </div>
-    </div>`;
-  }).join('');
-}
-async function checkAchievements(){
-  if(!profile)return;
-  const earned=profile.achievements||[];
-  const newlyEarned=[];
-  for(const a of ACHIEVEMENTS){
-    if(!earned.includes(a.id)&&a.check(profile,playerCars.length)){
-      newlyEarned.push(a);earned.push(a.id);
-    }
-  }
-  if(newlyEarned.length){
-    const totalReward=newlyEarned.reduce((s,a)=>s+a.reward,0);
-    await db.collection('profiles').doc(currentUser.uid).update({achievements:earned,cash:firebase.firestore.FieldValue.increment(totalReward)});
-    profile.cash+=totalReward;profile.achievements=earned;
-    renderHUD();
-    newlyEarned.forEach(a=>{
-      setTimeout(()=>toast(`🏅 Achievement: ${a.name} · +$${fmtCash(a.reward)}`,'t-success'),300);
-      showXpPop(a.icon+' '+a.name);
-    });
-  }
-}
-
-// ═══ LEADERBOARD ═══
-async function loadLeaderboard(){
-  const [wSnap,cSnap,sSnap]=await Promise.all([
-    db.collection('profiles').where('is_npc','!=',true).orderBy('is_npc').orderBy('wins','desc').limit(10).get().catch(()=>db.collection('profiles').orderBy('wins','desc').limit(10).get()),
-    db.collection('profiles').orderBy('cash','desc').limit(10).get(),
-    db.collection('profiles').orderBy('best_win_streak','desc').limit(10).get()
-  ]);
-  const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${d.is_npc?'<span style="font-size:9px;color:var(--text3)"> 🤖</span>':''}${d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
-  document.getElementById('lb-wins').innerHTML=wSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().wins||0)+' W')).join('');
-  document.getElementById('lb-cash').innerHTML=cSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,'$'+fmtCash(d.data().cash))).join('');
-  document.getElementById('lb-streak').innerHTML=sSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().best_win_streak||0)+' 🔥')).join('');
-  const gSnap=await db.collection('player_cars').get();
-  const counts={};gSnap.docs.forEach(d=>{const p=d.data().player_id;counts[p]=(counts[p]||0)+1;});
-  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const unames={};
-  await Promise.all(top.map(async([uid])=>{const d=await db.collection('profiles').doc(uid).get();if(d.exists)unames[uid]=d.data();}));
-  document.getElementById('lb-garage').innerHTML=top.map(([uid,cnt],i)=>row({...(unames[uid]||{username:'?'}),id:uid},i,cnt+' cars')).join('');
-}
-
-// ═══ PROFILE ═══
-async function renderProfile(){
-  if(!profile)return;
-  document.getElementById('prof-name').textContent=profile.username;
-  document.getElementById('prof-lvl').textContent=profile.level||1;
-  document.getElementById('prof-rep').textContent=(profile.reputation||0).toLocaleString();
-  document.getElementById('prof-streak-cnt').textContent=profile.win_streak||0;
-  document.getElementById('ps-wins').textContent=profile.wins||0;
-  document.getElementById('ps-losses').textContent=profile.losses||0;
-  document.getElementById('ps-cash').textContent='$'+fmtCash(profile.cash);
-  document.getElementById('ps-best').textContent=profile.best_win_streak||0;
-  const xpNext=(profile.level||1)*1000;
-  document.getElementById('xp-curr').textContent=profile.xp||0;
-  document.getElementById('xp-next').textContent=xpNext;
-  document.getElementById('xp-bar').style.width=Math.min(100,((profile.xp||0)/xpNext)*100)+'%';
-  document.getElementById('prof-av').textContent=(profile.username||'R')[0].toUpperCase();
-  document.getElementById('prof-role').innerHTML=roleBadge(profile.role);
-  const wr=profile.wins+profile.losses>0?Math.round((profile.wins/(profile.wins+profile.losses))*100):0;
-  document.getElementById('prof-stats-detail').innerHTML=`
-    <div class="stat-row"><div class="stat-lbl">Win Rate</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${wr}%;background:var(--green2)"></div></div><div class="stat-val">${wr}%</div></div>
-    <div class="stat-row"><div class="stat-lbl">Total Races</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.wins+profile.losses)/2)}%;background:var(--blue2)"></div></div><div class="stat-val">${(profile.wins||0)+(profile.losses||0)}</div></div>
-    <div class="stat-row"><div class="stat-lbl">Cars Owned</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,playerCars.length*10)}%;background:var(--amber2)"></div></div><div class="stat-val">${playerCars.length}</div></div>
-    <div class="stat-row"><div class="stat-lbl">Reputation</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.reputation||0)/10)}%;background:var(--purple2)"></div></div><div class="stat-val">${profile.reputation||0}</div></div>
-    <div class="stat-row"><div class="stat-lbl">Daily Streak</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.daily_streak||0)*14)}%;background:var(--red2)"></div></div><div class="stat-val">${profile.daily_streak||0} days</div></div>
-  `;
-  const last=profile.last_daily?.toDate?.()??null;
-  document.getElementById('prof-daily-info').innerHTML=`
-    <div style="margin-bottom:10px"><div style="font-family:var(--disp);font-size:28px;font-weight:700;color:var(--amber2)">${profile.daily_streak||0}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1.5px">DAY STREAK</div></div>
-    <div style="font-size:12px;margin-bottom:8px">Next bonus: <span style="color:var(--amber2)">$${fmtCash(DAILY_AMOUNTS[Math.min((profile.daily_streak||0),DAILY_AMOUNTS.length-1)])}</span></div>
-    <div style="font-size:11px;color:var(--text3)">Last claimed: ${last?timeAgo(last):'Never'}</div>
-    ${(!last||last.toDateString()!==new Date().toDateString())?'<button class="btn btn-gold" style="margin-top:10px;width:100%" onclick="showDailyBonus()">🎁 Claim Today\'s Bonus</button>':'<div style="font-family:var(--mono);font-size:10px;color:var(--green2);margin-top:8px">✓ Claimed today!</div>'}
-  `;
-  const rSnap=await db.collection('races').where('player_id','==',currentUser.uid).orderBy('created_at','desc').limit(10).get();
-  document.getElementById('race-hist').innerHTML=rSnap.empty?'<div class="empty">No races yet! Head to the Race tab.</div>':rSnap.docs.map(d=>{
-    const r=d.data(),w=r.result==='win';
-    return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);align-items:center">
-      <div>
-        <div style="font-weight:700;font-family:var(--disp);letter-spacing:.5px;font-size:13px">${r.race_type||'?'} <span style="font-size:10px;color:var(--text3);font-weight:400">· ${r.difficulty||''}</span></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">${r.car_name||''}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="color:${w?'var(--green2)':'var(--red2)'};font-weight:700;font-family:var(--disp);font-size:13px">${w?'WIN':'LOSS'}</div>
-        ${w?`<div style="font-family:var(--mono);font-size:10px;color:var(--amber2)">+$${fmtCash(r.reward)}</div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ═══ NPC ENGINE ═══
-let npcAccounts=[];
-const NPC_ADJECTIVES=['Ghost','Turbo','Nitro','Drag','Drift','Speed','Apex','Boost','Rev','Smoke','Burn','Flat'];
-const NPC_NOUNS=['Racer','King','Hunter','Wolf','Fox','Hawk','Storm','Legend','Devil','Phantom'];
-
-async function startNPCEngine(){
-  const snap=await db.collection('profiles').where('is_npc','==',true).limit(20).get();
-  npcAccounts=snap.docs.map(d=>({id:d.id,...d.data()}));
-  scheduleNPCActivity();
-}
-function scheduleNPCActivity(){
-  clearInterval(window._npcTick);
-  window._npcTick=setInterval(runNPCActivity,180000+Math.random()*300000);
-  setTimeout(runNPCActivity,15000);
-}
-async function runNPCActivity(){
-  if(!currentUser||!npcAccounts.length)return;
-  try{
-    const npc=npcAccounts[Math.floor(Math.random()*npcAccounts.length)];
-    const action=Math.random();
-    if(action<0.5){
-      const r=RACE_EVENTS[Math.floor(Math.random()*RACE_EVENTS.length)];
-      const won=Math.random()>0.35;
-      const cash=(npc.cash||5000)+(won?r.reward:0);
-      const wins=(npc.wins||0)+(won?1:0);
-      const losses=(npc.losses||0)+(won?0:1);
-      const xp=(npc.xp||0)+r.xp;
-      const level=Math.floor(xp/1000)+1;
-      await db.collection('profiles').doc(npc.id).update({cash:Math.max(1000,cash),wins,losses,xp,level,win_streak:won?(npc.win_streak||0)+1:0}).catch(()=>{});
-      npc.cash=cash;npc.wins=wins;
-      if(document.getElementById('tab-leaderboard').classList.contains('active'))loadLeaderboard();
-      showFeed(`🤖 ${npc.username} ${won?'won':'lost'} a ${r.name}${won?' and earned $'+fmtCash(r.reward):''}`);
-    } else if(action<0.75){
-      const aSnap=await db.collection('auctions').where('status','==','active').limit(8).get();
-      const now=new Date();
-      const valid=aSnap.docs.filter(d=>{const t=d.data().ends_at?.toDate?.();return t&&t>now&&d.data().seller_id!==npc.id;});
-      if(valid.length){
-        const aDoc=valid[Math.floor(Math.random()*valid.length)];
-        const a=aDoc.data();
-        const bidAmt=Math.round(a.current_price*(1.05+Math.random()*0.1));
-        if((npc.cash||0)>=bidAmt){
-          if(a.highest_bidder_id&&a.highest_bidder_id!==npc.id)
-            db.collection('profiles').doc(a.highest_bidder_id).update({cash:firebase.firestore.FieldValue.increment(a.current_price)}).catch(()=>{});
-          await db.collection('auctions').doc(aDoc.id).update({current_price:bidAmt,highest_bidder_id:npc.id,highest_bidder_username:npc.username,bid_count:firebase.firestore.FieldValue.increment(1)});
-          await db.collection('auctions').doc(aDoc.id).collection('bids').add({bidder_id:npc.id,bidder_username:npc.username,amount:bidAmt,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-          await db.collection('profiles').doc(npc.id).update({cash:firebase.firestore.FieldValue.increment(-bidAmt)}).catch(()=>{});
-          showFeed(`🤖 ${npc.username} bid $${fmtCash(bidAmt)} on ${a.car_name}`);
-          if(document.getElementById('tab-auction').classList.contains('active'))renderAuctions();
-        }
-      }
-    } else {
-      const affordable=CAR_DATA.filter(c=>{const p=marketPrices[c.name]?.current_price||c.base_price;return p<=(npc.cash||0)&&p<200000;});
-      if(affordable.length){
-        const car=affordable[Math.floor(Math.random()*affordable.length)];
-        const price=marketPrices[car.name]?.current_price||car.base_price;
-        await db.collection('player_cars').add({player_id:npc.id,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:price,is_active:true,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
-        await db.collection('profiles').doc(npc.id).update({cash:firebase.firestore.FieldValue.increment(-price)}).catch(()=>{});
-        npc.cash=(npc.cash||0)-price;
-        showFeed(`🤖 ${npc.username} bought a ${car.name} from the market`);
-      }
-    }
-  }catch(e){console.warn('NPC activity error:',e.message);}
-}
-async function maybeCreateNPC(){
-  if(!currentUser)return;
-  const snap=await db.collection('profiles').where('is_npc','==',true).get();
-  if(snap.size>=20)return;
-  const adj=NPC_ADJECTIVES[Math.floor(Math.random()*NPC_ADJECTIVES.length)];
-  const noun=NPC_NOUNS[Math.floor(Math.random()*NPC_NOUNS.length)];
-  const num=Math.floor(Math.random()*999);
-  const username=adj+noun+num;
-  const email=`npc_${username.toLowerCase()}@redline-npc.gg`;
-  const startCash=15000+Math.floor(Math.random()*50000);
-  const npcRef=db.collection('profiles').doc();
-  await npcRef.set({uid:npcRef.id,username,email,cash:startCash,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0,role:'player',is_banned:false,is_npc:true,daily_streak:0,last_daily:null,achievements:[],created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  const car=CAR_DATA.find(c=>c.name==='Toyota Supra MK5')||CAR_DATA[17];
-  await db.collection('player_cars').add({player_id:npcRef.id,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:0,is_active:true,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
-  npcAccounts.push({id:npcRef.id,username,cash:startCash,wins:0,losses:0,is_npc:true});
-  showFeed(`🆕 ${username} joined REDLINE and hit the streets!`);
-}
-setInterval(()=>{if(currentUser)maybeCreateNPC().catch(()=>{});},1800000+Math.random()*1800000);
-
-function showFeed(msg){
-  const feed=document.getElementById('npc-feed');
-  if(!feed)return;
-  const item=document.createElement('div');
-  item.className='feed-item';item.textContent=msg;
-  feed.appendChild(item);
-  while(feed.children.length>4)feed.removeChild(feed.firstChild);
-  setTimeout(()=>{item.classList.add('fade');setTimeout(()=>item.remove(),300);},8000);
-}
-
-// ═══ ADMIN PANEL ═══
-function adminSec(sec,el){
-  adminCurSec=sec;
-  document.querySelectorAll('.admin-nav-item').forEach(b=>b.classList.remove('active'));
-  if(el)el.classList.add('active');
-  loadAdminSec(sec);
-}
-async function loadAdminPanel(){
-  if(!['admin','owner'].includes(profile?.role)){
-    document.getElementById('admin-content').innerHTML='<div class="empty"><div class="empty-icon">🚫</div>Access denied.</div>';return;
-  }
-  const arb=document.getElementById('admin-role-badge');
-  if(arb){arb.textContent=profile.role.toUpperCase();arb.className=`role-badge role-${profile.role}`;}
-  loadAdminSec(adminCurSec);
-}
-async function loadAdminSec(sec){
-  const el=document.getElementById('admin-content');
-  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,broadcast:adminBroadcast,settings:adminSettings};
-  if(fns[sec])await fns[sec](el);
-}
-async function adminOverview(el){
-  const [pSnap,rSnap,aSnap,lSnap,pcSnap]=await Promise.all([
-    db.collection('profiles').get(),
-    db.collection('races').get(),
-    db.collection('auctions').where('status','==','active').get(),
-    db.collection('activity_logs').orderBy('created_at','desc').limit(15).get(),
-    db.collection('player_cars').get()
-  ]);
-  const realPlayers=pSnap.docs.filter(d=>!d.data().is_npc);
-  const npcs=pSnap.docs.filter(d=>d.data().is_npc);
-  const totalCash=pSnap.docs.reduce((s,d)=>s+(d.data().cash||0),0);
-  el.innerHTML=`
-    <div class="admin-stat-grid">
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--steel2)">${realPlayers.length}</div><div class="admin-stat-lbl">Real Players</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--text3)">${npcs.length}</div><div class="admin-stat-lbl">NPC Accounts</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--amber2)">${aSnap.size}</div><div class="admin-stat-lbl">Live Auctions</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2)">${rSnap.size}</div><div class="admin-stat-lbl">Total Races</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--green2);font-size:18px">$${fmtCash(totalCash)}</div><div class="admin-stat-lbl">Economy Size</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--blue2)">${pcSnap.size}</div><div class="admin-stat-lbl">Total Cars</div></div>
-    </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">LIVE ACTIVITY FEED</div>
-    <div class="live-activity">${lSnap.docs.map(d=>{const l=d.data();return `<div class="live-row"><span class="live-time">${timeAgo(l.created_at?.toDate())}</span><span><strong style="color:var(--steel2)">${l.username||'?'}</strong> <span class="log-action">${l.action}</span></span></div>`;}).join('')}</div>`;
-}
-async function adminUsers(el){
-  const snap=await db.collection('profiles').where('is_npc','!=',true).orderBy('is_npc').orderBy('created_at','desc').get().catch(()=>db.collection('profiles').orderBy('created_at','desc').get());
-  window._adminUsers=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>!u.is_npc);
-  el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${window._adminUsers.length} real players</div>
-    <input class="admin-search" placeholder="Search..." oninput="filterAdminUsers(this.value)">
-  </div>
-  <div id="admin-user-tbl">${userTable(window._adminUsers)}</div>`;
-}
-function filterAdminUsers(q){
-  const f=q?window._adminUsers.filter(u=>u.username?.toLowerCase().includes(q.toLowerCase())):window._adminUsers;
-  const el=document.getElementById('admin-user-tbl');if(el)el.innerHTML=userTable(f);
-}
-function userTable(users){
-  const ROLES=['admin','moderator','player'];
-  return `<table class="admin-table"><thead><tr><th>Username</th><th>Role</th><th>Lvl</th><th>Cash</th><th>W/L</th><th>Status</th><th>Actions</th></tr></thead>
-  <tbody>${users.map(u=>`<tr style="${u.is_banned?'opacity:.4':''}">
-    <td><strong>${u.username||'?'}</strong>${u.id===currentUser.uid?' <span style="font-size:9px;color:var(--text3)">(you)</span>':''}</td>
-    <td>${roleBadge(u.role)}</td>
-    <td style="font-family:var(--mono)">${u.level||1}</td>
-    <td style="font-family:var(--mono);color:var(--amber2)">$${fmtCash(u.cash)}</td>
-    <td style="font-family:var(--mono);font-size:10px">${u.wins||0}W/${u.losses||0}L</td>
-    <td><span class="pulse-dot" style="background:${u.is_banned?'var(--red2)':'var(--green2)'}"></span><span style="font-family:var(--mono);font-size:10px">${u.is_banned?'Banned':'Active'}</span></td>
-    <td style="display:flex;gap:4px;flex-wrap:wrap">
-      ${u.id!==currentUser.uid&&u.role!=='owner'?`
-        <select style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:2px 5px;font-size:10px;border-radius:3px;font-family:var(--mono)" onchange="setRole('${u.id}','${u.username}',this.value)">
-          ${(profile.role==='owner'?['owner','admin','moderator','player']:ROLES).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}
-        </select>
-        ${!u.is_banned?`<button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.2)" onclick="banUser('${u.id}','${u.username}')">Ban</button>`:`<button class="btn btn-sm btn-green" onclick="unbanUser('${u.id}','${u.username}')">Unban</button>`}
-        <button class="btn btn-sm btn-gold" onclick="giveCash('${u.id}','${u.username}')">+$</button>
-        <button class="btn btn-sm btn-ghost" onclick="resetUser('${u.id}','${u.username}')">Reset</button>
-        <button class="btn btn-sm btn-blue" onclick="viewUserDetail('${u.id}','${u.username}')">View</button>`
-      :'<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Owner account</span>'}
-    </td>
-  </tr>`).join('')}</tbody></table>`;
-}
-async function setRole(uid,name,role){
-  if(uid===currentUser.uid){toast("Can't change your own role",'t-error');return;}
-  if(role==='owner'&&profile.role!=='owner'){toast('Only the owner can assign the owner role','t-error');return;}
-  const targetSnap=await db.collection('profiles').doc(uid).get();
-  const target=targetSnap.data();
-  if(target.role==='owner'){toast("Cannot change the owner's role",'t-error');return;}
-  if(target.role==='admin'&&profile.role!=='owner'){toast("Only the owner can change admin roles",'t-error');return;}
-  await db.collection('profiles').doc(uid).update({role});
-  toast(`${name} is now ${role}`,'t-success');
-  logActivity('set_role',{target:name,role}).catch(()=>{});
-}
-async function banUser(uid,name){
-  const reason=prompt(`Ban reason for ${name}:`,'Violation of terms');if(!reason)return;
-  const targetSnap=await db.collection('profiles').doc(uid).get();
-  if(targetSnap.data()?.role==='owner'){toast("Cannot ban the owner",'t-error');return;}
-  if(targetSnap.data()?.role==='admin'&&profile.role!=='owner'){toast("Only the owner can ban admins",'t-error');return;}
-  await db.collection('profiles').doc(uid).update({is_banned:true,ban_reason:reason});
-  toast(`${name} banned`,'t-success');logActivity('ban',{target:name,reason}).catch(()=>{});
-  loadAdminSec('users');
-}
-async function unbanUser(uid,name){
-  await db.collection('profiles').doc(uid).update({is_banned:false,ban_reason:null});
-  toast(`${name} unbanned`,'t-success');logActivity('unban',{target:name}).catch(()=>{});
-  loadAdminSec('users');
-}
-async function giveCash(uid,name){
-  const amt=parseInt(prompt(`Give cash to ${name}:`,'10000'));if(!amt||isNaN(amt))return;
-  await db.collection('profiles').doc(uid).update({cash:firebase.firestore.FieldValue.increment(amt)});
-  toast(`Gave $${fmtCash(amt)} to ${name}`,'t-success');
-  logActivity('give_cash',{target:name,amount:amt}).catch(()=>{});
-}
-async function resetUser(uid,name){
-  if(!confirm(`Reset ${name}'s stats (wins/losses/XP/level)? Cash is kept.`))return;
-  await db.collection('profiles').doc(uid).update({wins:0,losses:0,xp:0,level:1,win_streak:0,best_win_streak:0,reputation:0,achievements:[]});
-  toast(`${name} stats reset`,'t-success');logActivity('reset_user',{target:name}).catch(()=>{});
-}
-async function viewUserDetail(uid,name){
-  const [profDoc,carsSnap]=await Promise.all([
-    db.collection('profiles').doc(uid).get(),
-    db.collection('player_cars').where('player_id','==',uid).get()
-  ]);
-  const u={...profDoc.data(),id:uid};
-  document.getElementById('modal-user-title').textContent=u.username||name;
-  document.getElementById('modal-user-body').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Cash</div><div style="font-family:var(--disp);font-size:18px;color:var(--amber2)">$${fmtCash(u.cash)}</div></div>
-      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Level</div><div style="font-family:var(--disp);font-size:18px;color:var(--steel)">${u.level||1}</div></div>
-      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">W / L</div><div style="font-family:var(--disp);font-size:18px;color:var(--green2)">${u.wins||0} / <span style="color:var(--red2)">${u.losses||0}</span></div></div>
-      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Cars Owned</div><div style="font-family:var(--disp);font-size:18px;color:var(--amber2)">${carsSnap.size}</div></div>
-    </div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:12px">Role: ${roleBadge(u.role)} · Rep: ${u.reputation||0} · Streak: ${u.win_streak||0}</div>
-    <div style="margin-bottom:12px"><strong style="font-family:var(--disp);font-size:12px;letter-spacing:1px;color:var(--steel2)">GARAGE</strong>
-      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${carsSnap.docs.map(d=>`<span style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:4px 8px;font-family:var(--mono);font-size:10px">${d.data().car_emoji||'🚗'} ${d.data().car_name}</span>`).join('')||'<span style="color:var(--text3);font-family:var(--mono);font-size:11px">No cars</span>'}</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-gold btn-sm" onclick="giveCash('${uid}','${u.username}')">+$ Give Cash</button>
-      <button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.2)" onclick="closeModal('modal-user');banUser('${uid}','${u.username}')">Ban</button>
-    </div>`;
-  openModal('modal-user');
-}
-async function adminNPCs(el){
-  const snap=await db.collection('profiles').where('is_npc','==',true).get();
-  const npcs=snap.docs.map(d=>({id:d.id,...d.data()}));
-  el.innerHTML=`
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      <button class="btn btn-steel" onclick="maybeCreateNPC().then(()=>loadAdminSec('npcs'))">🤖 Create NPC</button>
-      <button class="btn btn-red" onclick="runNPCActivity().then(()=>loadAdminSec('npcs'))">⚡ Force Activity</button>
-      <button class="btn btn-ghost" onclick="clearNPCAccounts()">🗑️ Delete All NPCs</button>
-    </div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">${npcs.length} NPC accounts active (cap: 20)</div>
-    <table class="admin-table"><thead><tr><th>Username</th><th>Level</th><th>Cash</th><th>W/L</th><th>Created</th><th></th></tr></thead>
-    <tbody>${npcs.map(u=>`<tr>
-      <td>🤖 <strong>${u.username}</strong></td>
-      <td style="font-family:var(--mono)">${u.level||1}</td>
-      <td style="font-family:var(--mono);color:var(--amber2)">$${fmtCash(u.cash)}</td>
-      <td style="font-family:var(--mono);font-size:10px">${u.wins||0}/${u.losses||0}</td>
-      <td style="font-family:var(--mono);font-size:9px;color:var(--text3)">${timeAgo(u.created_at?.toDate?.())}</td>
-      <td><button class="btn btn-sm btn-ghost" onclick="deleteNPC('${u.id}','${u.username}')">Delete</button></td>
-    </tr>`).join('')}</tbody></table>`;
-}
-async function deleteNPC(uid,name){
-  if(!confirm(`Delete NPC ${name}?`))return;
-  await db.collection('profiles').doc(uid).delete();
-  npcAccounts=npcAccounts.filter(n=>n.id!==uid);
-  toast(`NPC ${name} deleted`,'t-success');loadAdminSec('npcs');
-}
-async function clearNPCAccounts(){
-  if(!confirm('Delete ALL NPC accounts?'))return;
-  const snap=await db.collection('profiles').where('is_npc','==',true).get();
-  const batch=db.batch();
-  snap.docs.forEach(d=>batch.delete(d.ref));
-  await batch.commit();
-  npcAccounts=[];
-  toast('All NPCs deleted','t-success');logActivity('clear_npcs',{}).catch(()=>{});
-  loadAdminSec('npcs');
-}
-async function adminLogs(el){
-  const snap=await db.collection('activity_logs').orderBy('created_at','desc').limit(100).get();
-  el.innerHTML=`
-    <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${snap.size} recent logs</span>
-      <button class="btn btn-ghost btn-sm" onclick="adminLogs(document.getElementById('admin-content'))">↺ Refresh</button>
-    </div>
-    <div class="live-activity" style="max-height:500px">
-      ${snap.docs.map(d=>{const l=d.data();return `<div class="live-row"><span class="live-time">${timeAgo(l.created_at?.toDate())}</span><span><strong style="color:var(--steel2)">${l.username||'?'}</strong> <span class="log-action">${l.action}</span> <span style="font-size:10px;color:var(--text3)">${JSON.stringify(l.details||{}).slice(0,50)}</span></span></div>`;}).join('')}
-    </div>`;
-}
-async function adminMarket(el){
-  const snap=await db.collection('market_prices').get();
-  el.innerHTML=`
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      <button class="btn btn-gold" onclick="runMarketTick().then(()=>loadAdminSec('market'))">⚡ Force Tick</button>
-      <button class="btn btn-ghost" onclick="resetMarket()">↺ Reset Prices</button>
-      <button class="btn btn-green" onclick="spikeMarket()">📈 Spike All</button>
-      <button class="btn btn-red" onclick="crashMarket()">📉 Crash Market</button>
-      <button class="btn btn-purple" onclick="randomizeMarket()">🎲 Randomize</button>
-    </div>
-    <table class="admin-table"><thead><tr><th>Car</th><th>Rarity</th><th>Base</th><th>Current</th><th>Demand</th><th></th></tr></thead>
-    <tbody>${snap.docs.map(d=>{const mp=d.data();const car=CAR_DATA.find(c=>c.name===mp.car_name)||{};return `<tr><td>${car.emoji||'🚗'} <strong>${mp.car_name}</strong></td><td><span class="badge ${rcls(car.rarity)}">${car.rarity||'?'}</span></td><td style="font-family:var(--mono);color:var(--text3)">$${fmtCash(mp.base_price)}</td><td style="font-family:var(--mono);color:var(--amber2)">$${fmtCash(mp.current_price)}</td><td><div style="display:flex;align-items:center;gap:5px;min-width:80px"><div style="flex:1;height:3px;background:var(--bg3);border-radius:2px"><div style="height:100%;width:${mp.demand_score||50}%;background:${(mp.demand_score||50)>70?'var(--red2)':(mp.demand_score||50)>45?'var(--amber2)':'var(--green2)'}"></div></div><span style="font-family:var(--mono);font-size:9px;width:25px;text-align:right">${Math.round(mp.demand_score||50)}</span></div></td><td><button class="btn btn-sm btn-ghost" onclick="adminSetPrice('${d.id}','${mp.car_name}',${mp.current_price})">Set Price</button></td></tr>`;}).join('')}</tbody></table>`;
-}
-async function adminSetPrice(id,name,curr){
-  const p=parseInt(prompt(`Set price for ${name}:`,curr));if(!p||isNaN(p))return;
-  await db.collection('market_prices').doc(id).update({current_price:p});
-  if(marketPrices[name])marketPrices[name].current_price=p;
-  toast(`${name} → $${fmtCash(p)}`,'t-success');
-  logActivity('admin_set_price',{car:name,price:p}).catch(()=>{});loadAdminSec('market');
-}
-async function resetMarket(){
-  if(!confirm('Reset all prices to base?'))return;
-  const snap=await db.collection('market_prices').get();
-  const batch=db.batch();
-  snap.docs.forEach(d=>{const mp=d.data();batch.update(d.ref,{current_price:mp.base_price,demand_score:50});if(marketPrices[mp.car_name]){marketPrices[mp.car_name].current_price=mp.base_price;marketPrices[mp.car_name].demand_score=50;}});
-  await batch.commit();toast('Market reset to base prices','t-success');loadAdminSec('market');
-  logActivity('admin_reset_market',{}).catch(()=>{});
-}
-async function spikeMarket(){
-  if(!confirm('Spike all prices +25% and demand to 85+?'))return;
-  const snap=await db.collection('market_prices').get();
-  const batch=db.batch();
-  snap.docs.forEach(d=>{const p=Math.round(d.data().current_price*1.25);batch.update(d.ref,{demand_score:80+Math.round(Math.random()*15),current_price:p});if(marketPrices[d.data().car_name]){marketPrices[d.data().car_name].demand_score=85;marketPrices[d.data().car_name].current_price=p;}});
-  await batch.commit();toast('Market spiked! 📈','t-success');loadAdminSec('market');
-  logActivity('admin_spike',{}).catch(()=>{});
-}
-async function crashMarket(){
-  if(!confirm('Crash all prices by 40%?'))return;
-  const snap=await db.collection('market_prices').get();
-  const batch=db.batch();
-  snap.docs.forEach(d=>{const p=Math.max(1000,Math.round(d.data().current_price*0.6));batch.update(d.ref,{demand_score:10+Math.round(Math.random()*20),current_price:p});if(marketPrices[d.data().car_name]){marketPrices[d.data().car_name].demand_score=15;marketPrices[d.data().car_name].current_price=p;}});
-  await batch.commit();toast('Market crashed! 📉','t-success');loadAdminSec('market');
-  logActivity('admin_crash',{}).catch(()=>{});
-}
-async function randomizeMarket(){
-  if(!confirm('Randomize all market prices?'))return;
-  const snap=await db.collection('market_prices').get();
-  const batch=db.batch();
-  snap.docs.forEach(d=>{const mp=d.data();const mult=0.5+Math.random()*1.0;const p=Math.round(mp.base_price*mult);const dem=Math.round(20+Math.random()*75);batch.update(d.ref,{current_price:p,demand_score:dem});if(marketPrices[mp.car_name]){marketPrices[mp.car_name].current_price=p;marketPrices[mp.car_name].demand_score=dem;}});
-  await batch.commit();toast('Market randomized! 🎲','t-success');loadAdminSec('market');
-  logActivity('admin_randomize',{}).catch(()=>{});
-}
-async function adminAuctions(el){
-  const snap=await db.collection('auctions').orderBy('created_at','desc').limit(60).get();
-  const now=new Date();
-  el.innerHTML=`
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      <button class="btn btn-gold" onclick="seedNPCAuctions().then(()=>{toast('NPC auctions seeded','t-success');loadAdminSec('auctions')})">⚡ Seed NPCs</button>
-      <button class="btn btn-red" onclick="clearEndedAuctions()">🗑️ Clear Ended</button>
-      <button class="btn btn-ghost" onclick="endAllAuctions()">⏹ End All Active</button>
-    </div>
-    <table class="admin-table"><thead><tr><th>Car</th><th>Seller</th><th>Price</th><th>Bids</th><th>Status</th><th>Ends</th><th></th></tr></thead>
-    <tbody>${snap.docs.map(d=>{const a=d.data();const end=a.ends_at?.toDate();const expired=end&&end<now;return `<tr><td>${a.car_emoji||'🚗'} <strong>${a.car_name||'?'}</strong></td><td style="font-size:11px">${a.seller_username||'?'}</td><td style="font-family:var(--mono);color:var(--amber2)">$${fmtCash(a.current_price)}</td><td style="font-family:var(--mono)">${a.bid_count||0}</td><td><span class="badge ${a.status==='active'&&!expired?'badge-green':a.status==='sold'?'badge-gold':'badge-red'}">${expired&&a.status==='active'?'EXPIRED':a.status}</span></td><td style="font-family:var(--mono);font-size:9px;color:var(--text3)">${end?a.status==='active'&&!expired?fmtCD(end):end.toLocaleDateString():'?'}</td><td>${a.status==='active'&&!expired?`<button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.2)" onclick="cancelAuction('${d.id}')">Cancel</button>`:'—'}</td></tr>`;}).join('')}</tbody></table>`;
-}
-async function cancelAuction(id){
-  if(!confirm('Cancel this auction?'))return;
-  await db.collection('auctions').doc(id).update({status:'cancelled'});
-  toast('Cancelled','t-success');logActivity('cancel_auction',{id}).catch(()=>{});loadAdminSec('auctions');
-}
-async function clearEndedAuctions(){
-  if(!confirm('Delete all ended/cancelled auctions?'))return;
-  const snap=await db.collection('auctions').get();
-  const now=new Date();const batch=db.batch();let cnt=0;
-  snap.docs.forEach(d=>{const a=d.data();const end=a.ends_at?.toDate?.();if(a.status!=='active'||(end&&end<now)){batch.delete(d.ref);cnt++;}});
-  await batch.commit();toast(`Cleared ${cnt} auctions`,'t-success');logActivity('clear_auctions',{count:cnt}).catch(()=>{});loadAdminSec('auctions');
-}
-async function endAllAuctions(){
-  if(!confirm('Force-end all active auctions?'))return;
-  const snap=await db.collection('auctions').where('status','==','active').get();
-  const batch=db.batch();
-  snap.docs.forEach(d=>batch.update(d.ref,{status:'ended'}));
-  await batch.commit();toast(`Ended ${snap.size} auctions`,'t-success');logActivity('end_all_auctions',{}).catch(()=>{});loadAdminSec('auctions');
-}
-async function adminEconomy(el){
-  const pSnap=await db.collection('profiles').where('is_npc','!=',true).orderBy('is_npc').get().catch(()=>db.collection('profiles').get());
-  const real=pSnap.docs.filter(d=>!d.data().is_npc);
-  const total=real.reduce((s,d)=>s+(d.data().cash||0),0);
-  const avg=real.length?Math.round(total/real.length):0;
-  const rich=real.filter(d=>d.data().cash>1000000).length;
-  const broke=real.filter(d=>d.data().cash<1000).length;
-  el.innerHTML=`
-    <div class="admin-stat-grid">
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--amber2);font-size:18px">$${fmtCash(total)}</div><div class="admin-stat-lbl">Total Economy</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--steel2);font-size:18px">$${fmtCash(avg)}</div><div class="admin-stat-lbl">Avg Cash</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--green2)">${rich}</div><div class="admin-stat-lbl">Millionaires</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2)">${broke}</div><div class="admin-stat-lbl">Broke Players</div></div>
-    </div>
-    <div class="divider"></div>
-    <div style="font-family:var(--disp);font-size:12px;font-weight:700;color:var(--red2);letter-spacing:2px;margin-bottom:12px;text-transform:uppercase">Economy Controls</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="flex:1"><div style="font-weight:700;font-family:var(--disp);font-size:13px;letter-spacing:.5px">Give Cash to All Players</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Deposit into every real player account</div></div>
-        <input class="admin-search" type="number" id="econ-gift-amt" placeholder="Amount" style="width:120px">
-        <button class="btn btn-gold" onclick="giveAllCash()">Send</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="flex:1"><div style="font-weight:700;font-family:var(--disp);font-size:13px;letter-spacing:.5px">Tax All Players</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Take a percentage from everyone</div></div>
-        <input class="admin-search" type="number" id="econ-tax-pct" placeholder="%" style="width:80px" min="1" max="99">
-        <button class="btn btn-red" onclick="taxAll()">Apply Tax</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="flex:1"><div style="font-weight:700;font-family:var(--disp);font-size:13px;letter-spacing:.5px">Emergency Stimulus</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Give $5000 to anyone with less than $1000</div></div>
-        <button class="btn btn-green" onclick="emergencyStimulus()">Give Stimulus</button>
-      </div>
-    </div>`;
-}
-async function giveAllCash(){
-  const amt=parseInt(document.getElementById('econ-gift-amt').value);
-  if(!amt||amt<1){toast('Enter a valid amount','t-error');return;}
-  if(!confirm(`Give $${fmtCashFull(amt)} to ALL real players?`))return;
-  const snap=await db.collection('profiles').get();
-  const batch=db.batch();
-  snap.docs.filter(d=>!d.data().is_npc).forEach(d=>batch.update(d.ref,{cash:firebase.firestore.FieldValue.increment(amt)}));
-  await batch.commit();
-  toast(`Gave $${fmtCash(amt)} to players!`,'t-success');
-  logActivity('econ_give_all',{amount:amt}).catch(()=>{});
-}
-async function taxAll(){
-  const pct=parseFloat(document.getElementById('econ-tax-pct').value);
-  if(!pct||pct<1||pct>99){toast('Enter 1-99%','t-error');return;}
-  if(!confirm(`Tax ${pct}% from ALL players?`))return;
-  const snap=await db.collection('profiles').get();
-  const batch=db.batch();
-  snap.docs.filter(d=>!d.data().is_npc).forEach(d=>{const cash=d.data().cash||0;batch.update(d.ref,{cash:Math.max(500,Math.round(cash*(1-pct/100)))});});
-  await batch.commit();toast(`Taxed ${pct}% from all players`,'t-success');
-  logActivity('econ_tax',{pct}).catch(()=>{});
-}
-async function emergencyStimulus(){
-  if(!confirm('Give $5000 to all broke players (<$1000)?'))return;
-  const snap=await db.collection('profiles').where('cash','<',1000).get();
-  const batch=db.batch();
-  snap.docs.filter(d=>!d.data().is_npc).forEach(d=>batch.update(d.ref,{cash:5000}));
-  await batch.commit();toast(`Stimulus given to ${snap.size} players`,'t-success');
-  logActivity('econ_stimulus',{count:snap.size}).catch(()=>{});
-}
-async function adminRaces(el){
-  const [rSnap,todaySnap]=await Promise.all([
-    db.collection('races').orderBy('created_at','desc').limit(50).get(),
-    db.collection('races').get()
-  ]);
-  const byType={};const byResult={win:0,loss:0};
-  todaySnap.docs.forEach(d=>{const r=d.data();byType[r.race_type]=(byType[r.race_type]||0)+1;if(r.result)byResult[r.result]++;});
-  const topType=Object.entries(byType).sort((a,b)=>b[1]-a[1])[0];
-  el.innerHTML=`
-    <div class="admin-stat-grid">
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2)">${todaySnap.size}</div><div class="admin-stat-lbl">Total Races</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--green2)">${byResult.win||0}</div><div class="admin-stat-lbl">Total Wins</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--steel2)">${topType?topType[0]:'?'}</div><div class="admin-stat-lbl">Most Popular</div></div>
-    </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">RECENT RACES</div>
-    <table class="admin-table"><thead><tr><th>Player</th><th>Event</th><th>Result</th><th>Reward</th><th>Time</th></tr></thead>
-    <tbody>${rSnap.docs.map(d=>{const r=d.data();const w=r.result==='win';return `<tr><td><strong>${r.player_username||'?'}</strong></td><td>${r.race_type||'?'} <span style="color:var(--text3);font-size:10px">· ${r.difficulty}</span></td><td><span class="badge ${w?'badge-green':'badge-red'}">${r.result||'?'}</span></td><td style="font-family:var(--mono);color:var(--amber2)">${r.reward>0?'$'+fmtCash(r.reward):'—'}</td><td style="font-family:var(--mono);font-size:9px;color:var(--text3)">${timeAgo(r.created_at?.toDate?.())}</td></tr>`;}).join('')}</tbody></table>`;
-}
-async function adminBroadcast(el){
-  el.innerHTML=`
-    <div style="font-family:var(--disp);font-size:12px;font-weight:700;color:var(--red2);letter-spacing:2px;margin-bottom:16px;text-transform:uppercase">System Broadcast</div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div><label class="form-label">Message</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Type your announcement here..." style="resize:vertical;font-family:var(--body)"></textarea></div>
-      <div><label class="form-label">Type</label>
-        <select class="form-input" id="bc-type">
-          <option value="t-info">📢 Info</option>
-          <option value="t-success">✅ Success</option>
-          <option value="t-error">🚨 Alert</option>
-        </select>
-      </div>
-      <button class="btn btn-red btn-lg" onclick="sendBroadcast()">📢 Send Broadcast</button>
-      <div class="divider"></div>
-      <div id="bc-history"><div class="loading-screen"><div class="spinner"></div></div></div>
-    </div>`;
-  const snap=await db.collection('broadcasts').orderBy('created_at','desc').limit(10).get();
-  document.getElementById('bc-history').innerHTML=snap.empty?'<div class="empty">No broadcasts yet.</div>':snap.docs.map(d=>{const b=d.data();return `<div style="padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px"><div style="font-size:13px;margin-bottom:4px">${b.message}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">by ${b.sender||'admin'} · ${timeAgo(b.created_at?.toDate())}</div></div>`;}).join('');
-}
-async function sendBroadcast(){
-  const msg=document.getElementById('bc-msg').value.trim();
-  const type=document.getElementById('bc-type').value;
-  if(!msg){toast('Enter a message','t-error');return;}
-  await db.collection('broadcasts').add({message:msg,type,sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  toast(msg,type);
-  logActivity('broadcast',{message:msg}).catch(()=>{});
-  toast('Broadcast sent! ✓','t-success');
-  loadAdminSec('broadcast');
-}
-async function adminSettings(el){
-  const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
-  const sett=settDoc?.exists?settDoc.data():{};
-  el.innerHTML=`
-    <div style="font-family:var(--disp);font-size:12px;font-weight:700;color:var(--steel2);letter-spacing:2px;margin-bottom:16px;text-transform:uppercase">Game Settings</div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Daily Bonus Multiplier</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Current: <strong style="color:var(--amber2)">${sett.daily_multiplier||1}x</strong></div>
-        <div style="display:flex;gap:8px">
-          <input class="admin-search" type="number" id="set-daily-mult" value="${sett.daily_multiplier||1}" min="0.5" max="10" step="0.5" style="width:80px">
-          <button class="btn btn-gold" onclick="adminSaveSetting('daily_multiplier',parseFloat(document.getElementById('set-daily-mult').value))">Save</button>
-        </div>
-      </div>
-      <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Starting Cash (new accounts)</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Current: <strong style="color:var(--amber2)">$${fmtCash(sett.starting_cash||50000)}</strong></div>
-        <div style="display:flex;gap:8px">
-          <input class="admin-search" type="number" id="set-start-cash" value="${sett.starting_cash||50000}" style="width:120px">
-          <button class="btn btn-gold" onclick="adminSaveSetting('starting_cash',parseInt(document.getElementById('set-start-cash').value))">Save</button>
-        </div>
-      </div>
-      <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Make Myself Owner</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Promote your account to Owner role</div>
-        <button class="btn btn-purple" onclick="promoteSelfOwner()">👑 Set as Owner</button>
-      </div>
-    </div>`;
-}
-async function adminSaveSetting(key,val){
-  if(val===undefined||val===null||(typeof val!=='boolean'&&isNaN(val))){toast('Invalid value','t-error');return;}
-  await db.collection('settings').doc('game').set({[key]:val},{merge:true});
-  toast(`Setting '${key}' updated to ${val}`,'t-success');
-  logActivity('admin_setting',{key,val}).catch(()=>{});
-  loadAdminSec('settings');
-}
-async function promoteSelfOwner(){
-  if(!confirm('Promote yourself to Owner? This grants full control.'))return;
-  await db.collection('profiles').doc(currentUser.uid).update({role:'owner'});
-  profile.role='owner';renderHUD();
-  toast('You are now the Owner! 👑','t-success');
-  logActivity('self_promote_owner',{}).catch(()=>{});
-  loadAdminSec('settings');
-}
-
-// ═══ ACTIVITY LOG ═══
-async function logActivity(action,details){
-  if(!currentUser||!profile)return;
-  await db.collection('activity_logs').add({user_id:currentUser.uid,username:profile.username,action,details:details||{},created_at:firebase.firestore.FieldValue.serverTimestamp()});
-}
-</script>
-</head>
-<body>
-<div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">REDLINE</div>
-    <div class="auth-sub">Street Racing Economy · Est. 2024</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Sign In</button>
-      <button class="auth-tab" onclick="switchAuthTab('signup',this)">Register</button>
-    </div>
-    <div id="auth-login">
-      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="login-user" placeholder="YourRacerTag" autocomplete="username"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="btn-auth" onclick="doLogin()">IGNITE ENGINE</button>
-    </div>
-    <div id="auth-signup" style="display:none">
-      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="su-user" placeholder="YourRacerTag" maxlength="20"></div>
-      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="su-email" placeholder="you@redline.gg"></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="su-pass" placeholder="Min 6 chars" onkeydown="if(event.key==='Enter')doSignup()"></div>
-      <button class="btn-auth" onclick="doSignup()">JOIN THE GRID</button>
-    </div>
-    <div class="auth-msg" id="auth-msg"></div>
-  </div>
-</div>
-
-<div class="daily-banner" id="daily-banner">
-  <div class="daily-box">
-    <div style="font-size:48px;margin-bottom:8px">🎁</div>
-    <div class="daily-title">DAILY BONUS</div>
-    <div class="daily-amount" id="daily-amount">$5,000</div>
-    <div class="daily-days" id="daily-days"></div>
-    <div class="daily-streak" id="daily-streak">Day 1 streak</div>
-    <button class="btn-auth" onclick="claimDaily()">CLAIM REWARD</button>
-  </div>
-</div>
-
-<div id="game">
-  <header class="header">
-    <div>
-      <div class="logo">REDLINE</div>
-      <span class="logo-sub">Street Racing Economy</span>
-    </div>
-    <div class="hud">
-      <div class="hud-pill" onclick="showTab('profile')" style="cursor:pointer"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
-      <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
-      <div class="hud-pill"><div class="lbl">Wins</div><div class="val val-wins"><span id="hud-wins">0</span></div></div>
-      <div class="hud-pill" style="display:none" id="hud-car-pill"><div class="lbl">Ride</div><div class="val" style="font-size:18px" id="hud-car-emoji">🚗</div></div>
-      <div class="hud-avatar" id="avatar-btn" onclick="toggleHudMenu()">
-        <span id="avatar-init">R</span>
-        <div class="hud-menu" id="hud-menu">
-          <div class="hud-menu-top">
-            <div style="font-size:13px;font-weight:700;font-family:var(--disp);letter-spacing:1px;color:var(--steel)" id="menu-username">Driver</div>
-            <div id="menu-role" style="margin-top:5px"></div>
-          </div>
-          <div class="hud-menu-item" onclick="showTab('profile')">👤 Profile</div>
-          <div class="hud-menu-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
-          <div class="hud-menu-item" onclick="showTab('challenges')">🎯 Challenges</div>
-          <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
-          <div class="hud-menu-divider"></div>
-          <div class="hud-menu-item" id="admin-menu-link" style="display:none" onclick="showTab('admin')">🛡️ Admin Panel</div>
-          <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <nav class="nav">
-    <button class="nav-tab active" onclick="showTab('garage',this)">🏠 Garage</button>
-    <button class="nav-tab" onclick="showTab('market',this)">🏪 Market</button>
-    <button class="nav-tab" onclick="showTab('auction',this)">🔨 Auction</button>
-    <button class="nav-tab" onclick="showTab('race',this)">🏁 Race</button>
-    <button class="nav-tab" onclick="showTab('challenges',this)">🎯 Challenges</button>
-    <button class="nav-tab" onclick="showTab('leaderboard',this)">🏆 Board</button>
-    <button class="nav-tab" onclick="showTab('profile',this)">👤 Profile</button>
-    <button class="nav-tab" id="admin-nav-tab" style="display:none" onclick="showTab('admin',this)">🛡️ Admin</button>
-  </nav>
-
-  <main class="main">
-    <!-- GARAGE -->
-    <div class="section active" id="tab-garage">
-      <div class="sec-head">
-        <div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars · click a car to manage it</div></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-steel btn-lg" onclick="showTab('auction')">🔨 Auction</button>
-          <button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button>
-        </div>
-      </div>
-      <div class="garage-layout">
-        <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
-        <div id="garage-sidebar" style="display:none">
-          <div class="panel" style="margin-bottom:12px">
-            <div class="panel-hd"><h3 id="sb-name">Car</h3><span id="sb-rarity" class="badge"></span></div>
-            <div style="text-align:center;font-size:64px;margin:14px 0;filter:drop-shadow(0 0 12px rgba(212,32,32,.3))" id="sb-emoji">🚗</div>
-            <div id="sb-stats"></div>
-            <div style="margin-top:12px;padding:10px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px"><span>Power Boost</span><span style="color:var(--red2)" id="sb-pb">+0 hp</span></div>
-              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px"><span>Race Rating</span><span style="color:var(--amber2)" id="sb-rating">—</span></div>
-            </div>
-            <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
-              <button class="btn btn-red btn-lg" style="flex:1" onclick="setActiveCar()">⚡ Set Active</button>
-              <button class="btn btn-ghost" id="fav-btn" onclick="toggleFav()">♡</button>
-              <button class="btn btn-gold btn-sm" onclick="openSell()">Auction</button>
-            </div>
-          </div>
-          <div class="panel">
-            <h3>Upgrades</h3>
-            <div style="display:flex;gap:5px;margin-bottom:12px">
-              <button class="filter-btn active" onclick="showUpgrades('engine',this)">Engine</button>
-              <button class="filter-btn" onclick="showUpgrades('performance',this)">Perf</button>
-            </div>
-            <div id="upgrade-list"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MARKET -->
-    <div class="section" id="tab-market">
-      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>live demand-driven pricing · updates every 90s</div></div></div>
-      <div class="ticker-bar"><span class="rt-dot"></span> <span class="ticker-text" id="ticker-text">Loading market data...</span></div>
-      <div class="filter-bar">
-        <input class="filter-search" id="mkt-search" placeholder="Search cars..." oninput="renderMarket()">
-        <button class="filter-btn active" data-cls="all" onclick="setMktFilter(this)">All</button>
-        <button class="filter-btn" data-cls="Hypercar" onclick="setMktFilter(this)">Hypercar</button>
-        <button class="filter-btn" data-cls="Sports" onclick="setMktFilter(this)">Sports</button>
-        <button class="filter-btn" data-cls="Muscle" onclick="setMktFilter(this)">Muscle</button>
-        <button class="filter-btn" data-cls="EV" onclick="setMktFilter(this)">EV</button>
-        <button class="filter-btn" data-cls="SUV/Truck" onclick="setMktFilter(this)">SUV</button>
-        <select class="filter-search" id="mkt-sort" onchange="renderMarket()" style="width:130px;border-radius:20px">
-          <option value="demand">By Demand</option>
-          <option value="price_asc">Price ↑</option>
-          <option value="price_desc">Price ↓</option>
-          <option value="power">By Power</option>
-          <option value="speed">By Speed</option>
-        </select>
-      </div>
-      <div id="market-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
-    </div>
-
-    <!-- AUCTION -->
-    <div class="section" id="tab-auction">
-      <div class="sec-head">
-        <div><div class="sec-title">Auction House</div><div class="sec-sub"><span class="rt-dot"></span>live bidding · 5% seller fee · realtime bids</div></div>
-        <button class="btn btn-gold btn-lg" onclick="openListModal()">+ List Car</button>
-      </div>
-      <div class="filter-bar">
-        <button class="filter-btn active" data-evt="all" onclick="setAuctFilter(this)">All</button>
-        <button class="filter-btn" data-evt="hypercar" onclick="setAuctFilter(this)">Hypercar</button>
-        <button class="filter-btn" data-evt="jdm_night" onclick="setAuctFilter(this)">JDM Night</button>
-        <button class="filter-btn" data-evt="muscle_madness" onclick="setAuctFilter(this)">Muscle</button>
-        <button class="filter-btn" data-evt="ending_soon" onclick="setAuctFilter(this)">🔥 Ending Soon</button>
-      </div>
-      <div id="auction-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
-    </div>
-
-    <!-- RACE -->
-    <div class="section" id="tab-race">
-      <div class="sec-head">
-        <div><div class="sec-title">Race Events</div><div class="sec-sub">Win cash · earn XP · unlock achievements</div></div>
-        <div id="active-car-chip" style="display:none;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--text2)">
-          Active: <span id="active-car-chip-name" style="color:var(--amber2)"></span>
-        </div>
-      </div>
-      <div id="race-grid" class="race-events-grid"></div>
-      <div class="race-arena" id="race-arena">
-        <div class="arena-header">
-          <div class="arena-title" id="arena-title">Race</div>
-          <div class="arena-badge ready" id="arena-badge">READY</div>
-        </div>
-        <div class="phase-display" id="phase-disp"></div>
-        <div class="scoreboard" id="scoreboard" style="display:none">
-          <div class="score-box" id="score-box-p">
-            <div class="score-label">Your Score</div>
-            <div class="score-car" id="score-car-p">🚗</div>
-            <div class="score-name" id="score-name-p">YOU</div>
-            <div class="score-val" id="score-val-p">—</div>
-          </div>
-          <div class="score-box" id="score-box-o">
-            <div class="score-label">CPU Opponent</div>
-            <div class="score-car" id="opp-emoji">🏎️</div>
-            <div class="score-name" id="opp-name">CPU RACER</div>
-            <div class="score-val" id="score-val-o">—</div>
-          </div>
-        </div>
-        <div class="speed-bar-section">
-          <div class="speed-row"><div class="speed-label"><span class="speed-name" id="p-lbl">YOU</span><span class="speed-score" id="p-score"></span></div><div class="speed-track-bar"><div class="speed-fill fill-p" id="p-fill"></div></div></div>
-          <div class="speed-row" style="margin-top:8px"><div class="speed-label"><span class="speed-name" id="opp-lbl">OPPONENT</span><span class="speed-score" id="o-score"></span></div><div class="speed-track-bar"><div class="speed-fill fill-o" id="o-fill"></div></div></div>
-        </div>
-        <div class="race-track">
-          <div class="track-header"><span id="p-lane-name">PLAYER</span><span id="opp-lane-name">OPPONENT</span><span>FINISH</span></div>
-          <div class="track-inner">
-            <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.1s"></div><div class="road-stripe" style="animation-delay:-.4s;left:55%"></div><div class="road-stripe" style="animation-delay:-.7s;left:25%"></div></div><div class="lane-label" id="player-lane-lbl">YOU</div><div class="lane-car" id="r-player" style="left:3%">🚗</div><div class="lane-finish"></div></div>
-            <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.25s;animation-duration:.65s"></div><div class="road-stripe" style="animation-delay:-.55s;animation-duration:.65s;left:60%"></div></div><div class="lane-label" id="opp-lane-label">CPU</div><div class="lane-car opp" id="r-opp" style="left:3%">🏎️</div><div class="lane-finish"></div></div>
-          </div>
-        </div>
-      </div>
-      <div class="result-box" id="race-result"></div>
-    </div>
-
-    <!-- CHALLENGES -->
-    <div class="section" id="tab-challenges">
-      <div class="sec-head"><div><div class="sec-title">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
-      <div class="grid-2">
-        <div>
-          <div class="panel" style="margin-bottom:16px">
-            <h3>📅 Daily Challenges</h3>
-            <div id="daily-challenges"><div class="loading-screen"><div class="spinner"></div></div></div>
-          </div>
-          <div class="panel">
-            <h3>📋 Weekly Missions</h3>
-            <div id="weekly-challenges"><div class="loading-screen"><div class="spinner"></div></div></div>
-          </div>
-        </div>
-        <div class="panel">
-          <h3>🏅 Achievements</h3>
-          <div id="achievements-grid" class="ach-grid"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- LEADERBOARD -->
-    <div class="section" id="tab-leaderboard">
-      <div class="sec-head"><div><div class="sec-title">Leaderboard</div><div class="sec-sub">Top drivers worldwide · updated live</div></div></div>
-      <div class="grid-2">
-        <div class="panel"><h3>🏆 Top Racers</h3><table class="lb-table" id="lb-wins"></table></div>
-        <div class="panel"><h3>💰 Richest</h3><table class="lb-table" id="lb-cash"></table></div>
-        <div class="panel"><h3>🔥 Longest Streaks</h3><table class="lb-table" id="lb-streak"></table></div>
-        <div class="panel"><h3>🚗 Most Cars</h3><table class="lb-table" id="lb-garage"></table></div>
-      </div>
-    </div>
-
-    <!-- PROFILE -->
-    <div class="section" id="tab-profile">
-      <div class="profile-hero">
-        <div class="prof-avatar" id="prof-av">R</div>
-        <div>
-          <div class="prof-name-big" id="prof-name">Driver</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:4px 0">LEVEL <span id="prof-lvl">1</span> · <span id="prof-rep">0</span> REP · <span id="prof-streak-cnt">0</span> 🔥 STREAK</div>
-          <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px"><span id="xp-curr">0</span>/<span id="xp-next">1000</span> XP to next level</div>
-          <div style="margin-top:8px" id="prof-role"></div>
-        </div>
-        <div class="profile-stats">
-          <div class="profile-stat"><div class="pnum val-wins" id="ps-wins">0</div><div class="plbl">Wins</div></div>
-          <div class="profile-stat"><div class="pnum" style="color:var(--red2)" id="ps-losses">0</div><div class="plbl">Losses</div></div>
-          <div class="profile-stat"><div class="pnum val-cash" id="ps-cash">$0</div><div class="plbl">Net Worth</div></div>
-          <div class="profile-stat"><div class="pnum" style="color:var(--amber2)" id="ps-best">0</div><div class="plbl">Best Streak</div></div>
-        </div>
-      </div>
-      <div class="grid-3">
-        <div class="panel" style="grid-column:1/3">
-          <h3>Race History</h3>
-          <div id="race-hist"><div class="loading-screen"><div class="spinner"></div></div></div>
-        </div>
-        <div>
-          <div class="panel" style="margin-bottom:16px">
-            <h3>Stats</h3>
-            <div id="prof-stats-detail"></div>
-          </div>
-          <div class="panel">
-            <h3>Daily Login</h3>
-            <div id="prof-daily-info" style="font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ADMIN -->
-    <div class="section" id="tab-admin">
-      <div class="sec-head">
-        <div><div class="sec-title" style="color:var(--red2)">⚙ Admin Panel</div><div class="sec-sub">system control · restricted access</div></div>
-        <span id="admin-role-badge" class="role-badge"></span>
-      </div>
-      <div class="admin-layout">
-        <div class="admin-sidebar">
-          <div class="admin-nav-item active" onclick="adminSec('overview',this)">📊 Overview</div>
-          <div class="admin-nav-item" onclick="adminSec('users',this)">👥 Players</div>
-          <div class="admin-nav-item" onclick="adminSec('npcs',this)">🤖 NPC Control</div>
-          <div class="admin-nav-item" onclick="adminSec('logs',this)">📋 Activity</div>
-          <div class="admin-nav-item" onclick="adminSec('market',this)">📈 Market</div>
-          <div class="admin-nav-item" onclick="adminSec('auctions',this)">🔨 Auctions</div>
-          <div class="admin-nav-item" onclick="adminSec('economy',this)">💰 Economy</div>
-          <div class="admin-nav-item" onclick="adminSec('races',this)">🏁 Races</div>
-          <div class="admin-nav-item" onclick="adminSec('broadcast',this)">📢 Broadcast</div>
-          <div class="admin-nav-item" onclick="adminSec('settings',this)">⚙ Settings</div>
-        </div>
-        <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
-      </div>
-    </div>
-  </main>
-</div>
-
-<!-- NPC FEED -->
-<div class="feed-container" id="npc-feed"></div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-bid">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-bid')">✕</button>
-    <div class="modal-title">Place Bid</div>
-    <div id="bid-car-info" style="margin-bottom:16px"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Current Bid</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--amber2)">$<span id="bid-curr">0</span></div></div>
-      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Your Cash</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--green2)">$<span id="bid-mycash">0</span></div></div>
-    </div>
-    <div class="form-group"><label class="form-label">Your Bid</label><input class="form-input" type="number" id="bid-input" placeholder="Enter amount"></div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">Min bid: $<span id="bid-min">0</span> · Buyout: $<span id="bid-buyout-disp">N/A</span></div>
-    <div id="bid-hist-list" style="max-height:140px;overflow-y:auto;margin-bottom:14px"></div>
-    <button class="btn btn-red btn-lg" style="width:100%" onclick="submitBid()">⚡ Place Bid</button>
-  </div>
-</div>
-<div class="modal-overlay" id="modal-sell">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-sell')">✕</button>
-    <div class="modal-title">List for Auction</div>
-    <div id="sell-car-info" style="margin-bottom:14px"></div>
-    <div class="form-group"><label class="form-label">Starting Price ($)</label><input class="form-input" type="number" id="sell-start"></div>
-    <div class="form-group"><label class="form-label">Buyout Price (optional)</label><input class="form-input" type="number" id="sell-buyout" placeholder="Leave blank for no buyout"></div>
-    <div class="form-group"><label class="form-label">Duration</label>
-      <select class="form-input" id="sell-dur">
-        <option value="1">1 hour</option><option value="3">3 hours</option><option value="6" selected>6 hours</option><option value="12">12 hours</option><option value="24">24 hours</option>
-      </select>
-    </div>
-    <div class="form-group"><label class="form-label">Event Type</label>
-      <select class="form-input" id="sell-evt">
-        <option value="standard">Standard</option><option value="hypercar">🏆 Hypercar Night</option><option value="jdm_night">🎌 JDM Night</option><option value="muscle_madness">💪 Muscle Madness</option>
-      </select>
-    </div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:14px;padding:8px;background:var(--amber3);border:1px solid rgba(200,120,32,.25);border-radius:var(--r)">⚠ 5% fee deducted from final sale price</div>
-    <button class="btn btn-gold btn-lg" style="width:100%" onclick="submitAuction()">🔨 List Now</button>
-  </div>
-</div>
-<div class="modal-overlay" id="modal-car"><div class="modal"><button class="modal-close" onclick="closeModal('modal-car')">✕</button><div id="modal-car-body"></div></div></div>
-<div class="modal-overlay" id="modal-user">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
-    <div class="modal-title" id="modal-user-title">Player</div>
-    <div id="modal-user-body"></div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-</body>
-</html>
+      const timeLeft=end-
