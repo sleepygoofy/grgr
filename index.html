@@ -1,6 +1,5 @@
-python3 << 'PYEOF'
-html = r'''
 
+Here is the complete HTML file:
 
 <meta>
 <meta>
@@ -32,15 +31,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--border3);border-radius:2px;}
 ::selection{background:var(--red3);color:var(--red2);}
-
-/* ─── TYPOGRAPHY ─── */
 h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .sec-title{font-family:var(--disp);font-size:28px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:2px;}
 .sec-sub{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:20px;}
 .mono{font-family:var(--mono);}
 .disp{font-family:var(--disp);}
-
-/* ─── AUTH ─── */
 #auth-screen{
   display:flex;align-items:center;justify-content:center;
   min-height:100vh;
@@ -102,8 +97,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .auth-msg.err{background:var(--red3);border:1px solid rgba(196,30,30,.25);color:#ff9999;}
 .auth-msg.ok{background:var(--green3);border:1px solid rgba(22,120,50,.25);color:#99ffbb;}
 .auth-msg.info{background:var(--steel3);border:1px solid rgba(58,74,106,.25);color:var(--steel2);}
-
-/* ─── BUTTONS ─── */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:10px 20px;border:none;border-radius:var(--r);
@@ -128,11 +121,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .btn-sm{padding:5px 12px;font-size:11px;}
 .btn-lg{padding:14px 28px;font-size:15px;width:100%;}
 .btn-icon{padding:8px;width:34px;height:34px;border-radius:50%;}
-
-/* ─── LAYOUT ─── */
 #game{display:none;flex-direction:column;min-height:100vh;}
-
-/* ─── HUD ─── */
 .hud{
   position:sticky;top:0;z-index:100;height:56px;
   display:flex;align-items:center;gap:0;padding:0 16px;
@@ -176,8 +165,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   transition:box-shadow .2s;
 }
 .av-btn:hover{box-shadow:0 0 0 3px var(--red3);}
-
-/* ─── HUD DROPDOWN ─── */
 .hud-menu{
   position:absolute;top:calc(100% + 10px);right:0;
   background:var(--panel);border:1px solid var(--border2);
@@ -195,8 +182,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 }
 .menu-itm:hover{background:var(--panel2);color:var(--text);}
 .menu-div{height:1px;background:var(--border);margin:4px 0;}
-
-/* ─── TICKER ─── */
 .ticker{
   background:var(--panel);border-bottom:1px solid var(--border);
   height:30px;overflow:hidden;position:relative;
@@ -222,21 +207,15 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .tick-flat{color:var(--text3);}
 .tick-name{color:var(--steel2);}
 .tick-price{color:var(--amber2);font-weight:700;}
-
-/* ─── SECTIONS ─── */
 .section{display:none;padding:28px 20px;max-width:1440px;margin:0 auto;width:100%;}
 .section.active{display:block;}
 .sec-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
 .sec-hdr-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-
-/* ─── CARDS ─── */
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:18px;position:relative;overflow:hidden;}
 .card-sm{padding:12px;}
 .card-lg{padding:24px;}
 .card-hover{transition:border .2s,transform .2s,box-shadow .2s;}
 .card-hover:hover{border-color:var(--border3);transform:translateY(-2px);box-shadow:var(--shadow);}
-
-/* ─── BADGES ─── */
 .badge{
   display:inline-flex;align-items:center;
   padding:2px 8px;border-radius:4px;
@@ -252,8 +231,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .badge-red{background:var(--red3);color:var(--red2);border:1px solid rgba(196,30,30,.25);}
 .badge-steel{background:var(--steel3);color:var(--steel2);border:1px solid rgba(58,74,106,.25);}
 .badge-gold{background:var(--amber3);color:var(--amber2);border:1px solid rgba(184,110,24,.25);}
-
-/* ─── ROLE BADGES ─── */
 .role-badge{
   display:inline-flex;align-items:center;padding:2px 8px;
   border-radius:4px;font-family:var(--mono);font-size:9px;
@@ -264,16 +241,12 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .role-moderator{background:var(--amber3);color:var(--amber2);border:1px solid rgba(184,110,24,.3);}
 .role-player{background:var(--steel3);color:var(--steel2);border:1px solid rgba(58,74,106,.3);}
 .role-npc{background:var(--panel2);color:var(--text3);border:1px solid var(--border2);}
-
-/* ─── RARITY STRIPS ─── */
 .rar-strip{position:absolute;bottom:0;left:0;right:0;height:3px;}
 .rar-common{background:rgba(90,90,130,.5);}
 .rar-rare{background:linear-gradient(90deg,var(--blue),var(--blue2));}
 .rar-epic{background:linear-gradient(90deg,var(--purple),var(--purple2));}
 .rar-legendary{background:linear-gradient(90deg,var(--amber),var(--amber2));}
 .rar-mythic{background:linear-gradient(90deg,var(--red),var(--red2),var(--amber2));}
-
-/* ─── GRIDS ─── */
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
@@ -288,8 +261,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   .ga-lg{grid-template-columns:1fr;}
   .hide-xs{display:none!important;}
 }
-
-/* ─── CAR CARD ─── */
 .car-card{
   background:var(--panel);border:1px solid var(--border);
   border-radius:var(--r2);padding:16px;cursor:pointer;
@@ -312,21 +283,15 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .delta{font-family:var(--mono);font-size:9px;}
 .delta-up{color:var(--green2);}
 .delta-dn{color:var(--red2);}
-
-/* ─── STAT BARS ─── */
 .stat-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
 .stat-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--text3);width:64px;flex-shrink:0;text-transform:uppercase;}
 .stat-bg{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;}
 .stat-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.2,.8,.3,1);}
 .stat-val{font-family:var(--mono);font-size:10px;color:var(--text2);width:56px;text-align:right;flex-shrink:0;}
-
-/* ─── DEMAND BAR ─── */
 .dem-wrap{margin-bottom:10px;}
 .dem-hdr{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;}
 .dem-bar{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
 .dem-fill{height:100%;border-radius:2px;transition:width .6s;}
-
-/* ─── RACE SECTION ─── */
 .race-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
 .race-card{
   background:var(--panel);border:1px solid var(--border);
@@ -355,8 +320,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .pip-med{background:var(--amber3);color:var(--amber2);border:1px solid rgba(184,110,24,.25);}
 .pip-hard{background:var(--red3);color:var(--red2);border:1px solid rgba(196,30,30,.25);}
 .pip-elite{background:var(--purple3);color:var(--purple2);border:1px solid rgba(74,30,126,.25);}
-
-/* ─── RACE ARENA ─── */
 #race-arena{
   display:none;position:fixed;inset:0;z-index:300;
   flex-direction:column;align-items:center;justify-content:flex-start;
@@ -438,8 +401,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   font-size:11px;color:var(--text2);text-align:left;line-height:1.6;
 }
 .result-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
-
-/* ─── GARAGE ─── */
 .garage-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
 .sb{
   background:var(--panel);border:1px solid var(--border);
@@ -468,14 +429,12 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .upg-dots{display:flex;gap:4px;margin-top:6px;}
 .upg-dot{width:9px;height:9px;border-radius:50%;background:var(--border3);border:1px solid var(--border2);}
 .upg-dot.on{background:var(--red2);border-color:var(--red);box-shadow:0 0 6px rgba(196,30,30,.4);}
-
-/* ─── MARKET ─── */
 .filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
 .f-btn{
   padding:6px 14px;font-family:var(--mono);font-size:10px;font-weight:600;
   letter-spacing:1px;border:1px solid var(--border2);
   background:transparent;color:var(--text3);
-  border-radius:20px;cursor:pointer;transition:all .15s;white-space:nowrap;
+  border-radius:20px;cursor:pointer;transition:all .15px;white-space:nowrap;
 }
 .f-btn.active{border-color:var(--red2);color:var(--red2);background:var(--red4);}
 .f-btn:hover:not(.active){border-color:var(--border3);color:var(--text);}
@@ -495,8 +454,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   outline:none;cursor:pointer;
 }
 .sort-sel option{background:var(--bg2);}
-
-/* ─── AUCTION ─── */
 .auc-card{
   background:var(--panel);border:1px solid var(--border);
   border-radius:var(--r2);padding:20px;
@@ -526,8 +483,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 }
 .bid-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;}
 .bid-amt{font-family:var(--mono);color:var(--amber2);font-weight:700;}
-
-/* ─── LEADERBOARD ─── */
 .lb-tabs{display:flex;gap:7px;margin-bottom:18px;flex-wrap:wrap;}
 .lb-tab{
   padding:8px 18px;font-family:var(--mono);font-size:10px;
@@ -547,8 +502,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .lb-tbl tr.me td{background:rgba(196,30,30,.04);}
 .lb-rank{font-family:var(--disp);font-size:20px;font-weight:700;width:50px;}
 .lb-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--amber2);text-align:right;}
-
-/* ─── PROFILE ─── */
 .prof-hero{
   background:linear-gradient(135deg,rgba(196,30,30,.07),rgba(74,30,126,.05));
   border:1px solid var(--border);border-radius:var(--r3);
@@ -569,8 +522,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .prof-stat{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;}
 .ps-v{font-family:var(--disp);font-size:26px;font-weight:700;color:var(--amber2);}
 .ps-l{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
-
-/* ─── ACHIEVEMENTS ─── */
 .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
 .ach-card{
   background:var(--panel);border:1px solid var(--border);
@@ -582,8 +533,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .ach-icon{font-size:30px;line-height:1;flex-shrink:0;}
 .ach-name{font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.3px;margin-bottom:3px;}
 .ach-desc{font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.5;}
-
-/* ─── CHALLENGES ─── */
 .ch-item{
   display:flex;gap:14px;align-items:center;
   padding:15px;background:var(--panel);
@@ -595,8 +544,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .ch-name{font-family:var(--disp);font-size:15px;font-weight:700;letter-spacing:.3px;margin-bottom:2px;}
 .ch-prog{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:7px;}
 .ch-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber2));border-radius:2px;transition:width .5s;}
-
-/* ─── DAILY BANNER ─── */
 .daily-wrap{
   position:fixed;bottom:-140px;left:50%;transform:translateX(-50%);z-index:400;
   background:var(--panel);
@@ -621,8 +568,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 }
 .d-day.done{background:var(--green3);border-color:rgba(22,120,50,.4);color:var(--green2);}
 .d-day.today{background:var(--amber3);border-color:rgba(184,110,24,.4);color:var(--amber2);}
-
-/* ─── MODALS ─── */
 .modal-ov{
   display:none;position:fixed;inset:0;z-index:500;
   background:rgba(0,0,0,.75);backdrop-filter:blur(5px);
@@ -644,8 +589,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   transition:color .15s;
 }
 .modal-x:hover{color:var(--text);}
-
-/* ─── ADMIN ─── */
 .admin-layout{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:start;}
 @media(max-width:768px){.admin-layout{grid-template-columns:1fr;}}
 .admin-nav{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:12px;position:sticky;top:76px;}
@@ -675,8 +618,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .adm-ctrl-card{padding:16px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;}
 .adm-ctrl-title{font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:.3px;margin-bottom:3px;}
 .adm-ctrl-sub{font-size:11px;color:var(--text2);margin-bottom:10px;}
-
-/* ─── TOASTS ─── */
 #toast-wrap{position:fixed;top:68px;right:18px;z-index:600;display:flex;flex-direction:column;gap:9px;pointer-events:none;max-width:340px;}
 .toast{
   padding:13px 17px;border-radius:var(--r);font-size:13px;
@@ -689,8 +630,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 .t-error{background:var(--red3);border:1px solid rgba(196,30,30,.3);color:#ffaaaa;}
 .t-info{background:var(--steel3);border:1px solid rgba(58,74,106,.3);color:var(--steel2);}
 .t-gold{background:var(--amber3);border:1px solid rgba(184,110,24,.3);color:var(--amber2);}
-
-/* ─── XP POP ─── */
 .xp-pop{
   position:fixed;left:50%;transform:translateX(-50%);
   top:72px;z-index:700;pointer-events:none;
@@ -699,8 +638,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   animation:xpFloat 1.5s ease forwards;
 }
 @keyframes xpFloat{0%{opacity:0;transform:translateX(-50%) translateY(0)}15%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-70px)}}
-
-/* ─── NPC FEED ─── */
 .npc-feed{position:fixed;bottom:90px;left:18px;z-index:100;max-width:290px;display:flex;flex-direction:column;gap:7px;pointer-events:none;}
 .feed-item{
   padding:9px 13px;background:rgba(8,8,15,.92);
@@ -711,8 +648,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 }
 .feed-item.fade{opacity:0;}
 @keyframes feedIn{from{transform:translateX(-16px);opacity:0}to{transform:translateX(0);opacity:1}}
-
-/* ─── MISC ─── */
 .divider{height:1px;background:var(--border);margin:18px 0;}
 .empty{text-align:center;padding:52px 20px;color:var(--text3);}
 .empty-icon{font-size:52px;margin-bottom:14px;}
@@ -736,6 +671,8 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
       Street Racing · Live Economy · Auctions
       
         
+        
+        
       
     
     
@@ -746,14 +683,29 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
       
         
         
-          <label>Username</label><input>
-          <label>Password<input>
+          
+            <label>Username</label>
+            <input>
+          
+          
+            <label>Password
+            <input>
+          
           <button>Start Engine 🚗
         
         
-          <label>Username<input>
-          <label>Email<input>
-          <label>Password<input>
+          
+            <label>Username
+            <input>
+          
+          
+            <label>Email
+            <input>
+          
+          
+            <label>Password
+            <input>
+          
           <button>Create Account →
         
       
@@ -804,7 +756,9 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 
   
   
-    ◆Loading market...
+    
+      Loading market...
+    
   
 
   
@@ -815,10 +769,8 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
         Pick an event · Race · Earn cash
       
       
-        
-          🚗
-          No Car
-        
+        🚗
+        No Car
       
     
     
@@ -840,26 +792,21 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
     
       
       
+        🚗
+        —
         
-          
-            🚗
-            —
-            —
-          
-          
-          
-            POWER BOOST+0 hp
-          
-          
-            RATING—
-          
-          
+        
+        
+        POWER BOOST
+        +0 hp
+        RATING
+        —
+        
+        
           Upgrades
-          
-            <button>Engine
-            <button>Performance
-          
-          
+          <button>Engine
+          <button>Performance
+        
         
       
     
@@ -924,12 +871,14 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
       
         📅 Daily Challenges
         
+      
+      
         📆 Weekly Missions
         
       
-      
-        🏅 Achievements
-        
+    
+    
+      🏅 Achievements
       
     
   
@@ -957,41 +906,35 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
     Profile
     Stats · History · Daily Bonus
     
+      R
       
-        R
-        
-          
-            Driver
-            
-          
-          
-            Level 1 · 0 Rep · 0🔥 Streak
-          
-          
-          
-            0 / 1000 XP
-          
-        
-      
-      
-        0Wins
-        0Losses
-        $0Cash
-        0Best Streak
-      
-      
-        
-          Performance
-          
+        Driver
         
         
-          Daily Bonus
-          
+          Level 1 · 0 Rep · 0🔥 Streak
+        
+        
+        0 / 1000 XP
+      
+    
+    
+      0Wins
+      0Losses
+      $0Cash
+      0Best Streak
+    
+    
+      
+        Performance
         
       
       
-        Race History
+        Daily Bonus
         
+      
+    
+    
+      Race History
       
     
   
@@ -1042,7 +985,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
     READY
   
   
-    YOU
     
       
       YOU
@@ -1050,17 +992,16 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
         
         🚗
       
-      
+      YOU
     
-    OPPONENT
     
       
-      OPP
+      OPPONENT
       
         
         🏎️
       
-      
+      OPP
     
   
   3
@@ -1082,9 +1023,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 
 
 
-  <button>×
-
-
   
     <button>×
     Place Bid
@@ -1103,9 +1041,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
       <label>Bid Amount (min $0)
       <input>
     
-    
-      Buyout: N/A
-    
+    Buyout: N/A
     Recent Bids
     
     
@@ -1115,19 +1051,32 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   
 
 
+
+
   
     <button>×
     List for Auction
     
-    <label>Starting Price ($)<input>
-    <label>Buyout Price (optional)<input>
-    <label>Duration
+    
+      <label>Starting Price ($)
+      <input>
+    
+    
+      <label>Buyout Price (optional)
+      <input>
+    
+    
+      <label>Duration
       <select>
-        2 Hours4 Hours
-        6 Hours12 Hours24 Hours
+        2 Hours
+        4 Hours
+        6 Hours
+        12 Hours
+        24 Hours
       
     
-    <label>Event Type
+    
+      <label>Event Type
       <select>
         Standard
         🏆 Hypercar Night
@@ -1142,6 +1091,8 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
   
 
 
+
+
   
     <button>×
     User Detail
@@ -1154,11 +1105,21 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;letter-spacing:.5px;}
 
 
 
+
+
 <script>
 <script></script>
 <script>
+
 <script>
-firebase.initializeApp({apiKey:"AIzaSyDAPdNjRs8TkDymnNyYIdc3YpgtVbthvMc",authDomain:"redline-b4422.firebaseapp.com",projectId:"redline-b4422",storageBucket:"redline-b4422.firebasestorage.app",messagingSenderId:"725052073743",appId:"1:725052073743:web:c8ebd165a59f2fd9bbc07a"});
+firebase.initializeApp({
+  apiKey:"AIzaSyDAPdNjRs8TkDymnNyYIdc3YpgtVbthvMc",
+  authDomain:"redline-b4422.firebaseapp.com",
+  projectId:"redline-b4422",
+  storageBucket:"redline-b4422.firebasestorage.app",
+  messagingSenderId:"725052073743",
+  appId:"1:725052073743:web:c8ebd165a59f2fd9bbc07a"
+});
 const auth=firebase.auth(),db=firebase.firestore();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
@@ -1174,94 +1135,94 @@ const NPC_ADJ=['Ghost','Turbo','Nitro','Drag','Drift','Speed','Apex','Boost','Re
 const NPC_NOUN=['Racer','King','Hunter','Wolf','Fox','Hawk','Storm','Legend','Devil','Phantom'];
 
 const CARS=[
-{n:'McLaren 720S',b:'McLaren',cl:'Hypercar',r:'Legendary',e:'🦋',p:280000,ts:212,ac:96,ha:94,br:92,pw:720,wt:2829,d:'Aeroblade aero. 0-60 in 2.8s.'},
-{n:'McLaren P1',b:'McLaren',cl:'Hypercar',r:'Mythic',e:'🟠',p:1400000,ts:218,ac:97,ha:95,br:94,pw:903,wt:3075,d:'Hybrid hypercar. F1 tech on the road.'},
-{n:'McLaren Senna',b:'McLaren',cl:'Hypercar',r:'Mythic',e:'🔶',p:1000000,ts:208,ac:98,ha:97,br:96,pw:789,wt:2641,d:'Track weapon. Downforce king.'},
-{n:'Bugatti Chiron',b:'Bugatti',cl:'Hypercar',r:'Mythic',e:'🔵',p:3000000,ts:304,ac:96,ha:88,br:90,pw:1500,wt:4398,d:'Quad-turbo W16. 1500hp.'},
-{n:'Bugatti Veyron',b:'Bugatti',cl:'Hypercar',r:'Legendary',e:'💙',p:1500000,ts:268,ac:95,ha:85,br:88,pw:1001,wt:4162,d:'The original 1000hp street car.'},
-{n:'Koenigsegg Jesko',b:'Koenigsegg',cl:'Hypercar',r:'Mythic',e:'🟡',p:3000000,ts:300,ac:99,ha:96,br:95,pw:1600,wt:3131,d:'300mph capable. 1600hp.'},
-{n:'Koenigsegg Agera RS',b:'Koenigsegg',cl:'Hypercar',r:'Mythic',e:'⚪',p:2500000,ts:278,ac:98,ha:95,br:94,pw:1341,wt:3075,d:'World record holder.'},
-{n:'Pagani Huayra',b:'Pagani',cl:'Hypercar',r:'Mythic',e:'🎨',p:2700000,ts:238,ac:94,ha:90,br:90,pw:730,wt:2822,d:'Twin-turbo V12 art piece.'},
-{n:'Rimac Nevera',b:'Rimac',cl:'Hypercar',r:'Mythic',e:'⚡',p:2400000,ts:258,ac:100,ha:93,br:95,pw:1914,wt:4740,d:'Fastest production EV. 0-60 in 1.85s.'},
-{n:'Ferrari SF90 Stradale',b:'Ferrari',cl:'Hypercar',r:'Legendary',e:'🔴',p:620000,ts:211,ac:99,ha:95,br:93,pw:986,wt:3461,d:"Ferrari's most powerful road car."},
-{n:'Ferrari LaFerrari',b:'Ferrari',cl:'Hypercar',r:'Mythic',e:'🐎',p:2000000,ts:217,ac:98,ha:96,br:94,pw:950,wt:2767,d:'Hybrid F-car. Ultra-rare.'},
-{n:'Lamborghini Aventador SVJ',b:'Lamborghini',cl:'Hypercar',r:'Legendary',e:'🐂',p:500000,ts:217,ac:96,ha:93,br:91,pw:770,wt:3363,d:'V12 NA screamer. 770hp.'},
-{n:'Lamborghini Huracan STO',b:'Lamborghini',cl:'Hypercar',r:'Epic',e:'🏆',p:330000,ts:193,ac:95,ha:96,br:93,pw:631,wt:2932,d:'Track-bred V10.'},
-{n:'Porsche 918 Spyder',b:'Porsche',cl:'Hypercar',r:'Mythic',e:'🕷️',p:850000,ts:214,ac:97,ha:95,br:94,pw:887,wt:3715,d:'Hybrid V8. Nurburgring record.'},
-{n:'Porsche 911 GT3 RS',b:'Porsche',cl:'Sports',r:'Epic',e:'💛',p:250000,ts:184,ac:96,ha:99,br:97,pw:518,wt:3153,d:'NA flat-six track weapon.'},
-{n:'Porsche 911 Turbo S',b:'Porsche',cl:'Sports',r:'Epic',e:'🏆',p:220000,ts:205,ac:98,ha:94,br:93,pw:640,wt:3516,d:'AWD monster. 2.6s 0-60.'},
-{n:'Nissan GT-R Nismo',b:'Nissan',cl:'Sports',r:'Epic',e:'🇯🇵',p:200000,ts:196,ac:95,ha:92,br:91,pw:600,wt:3803,d:'Godzilla. AWD legend.'},
-{n:'Toyota Supra MK5',b:'Toyota',cl:'Sports',r:'Rare',e:'🟠',p:65000,ts:155,ac:88,ha:85,br:84,pw:382,wt:3370,d:'B58 inline-6. Born to be modded.'},
-{n:'Toyota Supra MK4',b:'Toyota',cl:'Sports',r:'Epic',e:'🏁',p:120000,ts:177,ac:90,ha:88,br:86,pw:320,wt:3197,d:'2JZ legend.'},
-{n:'Nissan Silvia S15',b:'Nissan',cl:'Sports',r:'Rare',e:'⬜',p:45000,ts:155,ac:82,ha:86,br:80,pw:247,wt:2767,d:'JDM drift icon.'},
-{n:'Mazda RX-7 FD',b:'Mazda',cl:'Sports',r:'Epic',e:'🔴',p:95000,ts:156,ac:87,ha:88,br:85,pw:276,wt:2723,d:'Rotary soul.'},
-{n:'Honda NSX Type R',b:'Honda',cl:'Sports',r:'Legendary',e:'⬜',p:450000,ts:174,ac:90,ha:95,br:93,pw:324,wt:2712,d:'Pure analog perfection.'},
-{n:'Honda Civic Type R',b:'Honda',cl:'Sports',r:'Common',e:'🔴',p:45000,ts:169,ac:85,ha:88,br:85,pw:315,wt:2998,d:'Hot hatch king.'},
-{n:'Subaru WRX STI',b:'Subaru',cl:'Sports',r:'Rare',e:'🔵',p:50000,ts:155,ac:82,ha:84,br:82,pw:310,wt:3388,d:'Rally-bred AWD.'},
-{n:'Mitsubishi Evo X',b:'Mitsubishi',cl:'Sports',r:'Rare',e:'⬜',p:48000,ts:155,ac:83,ha:85,br:82,pw:291,wt:3263,d:'The last Evo.'},
-{n:'Mazda MX-5',b:'Mazda',cl:'Sports',r:'Common',e:'🎌',p:30000,ts:136,ac:74,ha:82,br:78,pw:181,wt:2381,d:'Lightweight roadster.'},
-{n:'Nissan 370Z',b:'Nissan',cl:'Sports',r:'Common',e:'🔵',p:35000,ts:155,ac:80,ha:82,br:80,pw:332,wt:3232,d:'VQ37 NA fun.'},
-{n:'Dodge Hellcat Redeye',b:'Dodge',cl:'Muscle',r:'Epic',e:'👁️',p:95000,ts:203,ac:92,ha:74,br:76,pw:797,wt:4473,d:'797hp supercharged Hemi.'},
-{n:'Dodge Viper ACR',b:'Dodge',cl:'Muscle',r:'Legendary',e:'🐍',p:135000,ts:177,ac:92,ha:98,br:97,pw:645,wt:3374,d:'V10 analog monster.'},
-{n:'Ford Mustang GT500',b:'Ford',cl:'Muscle',r:'Epic',e:'🐍',p:80000,ts:180,ac:90,ha:84,br:83,pw:760,wt:4225,d:'Most powerful Ford ever made.'},
-{n:'Chevrolet Corvette Z06',b:'Chevrolet',cl:'Muscle',r:'Epic',e:'🏎️',p:120000,ts:196,ac:93,ha:95,br:93,pw:670,wt:3366,d:'LT6 flat-plane V8.'},
-{n:'Chevrolet Corvette C8',b:'Chevrolet',cl:'Muscle',r:'Rare',e:'🏁',p:75000,ts:194,ac:90,ha:90,br:88,pw:495,wt:3366,d:'Mid-engine revolution.'},
-{n:'Tesla Model S Plaid',b:'Tesla',cl:'EV',r:'Epic',e:'⚡',p:120000,ts:200,ac:100,ha:80,br:85,pw:1020,wt:4766,d:'1020hp tri-motor. 1.99s 0-60.'},
-{n:'Tesla Roadster',b:'Tesla',cl:'EV',r:'Legendary',e:'🚀',p:250000,ts:250,ac:100,ha:85,br:88,pw:1000,wt:2756,d:'Sub-1s 0-60 claimed.'},
-{n:'Porsche Taycan Turbo S',b:'Porsche',cl:'EV',r:'Epic',e:'🟡',p:190000,ts:161,ac:97,ha:89,br:91,pw:750,wt:5060,d:'Most athletic EV chassis.'},
-{n:'Lucid Air Sapphire',b:'Lucid',cl:'EV',r:'Legendary',e:'💎',p:250000,ts:205,ac:99,ha:83,br:87,pw:1234,wt:5182,d:'1234hp. Range meets speed.'},
-{n:'Lamborghini Urus',b:'Lamborghini',cl:'SUV/Truck',r:'Legendary',e:'🐂',p:260000,ts:190,ac:90,ha:88,br:86,pw:657,wt:4850,d:'Fastest production SUV.'},
-{n:'Jeep Trackhawk',b:'Jeep',cl:'SUV/Truck',r:'Rare',e:'🦅',p:85000,ts:180,ac:88,ha:72,br:74,pw:707,wt:5363,d:'Hellcat-powered Jeep.'},
-{n:'Ford Raptor R',b:'Ford',cl:'SUV/Truck',r:'Rare',e:'🦅',p:100000,ts:115,ac:82,ha:66,br:68,pw:700,wt:5950,d:'Off-road king.'},
-{n:'Ram TRX',b:'Ram',cl:'SUV/Truck',r:'Rare',e:'🛻',p:95000,ts:118,ac:80,ha:64,br:68,pw:702,wt:6350,d:'Hellcat in a truck.'}
+  {n:'McLaren 720S',b:'McLaren',cl:'Hypercar',r:'Legendary',e:'🦋',p:280000,ts:212,ac:96,ha:94,br:92,pw:720,wt:2829,d:'Aeroblade aero. 0-60 in 2.8s.'},
+  {n:'McLaren P1',b:'McLaren',cl:'Hypercar',r:'Mythic',e:'🟠',p:1400000,ts:218,ac:97,ha:95,br:94,pw:903,wt:3075,d:'Hybrid hypercar. F1 tech on the road.'},
+  {n:'McLaren Senna',b:'McLaren',cl:'Hypercar',r:'Mythic',e:'🔶',p:1000000,ts:208,ac:98,ha:97,br:96,pw:789,wt:2641,d:'Track weapon. Downforce king.'},
+  {n:'Bugatti Chiron',b:'Bugatti',cl:'Hypercar',r:'Mythic',e:'🔵',p:3000000,ts:304,ac:96,ha:88,br:90,pw:1500,wt:4398,d:'Quad-turbo W16. 1500hp.'},
+  {n:'Bugatti Veyron',b:'Bugatti',cl:'Hypercar',r:'Legendary',e:'💙',p:1500000,ts:268,ac:95,ha:85,br:88,pw:1001,wt:4162,d:'The original 1000hp street car.'},
+  {n:'Koenigsegg Jesko',b:'Koenigsegg',cl:'Hypercar',r:'Mythic',e:'🟡',p:3000000,ts:300,ac:99,ha:96,br:95,pw:1600,wt:3131,d:'300mph capable. 1600hp.'},
+  {n:'Koenigsegg Agera RS',b:'Koenigsegg',cl:'Hypercar',r:'Mythic',e:'⚪',p:2500000,ts:278,ac:98,ha:95,br:94,pw:1341,wt:3075,d:'World record holder.'},
+  {n:'Pagani Huayra',b:'Pagani',cl:'Hypercar',r:'Mythic',e:'🎨',p:2700000,ts:238,ac:94,ha:90,br:90,pw:730,wt:2822,d:'Twin-turbo V12 art piece.'},
+  {n:'Rimac Nevera',b:'Rimac',cl:'Hypercar',r:'Mythic',e:'⚡',p:2400000,ts:258,ac:100,ha:93,br:95,pw:1914,wt:4740,d:'Fastest production EV. 0-60 in 1.85s.'},
+  {n:'Ferrari SF90 Stradale',b:'Ferrari',cl:'Hypercar',r:'Legendary',e:'🔴',p:620000,ts:211,ac:99,ha:95,br:93,pw:986,wt:3461,d:"Ferrari's most powerful road car."},
+  {n:'Ferrari LaFerrari',b:'Ferrari',cl:'Hypercar',r:'Mythic',e:'🐎',p:2000000,ts:217,ac:98,ha:96,br:94,pw:950,wt:2767,d:'Hybrid F-car. Ultra-rare.'},
+  {n:'Lamborghini Aventador SVJ',b:'Lamborghini',cl:'Hypercar',r:'Legendary',e:'🐂',p:500000,ts:217,ac:96,ha:93,br:91,pw:770,wt:3363,d:'V12 NA screamer. 770hp.'},
+  {n:'Lamborghini Huracan STO',b:'Lamborghini',cl:'Hypercar',r:'Epic',e:'🏆',p:330000,ts:193,ac:95,ha:96,br:93,pw:631,wt:2932,d:'Track-bred V10.'},
+  {n:'Porsche 918 Spyder',b:'Porsche',cl:'Hypercar',r:'Mythic',e:'🕷️',p:850000,ts:214,ac:97,ha:95,br:94,pw:887,wt:3715,d:'Hybrid V8. Nurburgring record.'},
+  {n:'Porsche 911 GT3 RS',b:'Porsche',cl:'Sports',r:'Epic',e:'💛',p:250000,ts:184,ac:96,ha:99,br:97,pw:518,wt:3153,d:'NA flat-six track weapon.'},
+  {n:'Porsche 911 Turbo S',b:'Porsche',cl:'Sports',r:'Epic',e:'🏆',p:220000,ts:205,ac:98,ha:94,br:93,pw:640,wt:3516,d:'AWD monster. 2.6s 0-60.'},
+  {n:'Nissan GT-R Nismo',b:'Nissan',cl:'Sports',r:'Epic',e:'🇯🇵',p:200000,ts:196,ac:95,ha:92,br:91,pw:600,wt:3803,d:'Godzilla. AWD legend.'},
+  {n:'Toyota Supra MK5',b:'Toyota',cl:'Sports',r:'Rare',e:'🟠',p:65000,ts:155,ac:88,ha:85,br:84,pw:382,wt:3370,d:'B58 inline-6. Born to be modded.'},
+  {n:'Toyota Supra MK4',b:'Toyota',cl:'Sports',r:'Epic',e:'🏁',p:120000,ts:177,ac:90,ha:88,br:86,pw:320,wt:3197,d:'2JZ legend.'},
+  {n:'Nissan Silvia S15',b:'Nissan',cl:'Sports',r:'Rare',e:'⬜',p:45000,ts:155,ac:82,ha:86,br:80,pw:247,wt:2767,d:'JDM drift icon.'},
+  {n:'Mazda RX-7 FD',b:'Mazda',cl:'Sports',r:'Epic',e:'🔴',p:95000,ts:156,ac:87,ha:88,br:85,pw:276,wt:2723,d:'Rotary soul.'},
+  {n:'Honda NSX Type R',b:'Honda',cl:'Sports',r:'Legendary',e:'⬜',p:450000,ts:174,ac:90,ha:95,br:93,pw:324,wt:2712,d:'Pure analog perfection.'},
+  {n:'Honda Civic Type R',b:'Honda',cl:'Sports',r:'Common',e:'🔴',p:45000,ts:169,ac:85,ha:88,br:85,pw:315,wt:2998,d:'Hot hatch king.'},
+  {n:'Subaru WRX STI',b:'Subaru',cl:'Sports',r:'Rare',e:'🔵',p:50000,ts:155,ac:82,ha:84,br:82,pw:310,wt:3388,d:'Rally-bred AWD.'},
+  {n:'Mitsubishi Evo X',b:'Mitsubishi',cl:'Sports',r:'Rare',e:'⬜',p:48000,ts:155,ac:83,ha:85,br:82,pw:291,wt:3263,d:'The last Evo.'},
+  {n:'Mazda MX-5',b:'Mazda',cl:'Sports',r:'Common',e:'🎌',p:30000,ts:136,ac:74,ha:82,br:78,pw:181,wt:2381,d:'Lightweight roadster.'},
+  {n:'Nissan 370Z',b:'Nissan',cl:'Sports',r:'Common',e:'🔵',p:35000,ts:155,ac:80,ha:82,br:80,pw:332,wt:3232,d:'VQ37 NA fun.'},
+  {n:'Dodge Hellcat Redeye',b:'Dodge',cl:'Muscle',r:'Epic',e:'👁️',p:95000,ts:203,ac:92,ha:74,br:76,pw:797,wt:4473,d:'797hp supercharged Hemi.'},
+  {n:'Dodge Viper ACR',b:'Dodge',cl:'Muscle',r:'Legendary',e:'🐍',p:135000,ts:177,ac:92,ha:98,br:97,pw:645,wt:3374,d:'V10 analog monster.'},
+  {n:'Ford Mustang GT500',b:'Ford',cl:'Muscle',r:'Epic',e:'🐍',p:80000,ts:180,ac:90,ha:84,br:83,pw:760,wt:4225,d:'Most powerful Ford ever made.'},
+  {n:'Chevrolet Corvette Z06',b:'Chevrolet',cl:'Muscle',r:'Epic',e:'🏎️',p:120000,ts:196,ac:93,ha:95,br:93,pw:670,wt:3366,d:'LT6 flat-plane V8.'},
+  {n:'Chevrolet Corvette C8',b:'Chevrolet',cl:'Muscle',r:'Rare',e:'🏁',p:75000,ts:194,ac:90,ha:90,br:88,pw:495,wt:3366,d:'Mid-engine revolution.'},
+  {n:'Tesla Model S Plaid',b:'Tesla',cl:'EV',r:'Epic',e:'⚡',p:120000,ts:200,ac:100,ha:80,br:85,pw:1020,wt:4766,d:'1020hp tri-motor. 1.99s 0-60.'},
+  {n:'Tesla Roadster',b:'Tesla',cl:'EV',r:'Legendary',e:'🚀',p:250000,ts:250,ac:100,ha:85,br:88,pw:1000,wt:2756,d:'Sub-1s 0-60 claimed.'},
+  {n:'Porsche Taycan Turbo S',b:'Porsche',cl:'EV',r:'Epic',e:'🟡',p:190000,ts:161,ac:97,ha:89,br:91,pw:750,wt:5060,d:'Most athletic EV chassis.'},
+  {n:'Lucid Air Sapphire',b:'Lucid',cl:'EV',r:'Legendary',e:'💎',p:250000,ts:205,ac:99,ha:83,br:87,pw:1234,wt:5182,d:'1234hp. Range meets speed.'},
+  {n:'Lamborghini Urus',b:'Lamborghini',cl:'SUV/Truck',r:'Legendary',e:'🐂',p:260000,ts:190,ac:90,ha:88,br:86,pw:657,wt:4850,d:'Fastest production SUV.'},
+  {n:'Jeep Trackhawk',b:'Jeep',cl:'SUV/Truck',r:'Rare',e:'🦅',p:85000,ts:180,ac:88,ha:72,br:74,pw:707,wt:5363,d:'Hellcat-powered Jeep.'},
+  {n:'Ford Raptor R',b:'Ford',cl:'SUV/Truck',r:'Rare',e:'🦅',p:100000,ts:115,ac:82,ha:66,br:68,pw:700,wt:5950,d:'Off-road king.'},
+  {n:'Ram TRX',b:'Ram',cl:'SUV/Truck',r:'Rare',e:'🛻',p:95000,ts:118,ac:80,ha:64,br:68,pw:702,wt:6350,d:'Hellcat in a truck.'}
 ];
 
 const UPGRADES=[
-{n:'Air Intake L1',cat:'engine',key:'intake',lvl:1,cost:2000,pb:15,hb:0,sb:5},
-{n:'Air Intake L2',cat:'engine',key:'intake',lvl:2,cost:4500,pb:30,hb:0,sb:8},
-{n:'Turbo Kit L1',cat:'engine',key:'turbo',lvl:1,cost:8000,pb:60,hb:0,sb:15},
-{n:'Turbo Kit L2',cat:'engine',key:'turbo',lvl:2,cost:18000,pb:120,hb:0,sb:25},
-{n:'Turbo Kit L3',cat:'engine',key:'turbo',lvl:3,cost:35000,pb:200,hb:0,sb:40},
-{n:'Supercharger L1',cat:'engine',key:'sc',lvl:1,cost:12000,pb:80,hb:0,sb:18},
-{n:'Supercharger L2',cat:'engine',key:'sc',lvl:2,cost:25000,pb:150,hb:0,sb:30},
-{n:'Engine Swap',cat:'engine',key:'eswap',lvl:1,cost:30000,pb:100,hb:0,sb:20},
-{n:'Street Tires',cat:'performance',key:'tires',lvl:1,cost:1500,pb:0,hb:8,sb:3},
-{n:'Track Tires',cat:'performance',key:'tires',lvl:2,cost:5000,pb:0,hb:18,sb:6},
-{n:'Race Slicks',cat:'performance',key:'tires',lvl:3,cost:12000,pb:0,hb:30,sb:10},
-{n:'Big Brake Kit',cat:'performance',key:'brakes',lvl:1,cost:3000,pb:0,hb:10,sb:0},
-{n:'Coilover Kit',cat:'performance',key:'susp',lvl:1,cost:5000,pb:0,hb:15,sb:5},
-{n:'Race Suspension',cat:'performance',key:'susp',lvl:2,cost:12000,pb:0,hb:28,sb:8},
-{n:'ECU Tune L1',cat:'performance',key:'ecu',lvl:1,cost:3000,pb:25,hb:5,sb:8},
-{n:'ECU Tune L2',cat:'performance',key:'ecu',lvl:2,cost:7000,pb:50,hb:8,sb:15},
-{n:'ECU Tune L3',cat:'performance',key:'ecu',lvl:3,cost:15000,pb:80,hb:12,sb:22}
+  {n:'Air Intake L1',cat:'engine',key:'intake',lvl:1,cost:2000,pb:15,hb:0,sb:5},
+  {n:'Air Intake L2',cat:'engine',key:'intake',lvl:2,cost:4500,pb:30,hb:0,sb:8},
+  {n:'Turbo Kit L1',cat:'engine',key:'turbo',lvl:1,cost:8000,pb:60,hb:0,sb:15},
+  {n:'Turbo Kit L2',cat:'engine',key:'turbo',lvl:2,cost:18000,pb:120,hb:0,sb:25},
+  {n:'Turbo Kit L3',cat:'engine',key:'turbo',lvl:3,cost:35000,pb:200,hb:0,sb:40},
+  {n:'Supercharger L1',cat:'engine',key:'sc',lvl:1,cost:12000,pb:80,hb:0,sb:18},
+  {n:'Supercharger L2',cat:'engine',key:'sc',lvl:2,cost:25000,pb:150,hb:0,sb:30},
+  {n:'Engine Swap',cat:'engine',key:'eswap',lvl:1,cost:30000,pb:100,hb:0,sb:20},
+  {n:'Street Tires',cat:'performance',key:'tires',lvl:1,cost:1500,pb:0,hb:8,sb:3},
+  {n:'Track Tires',cat:'performance',key:'tires',lvl:2,cost:5000,pb:0,hb:18,sb:6},
+  {n:'Race Slicks',cat:'performance',key:'tires',lvl:3,cost:12000,pb:0,hb:30,sb:10},
+  {n:'Big Brake Kit',cat:'performance',key:'brakes',lvl:1,cost:3000,pb:0,hb:10,sb:0},
+  {n:'Coilover Kit',cat:'performance',key:'susp',lvl:1,cost:5000,pb:0,hb:15,sb:5},
+  {n:'Race Suspension',cat:'performance',key:'susp',lvl:2,cost:12000,pb:0,hb:28,sb:8},
+  {n:'ECU Tune L1',cat:'performance',key:'ecu',lvl:1,cost:3000,pb:25,hb:5,sb:8},
+  {n:'ECU Tune L2',cat:'performance',key:'ecu',lvl:2,cost:7000,pb:50,hb:8,sb:15},
+  {n:'ECU Tune L3',cat:'performance',key:'ecu',lvl:3,cost:15000,pb:80,hb:12,sb:22}
 ];
 
 const RACES=[
-{id:'drag',n:'Drag Strip',d:'Raw HP from 0 to ¼ mile. Launch control and torque decide it.',e:'🏁',diff:'easy',rw:10000,xp:150,opp:520,oe:'🚗',on:'Street Racer',f:s=>s.pw*0.5+s.ac*8},
-{id:'street',n:'Street Sprint',d:'Short burst through traffic. Pure acceleration wins.',e:'🏙️',diff:'easy',rw:10000,xp:150,opp:540,oe:'🚕',on:'City Drifter',f:s=>s.ac*10+s.pw*0.3},
-{id:'circuit',n:'Road Circuit',d:'Mixed straights and technical corners. Balance required.',e:'🔄',diff:'medium',rw:25000,xp:300,opp:1100,oe:'🏎️',on:'Circuit Pro',f:s=>s.ha*8+s.pw*0.4+s.ts*2},
-{id:'highway',n:'Highway Pull',d:'Top speed endurance. No corners. Power is everything.',e:'🛣️',diff:'medium',rw:25000,xp:300,opp:1050,oe:'🚗',on:'Highway King',f:s=>s.pw*0.7+s.ts*4},
-{id:'ev',n:'EV Battle',d:'Electric torque vs combustion. Tesla/Rimac/Lucid get +500.',e:'⚡',diff:'medium',rw:25000,xp:300,opp:900,oe:'⚡',on:'Volt Striker',f:(s,c)=>s.pw*0.3+s.ac*8+(['Rimac Nevera','Tesla Model S Plaid','Tesla Roadster','Lucid Air Sapphire'].includes(c?.n)?500:0)},
-{id:'offroad',n:'Off-Road Rally',d:'Dirt, rocks, jumps. SUVs get a massive +600 bonus.',e:'🌲',diff:'hard',rw:75000,xp:600,opp:1400,oe:'🚙',on:'Dirt Devil',f:(s,c)=>s.pw*0.4+s.ha*5+(c?.cl==='SUV/Truck'?600:0)},
-{id:'drift',n:'Drift Battle',d:'Angle, smoke, style. Handling is everything here.',e:'💨',diff:'hard',rw:75000,xp:600,opp:1500,oe:'🚗',on:'Smoke King',f:s=>s.ha*15+s.pw*0.15},
-{id:'midnight',n:'Midnight Run',d:'Full endurance at speed. Every single stat counts.',e:'🌙',diff:'elite',rw:200000,xp:1500,opp:2500,oe:'🏎️',on:'Ghost Racer',f:s=>(s.pw+s.ts*3+s.ha*10+s.ac*6)*0.5}
+  {id:'drag',n:'Drag Strip',d:'Raw HP from 0 to ¼ mile. Launch control and torque decide it.',e:'🏁',diff:'easy',rw:10000,xp:150,opp:520,oe:'🚗',on:'Street Racer',f:s=>s.pw*0.5+s.ac*8},
+  {id:'street',n:'Street Sprint',d:'Short burst through traffic. Pure acceleration wins.',e:'🏙️',diff:'easy',rw:10000,xp:150,opp:540,oe:'🚕',on:'City Drifter',f:s=>s.ac*10+s.pw*0.3},
+  {id:'circuit',n:'Road Circuit',d:'Mixed straights and technical corners. Balance required.',e:'🔄',diff:'medium',rw:25000,xp:300,opp:1100,oe:'🏎️',on:'Circuit Pro',f:s=>s.ha*8+s.pw*0.4+s.ts*2},
+  {id:'highway',n:'Highway Pull',d:'Top speed endurance. No corners. Power is everything.',e:'🛣️',diff:'medium',rw:25000,xp:300,opp:1050,oe:'🚗',on:'Highway King',f:s=>s.pw*0.7+s.ts*4},
+  {id:'ev',n:'EV Battle',d:'Electric torque vs combustion. Tesla/Rimac/Lucid get +500.',e:'⚡',diff:'medium',rw:25000,xp:300,opp:900,oe:'⚡',on:'Volt Striker',f:(s,c)=>s.pw*0.3+s.ac*8+(['Rimac Nevera','Tesla Model S Plaid','Tesla Roadster','Lucid Air Sapphire'].includes(c?.n)?500:0)},
+  {id:'offroad',n:'Off-Road Rally',d:'Dirt, rocks, jumps. SUVs get a massive +600 bonus.',e:'🌲',diff:'hard',rw:75000,xp:600,opp:1400,oe:'🚙',on:'Dirt Devil',f:(s,c)=>s.pw*0.4+s.ha*5+(c?.cl==='SUV/Truck'?600:0)},
+  {id:'drift',n:'Drift Battle',d:'Angle, smoke, style. Handling is everything here.',e:'💨',diff:'hard',rw:75000,xp:600,opp:1500,oe:'🚗',on:'Smoke King',f:s=>s.ha*15+s.pw*0.15},
+  {id:'midnight',n:'Midnight Run',d:'Full endurance at speed. Every single stat counts.',e:'🌙',diff:'elite',rw:200000,xp:1500,opp:2500,oe:'🏎️',on:'Ghost Racer',f:s=>(s.pw+s.ts*3+s.ha*10+s.ac*6)*0.5}
 ];
 
 const TIPS={drag:'Stack turbo and supercharger upgrades.',circuit:'Balance handling + power.',street:'Max acceleration upgrades.',highway:'Raw power and top speed builds.',offroad:'SUV/Truck class gets +600 bonus!',drift:'Stack every handling upgrade.',midnight:'Balanced build wins here.',ev:'Tesla/Rimac/Lucid get a +500 bonus!'};
 
 const ACHS=[
-{id:'first_race',n:'First Race',d:'Complete your first race',ic:'🏁',ch:p=>p.wins+p.losses>=1,rw:1000},
-{id:'win5',n:'5 Wins',d:'Win 5 races',ic:'🏆',ch:p=>p.wins>=5,rw:5000},
-{id:'win25',n:'25 Wins',d:'Win 25 races',ic:'🥇',ch:p=>p.wins>=25,rw:25000},
-{id:'win100',n:'Century Club',d:'Win 100 races',ic:'💯',ch:p=>p.wins>=100,rw:100000},
-{id:'streak5',n:'On Fire',d:'Win 5 races in a row',ic:'🔥',ch:p=>p.best_streak>=5,rw:10000},
-{id:'streak10',n:'Unstoppable',d:'Win 10 races in a row',ic:'⚡',ch:p=>p.best_streak>=10,rw:50000},
-{id:'rich',n:'Millionaire',d:'Have $1,000,000 cash',ic:'💰',ch:p=>p.cash>=1000000,rw:10000},
-{id:'cars3',n:'Collector',d:'Own 3 cars',ic:'🚗',ch:(p,n)=>n>=3,rw:5000},
-{id:'cars10',n:'Fleet Owner',d:'Own 10 cars',ic:'🏎️',ch:(p,n)=>n>=10,rw:50000},
-{id:'daily7',n:'Week Warrior',d:'7-day login streak',ic:'📅',ch:p=>p.daily_streak>=7,rw:25000},
-{id:'lv10',n:'Veteran',d:'Reach Level 10',ic:'⭐',ch:p=>p.level>=10,rw:20000},
-{id:'rep500',n:'Street Legend',d:'Earn 500 reputation',ic:'👑',ch:p=>p.rep>=500,rw:50000}
+  {id:'first_race',n:'First Race',d:'Complete your first race',ic:'🏁',ch:p=>p.wins+p.losses>=1,rw:1000},
+  {id:'win5',n:'5 Wins',d:'Win 5 races',ic:'🏆',ch:p=>p.wins>=5,rw:5000},
+  {id:'win25',n:'25 Wins',d:'Win 25 races',ic:'🥇',ch:p=>p.wins>=25,rw:25000},
+  {id:'win100',n:'Century Club',d:'Win 100 races',ic:'💯',ch:p=>p.wins>=100,rw:100000},
+  {id:'streak5',n:'On Fire',d:'Win 5 races in a row',ic:'🔥',ch:p=>p.best_streak>=5,rw:10000},
+  {id:'streak10',n:'Unstoppable',d:'Win 10 races in a row',ic:'⚡',ch:p=>p.best_streak>=10,rw:50000},
+  {id:'rich',n:'Millionaire',d:'Have $1,000,000 cash',ic:'💰',ch:p=>p.cash>=1000000,rw:10000},
+  {id:'cars3',n:'Collector',d:'Own 3 cars',ic:'🚗',ch:(p,n)=>n>=3,rw:5000},
+  {id:'cars10',n:'Fleet Owner',d:'Own 10 cars',ic:'🏎️',ch:(p,n)=>n>=10,rw:50000},
+  {id:'daily7',n:'Week Warrior',d:'7-day login streak',ic:'📅',ch:p=>p.daily_streak>=7,rw:25000},
+  {id:'lv10',n:'Veteran',d:'Reach Level 10',ic:'⭐',ch:p=>p.level>=10,rw:20000},
+  {id:'rep500',n:'Street Legend',d:'Earn 500 reputation',ic:'👑',ch:p=>p.rep>=500,rw:50000}
 ];
 
 // ══ HELPERS ══
@@ -1438,3 +1399,41 @@ function showDailyBanner(){
 async function claimDaily(){
   if(!P||!CU)return;
   const last=P.last_daily?.toDate?.()??null;
+  if(last&&last.toDateString()===new Date().toDateString()){toast('Already claimed today!','t-info');return;}
+  const streak=Math.min((P.daily_streak||0),DAILY.length-1);
+  const amt=DAILY[streak];
+  const newStreak=(P.daily_streak||0)+1;
+  const updates={cash:firebase.firestore.FieldValue.increment(amt),daily_streak:newStreak,last_daily:firebase.firestore.FieldValue.serverTimestamp()};
+  await db.collection('profiles').doc(CU.uid).update(updates);
+  P.cash=(P.cash||0)+amt;P.daily_streak=newStreak;P.last_daily={toDate:()=>new Date()};
+  document.getElementById('daily-wrap').classList.remove('show');
+  toast(`🎁 Daily bonus claimed: $${fcf(amt)}!`,'t-gold');
+  xpPop('+$'+fc(amt));
+  renderHUD();
+}
+
+// ══ HUD ══
+function renderHUD(){
+  if(!P)return;
+  document.getElementById('hud-cash').textContent='$'+fc(P.cash);
+  document.getElementById('hud-lv').textContent=P.level||1;
+  const init=(P.username||'?')[0].toUpperCase();
+  document.getElementById('av-btn').textContent=init;
+  document.getElementById('menu-uname').textContent=P.username||'Driver';
+  document.getElementById('menu-role').innerHTML=roleBadge(P.role);
+  const isAdmin=['owner','admin','moderator'].includes(P.role);
+  document.getElementById('admin-nav-btn').style.display=isAdmin?'':'none';
+  document.getElementById('menu-admin-btn').style.display=isAdmin?'':'none';
+}
+function toggleHudMenu(){
+  document.getElementById('hud-menu').classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  const wrap=document.querySelector('.av-wrap');
+  if(wrap&&!wrap.contains(e.target))document.getElementById('hud-menu').classList.remove('open');
+});
+
+// ══ NAV ══
+function navTo(sec){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>
