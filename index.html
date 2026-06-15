@@ -1,4 +1,387 @@
-cat >> /tmp/p1.html << 'JSEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REDLINE</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#05060a;--bg2:#08090f;--bg3:#0d0f18;
+  --panel:#0d0f18;--panel2:#121420;--panel3:#171a28;
+  --border:#1c1f30;--border2:#252840;--border3:#303550;
+  --red:#d42020;--red2:#f03535;--red3:rgba(212,32,32,.1);
+  --amber:#c87820;--amber2:#e09030;--amber3:rgba(200,120,32,.1);
+  --steel:#c0c8e0;--steel2:#8890a8;--steel3:#404860;
+  --green:#258035;--green2:#35a048;--green3:rgba(37,128,53,.1);
+  --blue:#1858a0;--blue2:#2878d0;--blue3:rgba(24,88,160,.1);
+  --purple:#5828a0;--purple2:#7848c8;--purple3:rgba(88,40,160,.1);
+  --text:#d8daea;--text2:#7880a0;--text3:#383d58;--text4:#1c2038;
+  --mono:'Share Tech Mono',monospace;
+  --disp:'Orbitron',sans-serif;
+  --body:'Rajdhani',sans-serif;
+  --r:5px;--r2:8px;
+  --glow-red:0 0 20px rgba(212,32,32,.3);
+  --glow-amber:0 0 16px rgba(200,120,32,.2);
+  --glow-steel:0 0 16px rgba(192,200,224,.1);
+}
+body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;}
+button{font-family:var(--body);cursor:pointer;}
+input,select,textarea{font-family:var(--body);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* AUTH */
+#auth-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;background-image:radial-gradient(ellipse at 20% 50%,rgba(212,32,32,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 30%,rgba(192,200,224,.03) 0%,transparent 60%);}
+.auth-box{width:100%;max-width:390px;background:var(--panel);border:1px solid var(--border2);border-radius:var(--r2);padding:36px;position:relative;overflow:hidden;}
+.auth-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--steel),var(--amber),transparent);}
+.auth-logo{font-family:var(--disp);font-weight:900;font-size:38px;letter-spacing:10px;text-align:center;margin-bottom:3px;color:var(--red2);text-shadow:var(--glow-red);}
+.auth-sub{text-align:center;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:28px;text-transform:uppercase;}
+.auth-tabs{display:flex;margin-bottom:22px;background:var(--bg3);border-radius:var(--r);padding:3px;gap:3px;}
+.auth-tab{flex:1;padding:8px;text-align:center;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:none;color:var(--text3);border-radius:3px;transition:all .15s;}
+.auth-tab.active{background:var(--panel2);color:var(--red2);box-shadow:inset 0 0 8px rgba(212,32,32,.1);}
+.form-group{margin-bottom:14px;}
+.form-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;}
+.form-input{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:14px;outline:none;transition:border-color .15s;font-family:var(--mono);}
+.form-input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(212,32,32,.06);}
+.btn-auth{width:100%;padding:12px;background:var(--red);border:none;border-radius:var(--r);color:#fff;font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-top:6px;}
+.btn-auth:hover{background:var(--red2);box-shadow:var(--glow-red);}
+.auth-msg{font-size:12px;font-family:var(--mono);margin-top:10px;text-align:center;display:none;padding:8px;border-radius:var(--r);}
+.auth-msg.err{color:#e07070;background:rgba(180,30,30,.15);border:1px solid rgba(180,30,30,.3);}
+.auth-msg.ok{color:var(--green2);background:var(--green3);border:1px solid rgba(37,128,53,.3);}
+
+/* DAILY */
+.daily-banner{position:fixed;inset:0;z-index:8000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.9);backdrop-filter:blur(4px);}
+.daily-banner.show{display:flex;}
+.daily-box{background:var(--panel);border:1px solid var(--amber);border-radius:var(--r2);padding:36px;text-align:center;max-width:360px;width:100%;box-shadow:var(--glow-amber),0 0 60px rgba(200,120,32,.08);}
+.daily-title{font-family:var(--disp);font-size:18px;font-weight:900;color:var(--amber2);letter-spacing:5px;margin-bottom:6px;text-transform:uppercase;}
+.daily-amount{font-family:var(--disp);font-size:52px;font-weight:900;color:var(--amber2);margin:14px 0;text-shadow:var(--glow-amber);}
+.daily-streak{font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:20px;}
+.daily-days{display:flex;justify-content:center;gap:6px;margin-bottom:20px;}
+.daily-day{width:38px;height:38px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:10px;font-weight:700;border:1px solid var(--border2);color:var(--text3);}
+.daily-day.done{background:var(--amber3);border-color:rgba(200,120,32,.4);color:var(--amber2);}
+.daily-day.today{background:var(--amber);border-color:var(--amber2);color:#000;box-shadow:var(--glow-amber);}
+
+/* HEADER */
+#game{display:none;min-height:100vh;}
+.header{background:rgba(5,6,10,.98);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;}
+.logo{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:7px;color:var(--red2);text-shadow:var(--glow-red);}
+.logo-sub{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:2px;line-height:1;margin-top:2px;display:block;}
+.hud{display:flex;gap:6px;align-items:center;}
+.hud-pill{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;text-align:center;min-width:64px;transition:border-color .2s;}
+.hud-pill:hover{border-color:var(--border2);}
+.hud-pill .lbl{font-family:var(--mono);font-size:8px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
+.hud-pill .val{font-family:var(--disp);font-size:14px;font-weight:700;}
+.val-cash{color:var(--amber2);}
+.val-level{color:var(--steel);}
+.val-wins{color:var(--green2);}
+.hud-avatar{width:32px;height:32px;border-radius:50%;background:var(--red3);border:1px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:13px;color:var(--red2);cursor:pointer;position:relative;transition:all .15s;}
+.hud-avatar:hover{box-shadow:var(--glow-red);}
+.hud-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r2);min-width:200px;z-index:300;display:none;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.hud-menu.open{display:block;}
+.hud-menu-top{padding:12px 14px 10px;border-bottom:1px solid var(--border);background:var(--panel3);}
+.hud-menu-item{padding:10px 14px;font-size:13px;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:8px;font-weight:600;color:var(--text);}
+.hud-menu-item:hover{background:var(--panel3);}
+.hud-menu-item.danger{color:#e07070;}
+.hud-menu-divider{height:1px;background:var(--border);margin:4px 0;}
+
+/* NAV */
+.nav{background:rgba(5,6,10,.96);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 12px;gap:2px;}
+.nav-tab{padding:12px 16px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0;background:none;border-left:none;border-right:none;border-top:none;}
+.nav-tab:hover{color:var(--steel2);}
+.nav-tab.active{color:var(--red2);border-bottom-color:var(--red);}
+
+/* MAIN */
+.main{padding:20px;max-width:1380px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.sec-head{margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
+.sec-title{font-family:var(--disp);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:3px;line-height:1;color:var(--steel);}
+.sec-sub{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;margin-top:4px;text-transform:uppercase;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.grid-3{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:18px;}
+.panel h3{font-family:var(--disp);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;color:var(--steel2);}
+.panel-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.panel-hd h3{margin-bottom:0;}
+
+/* BADGES */
+.badge{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;}
+.badge-common{background:rgba(60,65,85,.5);color:var(--steel2);border:1px solid var(--border2);}
+.badge-rare{background:var(--blue3);color:var(--blue2);border:1px solid rgba(24,88,160,.3);}
+.badge-epic{background:var(--purple3);color:var(--purple2);border:1px solid rgba(88,40,160,.3);}
+.badge-gold{background:var(--amber3);color:var(--amber2);border:1px solid rgba(200,120,32,.3);}
+.badge-mythic{background:linear-gradient(135deg,rgba(88,40,160,.2),rgba(212,32,32,.2));color:#c890ff;border:1px solid rgba(160,80,200,.35);}
+.badge-green{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
+.badge-red{background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.3);}
+.badge-steel{background:rgba(64,72,96,.5);color:var(--steel2);border:1px solid var(--border2);}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:var(--r);font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .12s;font-family:var(--disp);letter-spacing:1px;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;}
+.btn-red{background:var(--red);color:#fff;border:1px solid var(--red2);}.btn-red:hover{background:var(--red2);box-shadow:var(--glow-red);}
+.btn-hot{background:var(--red);color:#fff;}.btn-hot:hover{background:var(--red2);box-shadow:var(--glow-red);}
+.btn-gold{background:var(--amber3);color:var(--amber2);border:1px solid rgba(200,120,32,.3);}.btn-gold:hover{background:rgba(200,120,32,.18);box-shadow:var(--glow-amber);}
+.btn-ghost{background:var(--panel3);color:var(--text2);border:1px solid var(--border2);}.btn-ghost:hover{color:var(--text);border-color:var(--border3);}
+.btn-steel{background:rgba(64,72,96,.5);color:var(--steel2);border:1px solid var(--border2);}.btn-steel:hover{color:var(--steel);border-color:var(--border3);}
+.btn-green{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
+.btn-purple{background:var(--purple3);color:var(--purple2);border:1px solid rgba(88,40,160,.3);}
+.btn-blue{background:var(--blue3);color:var(--blue2);border:1px solid rgba(24,88,160,.3);}
+.btn-lg{padding:11px 24px;font-size:12px;letter-spacing:2px;}
+.btn-sm{padding:4px 9px;font-size:10px;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* STAT BARS */
+.stat-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);}
+.stat-row:last-child{border-bottom:none;}
+.stat-lbl{width:80px;font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0;text-transform:uppercase;letter-spacing:1px;}
+.stat-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.stat-bar{height:100%;border-radius:2px;transition:width .5s;}
+.stat-val{width:55px;text-align:right;font-family:var(--mono);font-size:10px;color:var(--text2);}
+
+/* CAR CARDS */
+.car-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.car-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),var(--amber));opacity:0;transition:opacity .15s;}
+.car-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.5);}
+.car-card:hover::after{opacity:1;}
+.car-card.selected{border-color:var(--red);box-shadow:0 0 0 1px rgba(212,32,32,.15),var(--glow-red);}
+.car-card.selected::after{opacity:1;}
+.car-emoji{font-size:36px;margin-bottom:8px;line-height:1;}
+.car-name{font-family:var(--disp);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;line-height:1.2;}
+.car-brand{font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+.sel-tag{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:1px;background:var(--red);color:#fff;padding:2px 5px;border-radius:2px;}
+.rarity-strip{position:absolute;bottom:0;left:0;right:0;height:2px;}
+.rarity-common{background:var(--border2);}
+.rarity-rare{background:var(--blue2);}
+.rarity-epic{background:var(--purple2);}
+.rarity-legendary{background:var(--amber2);}
+.rarity-mythic{background:linear-gradient(90deg,var(--red),var(--purple2),var(--amber2));}
+
+/* FILTER */
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.filter-btn{padding:5px 11px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--text3);transition:all .12s;text-transform:uppercase;letter-spacing:1px;}
+.filter-btn.active,.filter-btn:hover{border-color:var(--red);color:var(--red2);background:var(--red3);}
+.filter-search{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--text);outline:none;font-family:var(--mono);width:160px;}
+.filter-search:focus{border-color:var(--red);}
+
+/* GARAGE */
+.garage-layout{display:grid;grid-template-columns:1fr 320px;gap:16px;}
+@media(max-width:900px){.garage-layout{grid-template-columns:1fr;}}
+.upgrade-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;transition:border-color .15s;}
+.upgrade-item:hover{border-color:var(--border2);}
+.upgrade-name{font-weight:700;font-size:13px;margin-bottom:2px;font-family:var(--disp);letter-spacing:.5px;}
+.upgrade-meta{font-size:11px;color:var(--text2);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border2);display:inline-block;}
+.dot.filled{background:var(--amber);box-shadow:0 0 4px rgba(200,120,32,.6);}
+.upgrade-dots{display:flex;gap:3px;margin-top:4px;}
+
+/* MARKET */
+.ticker-bar{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:7px 12px;margin-bottom:12px;font-family:var(--mono);font-size:10px;color:var(--text3);overflow:hidden;white-space:nowrap;}
+.ticker-text{display:inline-block;animation:tickerScroll 50s linear infinite;}
+@keyframes tickerScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.delta-up{color:var(--green2);}
+.delta-down{color:var(--red2);}
+
+/* AUCTION */
+.auction-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:16px;transition:all .15s;position:relative;overflow:hidden;}
+.auction-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.25;}
+.auction-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.auction-timer{font-family:var(--mono);font-size:12px;color:var(--amber2);font-weight:700;}
+.auction-timer.urgent{color:var(--red2);animation:urgPulse 1s infinite;}
+@keyframes urgPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.auction-price{font-family:var(--disp);font-size:20px;font-weight:700;color:var(--text);}
+.auction-bids{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px;}
+.bid-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.bid-row:last-child{border-bottom:none;}
+.bid-amount{font-family:var(--mono);color:var(--amber2);}
+
+/* RACE */
+.race-events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:24px;}
+.race-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.race-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;pointer-events:none;}
+.race-card.easy::before{background:radial-gradient(ellipse at 0% 100%,rgba(37,128,53,.08),transparent 70%);}
+.race-card.medium::before{background:radial-gradient(ellipse at 0% 100%,rgba(200,120,32,.08),transparent 70%);}
+.race-card.hard::before{background:radial-gradient(ellipse at 0% 100%,rgba(212,32,32,.08),transparent 70%);}
+.race-card.elite::before{background:radial-gradient(ellipse at 0% 100%,rgba(88,40,160,.1),transparent 70%);}
+.race-card:hover::before{opacity:1;}
+.race-card:hover{transform:translateY(-3px);}
+.race-card.easy:hover{border-color:rgba(37,128,53,.4);box-shadow:0 8px 28px rgba(37,128,53,.06);}
+.race-card.medium:hover{border-color:rgba(200,120,32,.4);box-shadow:0 8px 28px rgba(200,120,32,.06);}
+.race-card.hard:hover{border-color:rgba(212,32,32,.4);box-shadow:0 8px 28px rgba(212,32,32,.08);}
+.race-card.elite:hover{border-color:rgba(88,40,160,.4);box-shadow:0 8px 28px rgba(88,40,160,.1);}
+.diff-pip{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 8px;border-radius:3px;text-transform:uppercase;margin-bottom:10px;}
+.pip-easy{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
+.pip-medium{background:var(--amber3);color:var(--amber2);border:1px solid rgba(200,120,32,.3);}
+.pip-hard{background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.3);}
+.pip-elite{background:var(--purple3);color:var(--purple2);border:1px solid rgba(88,40,160,.3);}
+.race-name{font-family:var(--disp);font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;color:var(--steel);}
+.race-desc{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+.race-footer{display:flex;justify-content:space-between;align-items:center;}
+.race-reward{font-family:var(--mono);font-size:11px;color:var(--amber2);font-weight:700;}
+
+/* RACE ARENA */
+.race-arena{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:16px;position:relative;overflow:hidden;}
+.race-arena::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,32,32,.04),transparent 60%);pointer-events:none;}
+.arena-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.arena-title{font-family:var(--disp);font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:3px;color:var(--red2);}
+.arena-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:3px;letter-spacing:1px;text-transform:uppercase;}
+.arena-badge.ready{background:var(--blue3);color:var(--blue2);border:1px solid rgba(24,88,160,.3);}
+.arena-badge.countdown{background:var(--amber3);color:var(--amber2);border:1px solid rgba(200,120,32,.3);}
+.arena-badge.racing{background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.3);animation:urgPulse 1s infinite;}
+.arena-badge.victory{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
+.arena-badge.defeat{background:rgba(80,30,30,.3);color:#e06060;border:1px solid rgba(180,40,40,.3);}
+.phase-display{font-family:var(--disp);font-size:72px;font-weight:900;text-align:center;letter-spacing:8px;text-transform:uppercase;padding:14px 0;display:none;text-shadow:0 0 40px currentColor;}
+.phase-cd{color:var(--red2);}
+.phase-go{color:var(--green2);}
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+.score-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;transition:all .4s;}
+.score-box.winner{border-color:var(--green2);background:rgba(37,128,53,.05);box-shadow:0 0 20px rgba(37,128,53,.12);}
+.score-box.loser{border-color:rgba(180,40,40,.4);background:rgba(180,40,40,.04);}
+.score-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.score-car{font-size:40px;margin-bottom:6px;line-height:1;}
+.score-name{font-family:var(--disp);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;color:var(--text2);}
+.score-val{font-family:var(--disp);font-size:32px;font-weight:900;line-height:1;color:var(--steel);}
+.score-box.winner .score-val{color:var(--green2);}
+.score-box.loser .score-val{color:var(--red2);}
+.race-track{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.track-header{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.track-inner{padding:16px 14px;display:flex;flex-direction:column;gap:14px;}
+.track-lane{position:relative;height:52px;background:linear-gradient(90deg,rgba(255,255,255,.01),rgba(255,255,255,.02),rgba(255,255,255,.01));border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.lane-road{position:absolute;inset:0;overflow:hidden;}
+.road-stripe{position:absolute;top:50%;width:40px;height:2px;background:rgba(255,255,255,.06);border-radius:1px;transform:translateY(-50%);animation:roadAnim .6s linear infinite;}
+@keyframes roadAnim{from{left:110%;}to{left:-10%;}}
+.lane-label{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:9px;color:var(--text3);z-index:3;text-transform:uppercase;letter-spacing:1px;}
+.lane-car{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;left:3%;line-height:1;filter:drop-shadow(0 0 8px rgba(212,32,32,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);}
+.lane-car.opp{transition-duration:2.8s;filter:drop-shadow(0 0 8px rgba(200,80,80,.4));}
+.lane-finish{position:absolute;right:0;top:0;bottom:0;width:24px;background:repeating-conic-gradient(rgba(255,255,255,.06) 0% 25%,rgba(255,255,255,.01) 0% 50%) 0 0/12px 12px;z-index:2;}
+.speed-bar-section{margin-bottom:20px;}
+.speed-row{margin-bottom:10px;}
+.speed-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;margin-bottom:5px;}
+.speed-name{color:var(--text2);}
+.speed-score{color:var(--text3);}
+.speed-track-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.speed-fill{height:100%;border-radius:3px;width:0%;transition:width 2.4s cubic-bezier(.2,.6,.3,1);}
+.fill-p{background:linear-gradient(90deg,var(--amber),var(--amber2));}
+.fill-o{background:linear-gradient(90deg,#802020,var(--red2));}
+.result-box{border-radius:var(--r2);padding:28px;display:none;text-align:center;position:relative;overflow:hidden;}
+.result-win{background:linear-gradient(135deg,rgba(37,128,53,.08),rgba(200,120,32,.04));border:1px solid rgba(37,128,53,.3);}
+.result-lose{background:linear-gradient(135deg,rgba(212,32,32,.08),rgba(88,40,160,.04));border:1px solid rgba(212,32,32,.3);}
+.result-title{font-family:var(--disp);font-size:42px;font-weight:900;letter-spacing:4px;text-transform:uppercase;}
+.result-win .result-title{color:var(--green2);text-shadow:0 0 30px rgba(37,128,53,.4);}
+.result-lose .result-title{color:var(--red2);text-shadow:0 0 30px rgba(212,32,32,.4);}
+.result-detail{font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:8px;line-height:1.7;}
+.result-rewards{display:flex;justify-content:center;gap:20px;margin:14px 0;flex-wrap:wrap;}
+.result-rew-item{text-align:center;}
+.result-rew-val{font-family:var(--disp);font-size:20px;font-weight:700;}
+.result-rew-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+
+/* LEADERBOARD */
+.lb-table{width:100%;border-collapse:collapse;}
+.lb-table th{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.lb-table td{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;}
+.lb-table tr:last-child td{border-bottom:none;}
+.lb-table tr:hover td{background:var(--panel2);}
+.lb-val{font-family:var(--mono);font-size:11px;color:var(--amber2);text-align:right;}
+.lb-rank{font-family:var(--disp);font-size:14px;font-weight:700;width:36px;color:var(--text3);}
+
+/* PROFILE */
+.profile-hero{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:18px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;flex-wrap:wrap;}
+.profile-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);}
+.prof-avatar{width:68px;height:68px;border-radius:50%;background:var(--red3);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:26px;color:var(--red2);flex-shrink:0;}
+.prof-name-big{font-family:var(--disp);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:3px;color:var(--steel);}
+.xp-bar-wrap{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:8px;width:200px;}
+.xp-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px;transition:width .6s;}
+.profile-stats{display:flex;gap:20px;margin-left:auto;}
+.profile-stat{text-align:center;}
+.profile-stat .pnum{font-family:var(--disp);font-size:24px;font-weight:700;}
+.profile-stat .plbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+
+/* ACHIEVEMENTS */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.ach-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;gap:10px;align-items:center;transition:border-color .15s;}
+.ach-card.earned{border-color:rgba(200,120,32,.3);background:var(--amber3);}
+.ach-card:hover{border-color:var(--border2);}
+.ach-icon{font-size:24px;flex-shrink:0;}
+.ach-name{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+.ach-desc{font-family:var(--mono);font-size:9px;color:var(--text3);}
+
+/* ROLE BADGES */
+.role-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:20px;}
+.role-owner{background:linear-gradient(135deg,rgba(88,40,160,.3),rgba(212,32,32,.3));color:#fff;border:1px solid rgba(160,80,200,.4);}
+.role-admin{background:var(--red3);color:var(--red2);border:1px solid rgba(212,32,32,.3);}
+.role-moderator{background:var(--amber3);color:var(--amber2);border:1px solid rgba(200,120,32,.3);}
+.role-player{background:var(--panel3);color:var(--text3);border:1px solid var(--border);}
+.role-npc{background:rgba(30,32,55,.5);color:var(--text3);border:1px solid var(--border);}
+
+/* ADMIN */
+.admin-layout{display:grid;grid-template-columns:190px 1fr;gap:0;min-height:620px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.admin-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 0;}
+.admin-nav-item{padding:10px 16px;font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--text3);transition:all .12s;border-left:2px solid transparent;letter-spacing:1px;text-transform:uppercase;}
+.admin-nav-item:hover{background:var(--panel);color:var(--text2);}
+.admin-nav-item.active{background:var(--panel);color:var(--red2);border-left-color:var(--red);}
+.admin-content{background:var(--panel);padding:20px;overflow-y:auto;max-height:85vh;}
+.admin-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
+.admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.admin-stat-val{font-family:var(--disp);font-size:26px;font-weight:700;}
+.admin-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.admin-table{width:100%;border-collapse:collapse;font-size:12px;}
+.admin-table th{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.admin-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.admin-table tr:hover td{background:var(--panel2);}
+.log-action{font-family:var(--mono);font-size:10px;color:var(--red2);}
+.admin-search{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:6px 10px;color:var(--text);font-size:12px;outline:none;width:200px;font-family:var(--mono);}
+.admin-search:focus{border-color:var(--red);}
+.live-activity{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px;max-height:220px;overflow-y:auto;}
+.live-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start;}
+.live-row:last-child{border-bottom:none;}
+.live-time{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;margin-top:1px;flex-shrink:0;}
+@media(max-width:700px){.admin-layout{grid-template-columns:1fr;}.admin-sidebar{display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);padding:6px;}.admin-nav-item{white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:8px 12px;}.admin-nav-item.active{border-bottom-color:var(--red);border-left-color:transparent;}}
+
+/* NPC ACTIVITY FEED */
+.feed-container{position:fixed;bottom:24px;left:24px;z-index:400;pointer-events:none;}
+.feed-item{background:rgba(13,15,24,.95);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;font-family:var(--mono);font-size:11px;color:var(--text2);max-width:280px;backdrop-filter:blur(8px);animation:feedSlide .3s ease;transition:opacity .3s;}
+.feed-item.fade{opacity:0;}
+@keyframes feedSlide{from{transform:translateX(-20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);}
+.modal-title{font-family:var(--disp);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:3px;margin-bottom:18px;color:var(--red2);}
+.modal-close{position:absolute;top:14px;right:14px;font-size:18px;cursor:pointer;color:var(--text3);background:none;border:none;transition:color .15s;}
+.modal-close:hover{color:var(--red2);}
+
+/* MISC */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-family:var(--mono);font-size:11px;letter-spacing:1px;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-screen{display:flex;align-items:center;justify-content:center;height:180px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--text3);}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;font-size:12px;z-index:9000;transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none;max-width:290px;font-family:var(--mono);box-shadow:0 8px 24px rgba(0,0,0,.6);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.t-success{border-color:rgba(37,128,53,.5);color:var(--green2);}
+.toast.t-error{border-color:rgba(212,32,32,.5);color:var(--red2);}
+.toast.t-info{border-color:var(--border2);color:var(--steel2);}
+.rt-dot{width:6px;height:6px;border-radius:50%;background:var(--red2);display:inline-block;margin-right:5px;animation:rtPulse 2s infinite;}
+@keyframes rtPulse{0%,100%{opacity:1;}50%{opacity:.2;}}
+.xp-pop{position:fixed;top:70px;right:20px;z-index:8000;font-family:var(--disp);font-size:16px;font-weight:700;color:var(--amber2);pointer-events:none;animation:xpFloat 2s ease forwards;text-shadow:var(--glow-amber);}
+@keyframes xpFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-50px);}}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.card-mini{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:12px;}
+.challenge-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;}
+.challenge-icon{font-size:24px;flex-shrink:0;}
+.challenge-info{flex:1;}
+.challenge-name{font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+.challenge-prog{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden;}
+.challenge-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px;transition:width .5s;}
+.pulse-dot{display:inline-block;width:7px;height:7px;border-radius:50%;animation:rtPulse 2s infinite;}
+</style>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -107,6 +490,46 @@ const ACHIEVEMENTS=[
 {id:'level10',name:'Veteran',desc:'Reach Level 10',icon:'⭐',check:p=>p.level>=10,reward:20000},
 {id:'reputation',name:'Street Legend',desc:'Earn 500 reputation',icon:'👑',check:p=>p.reputation>=500,reward:50000},
 ];
+
+// ═══ HELPERS ═══
+function fmtCash(n){if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'K';return String(Math.round(n));}
+function fmtCashFull(n){return Number(n).toLocaleString();}
+function fmtCD(date){
+  const diff=date-Date.now();
+  if(diff<=0)return'ENDED';
+  const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  return h>0?`${h}h ${m}m`:`${m}m ${s}s`;
+}
+function rcls(r){const m={Common:'badge-common',Rare:'badge-rare',Epic:'badge-epic',Legendary:'badge-gold',Mythic:'badge-mythic'};return m[r]||'badge-common';}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function timeAgo(d){
+  if(!d)return'never';
+  const s=Math.round((Date.now()-d)/1000);
+  if(s<60)return s+'s ago';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+let _toastTimer=null;
+function toast(msg,cls='t-info'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show '+(cls||'');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>el.classList.remove('show'),3200);
+}
+function showXpPop(txt){
+  const el=document.createElement('div');
+  el.className='xp-pop';el.textContent=txt;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2100);
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// Close modals on overlay click
+document.addEventListener('click',e=>{
+  document.querySelectorAll('.modal-overlay.open').forEach(m=>{if(e.target===m)m.classList.remove('open');});
+});
 
 // ═══ AUTH ═══
 function switchAuthTab(t,el){
@@ -232,7 +655,6 @@ function showDailyBonus(){
   const amount=DAILY_AMOUNTS[streak];
   document.getElementById('daily-amount').textContent='$'+fmtCashFull(amount);
   document.getElementById('daily-streak').textContent=`Day ${streak+1} streak · Come back tomorrow to continue!`;
-  // render day dots
   const days=['M','T','W','T','F','S','S'];
   document.getElementById('daily-days').innerHTML=days.map((d,i)=>`<div class="daily-day ${i<streak?'done':i===streak?'today':''}">${i<streak?'✓':d}</div>`).join('');
   document.getElementById('daily-banner').classList.add('show');
@@ -311,7 +733,10 @@ function showTab(t,el){
 }
 function toggleHudMenu(){document.getElementById('hud-menu').classList.toggle('open');}
 function closeHudMenu(){document.getElementById('hud-menu').classList.remove('open');}
-document.addEventListener('click',e=>{if(!document.getElementById('avatar-btn').contains(e.target))closeHudMenu();});
+document.addEventListener('click',e=>{
+  const avatarBtn=document.getElementById('avatar-btn');
+  if(avatarBtn&&!avatarBtn.contains(e.target))closeHudMenu();
+});
 
 // ═══ GARAGE ═══
 function renderPlayerCars(){
@@ -520,7 +945,7 @@ async function runMarketTick(){
   if(document.getElementById('tab-market').classList.contains('active'))renderMarket();
 }
 
-// ═══ AUCTIONS — FIXED ═══
+// ═══ AUCTIONS ═══
 function setupAuctionListener(){
   const unsub=db.collection('auctions').where('status','==','active').onSnapshot(snap=>{
     if(document.getElementById('tab-auction').classList.contains('active'))renderAuctions();
@@ -652,7 +1077,6 @@ async function submitBid(){
   if(amount<=currentBidAuction.current_price){toast(`Must exceed $${fmtCash(currentBidAuction.current_price)}`,'t-error');return;}
   if(profile.cash<amount){toast('Not enough cash!','t-error');return;}
   if(currentBidAuction.seller_id===currentUser.uid){toast("Can't bid on your own listing",'t-error');return;}
-  // Refund previous bidder
   if(currentBidAuction.highest_bidder_id&&currentBidAuction.highest_bidder_id!==currentUser.uid)
     db.collection('profiles').doc(currentBidAuction.highest_bidder_id).update({cash:firebase.firestore.FieldValue.increment(currentBidAuction.current_price)}).catch(()=>{});
   await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-amount)});
@@ -667,7 +1091,6 @@ async function submitBid(){
 async function buyoutAuction(aId,price,carName,carEmoji,sellerId){
   if(!confirm(`Buy out for $${fmtCash(price)}?`))return;
   if(profile.cash<price){toast('Not enough cash!','t-error');return;}
-  // Refund previous bidder
   const doc=await db.collection('auctions').doc(aId).get();
   const a=doc.data();
   if(a.highest_bidder_id&&a.highest_bidder_id!==currentUser.uid)
@@ -676,7 +1099,6 @@ async function buyoutAuction(aId,price,carName,carEmoji,sellerId){
   const fee=Math.round(price*0.05);
   await db.collection('profiles').doc(sellerId).update({cash:firebase.firestore.FieldValue.increment(price-fee)}).catch(()=>{});
   await db.collection('auctions').doc(aId).update({status:'sold',current_price:price});
-  // Give car
   const car=allCars.find(c=>c.name===carName)||{};
   await db.collection('player_cars').add({player_id:currentUser.uid,car_name:carName,car_class:car.class||'',car_emoji:carEmoji||'🚗',purchase_price:price,is_active:false,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
   profile.cash-=price;
@@ -781,7 +1203,6 @@ async function startRace(rid){
   document.getElementById('r-player').textContent=pc.car_emoji||'🚗';
   document.getElementById('r-opp').textContent=r.oppEmoji||'🏎️';
 
-  // Reset
   ['p-fill','o-fill'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.width='0%';});
   ['r-player','r-opp'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.left='3%';});
   document.getElementById('p-score').textContent='';
@@ -791,7 +1212,6 @@ async function startRace(rid){
   document.getElementById('score-box-p').className='score-box';
   document.getElementById('score-box-o').className='score-box';
 
-  // Countdown
   const ph=document.getElementById('phase-disp');
   ph.style.display='block';
   setArenaBadge('countdown','COUNTDOWN');
@@ -829,7 +1249,6 @@ async function startRace(rid){
   document.getElementById('score-box-p').className='score-box '+(won?'winner':'loser');
   document.getElementById('score-box-o').className='score-box '+(won?'loser':'winner');
 
-  // Update stats
   const cashGain=won?r.reward:0;
   const newCash=profile.cash+cashGain;
   const newWins=(profile.wins||0)+(won?1:0);
@@ -888,7 +1307,6 @@ function resetArena(){
 
 // ═══ CHALLENGES & ACHIEVEMENTS ═══
 async function renderChallenges(){
-  // Daily challenges
   const dailyChallenges=[
     {id:'race3',name:'Complete 3 Races',desc:'Win or lose',icon:'🏁',target:3,get:p=>Math.min(3,(p.wins||0)+(p.losses||0)),reward:8000},
     {id:'win2',name:'Win 2 Races Today',desc:'Back-to-back victories',icon:'🏆',target:2,get:p=>Math.min(2,p.wins||0),reward:15000},
@@ -911,7 +1329,6 @@ async function renderChallenges(){
     </div>`;
   }).join('');
 
-  // Weekly missions
   const weeklyMissions=[
     {name:'Win 15 Races',icon:'🏆',target:15,get:p=>Math.min(15,p.wins||0),reward:50000},
     {name:'Buy 2 Cars',icon:'🚗',target:2,get:(p,pc)=>Math.min(2,pc),reward:30000},
@@ -933,7 +1350,6 @@ async function renderChallenges(){
     </div>`;
   }).join('');
 
-  // Achievements
   document.getElementById('achievements-grid').innerHTML=ACHIEVEMENTS.map(a=>{
     const earned=(profile.achievements||[]).includes(a.id)||(a.check(profile,playerCars.length));
     return `<div class="ach-card ${earned?'earned':''}">
@@ -946,15 +1362,13 @@ async function renderChallenges(){
     </div>`;
   }).join('');
 }
-
 async function checkAchievements(){
   if(!profile)return;
   const earned=profile.achievements||[];
   const newlyEarned=[];
   for(const a of ACHIEVEMENTS){
     if(!earned.includes(a.id)&&a.check(profile,playerCars.length)){
-      newlyEarned.push(a);
-      earned.push(a.id);
+      newlyEarned.push(a);earned.push(a.id);
     }
   }
   if(newlyEarned.length){
@@ -976,7 +1390,7 @@ async function loadLeaderboard(){
     db.collection('profiles').orderBy('cash','desc').limit(10).get(),
     db.collection('profiles').orderBy('best_win_streak','desc').limit(10).get()
   ]);
-  const row=(d,i,val,sub)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${d.is_npc?'<span style="font-size:9px;color:var(--text3)"> 🤖</span>':''}${d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
+  const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${d.is_npc?'<span style="font-size:9px;color:var(--text3)"> 🤖</span>':''}${d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
   document.getElementById('lb-wins').innerHTML=wSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().wins||0)+' W')).join('');
   document.getElementById('lb-cash').innerHTML=cSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,'$'+fmtCash(d.data().cash))).join('');
   document.getElementById('lb-streak').innerHTML=sSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().best_win_streak||0)+' 🔥')).join('');
@@ -1042,29 +1456,21 @@ const NPC_ADJECTIVES=['Ghost','Turbo','Nitro','Drag','Drift','Speed','Apex','Boo
 const NPC_NOUNS=['Racer','King','Hunter','Wolf','Fox','Hawk','Storm','Legend','Devil','Phantom'];
 
 async function startNPCEngine(){
-  // Load existing NPCs
   const snap=await db.collection('profiles').where('is_npc','==',true).limit(20).get();
   npcAccounts=snap.docs.map(d=>({id:d.id,...d.data()}));
-  // Run NPC activities every 3-8 minutes
   scheduleNPCActivity();
 }
-
 function scheduleNPCActivity(){
   clearInterval(window._npcTick);
-  const interval=180000+Math.random()*300000; // 3-8 min
-  window._npcTick=setInterval(runNPCActivity,interval);
-  // Also run once after 15s
+  window._npcTick=setInterval(runNPCActivity,180000+Math.random()*300000);
   setTimeout(runNPCActivity,15000);
 }
-
 async function runNPCActivity(){
   if(!currentUser||!npcAccounts.length)return;
   try{
-    // Pick random NPC
     const npc=npcAccounts[Math.floor(Math.random()*npcAccounts.length)];
     const action=Math.random();
     if(action<0.5){
-      // NPC races
       const r=RACE_EVENTS[Math.floor(Math.random()*RACE_EVENTS.length)];
       const won=Math.random()>0.35;
       const cash=(npc.cash||5000)+(won?r.reward:0);
@@ -1077,7 +1483,6 @@ async function runNPCActivity(){
       if(document.getElementById('tab-leaderboard').classList.contains('active'))loadLeaderboard();
       showFeed(`🤖 ${npc.username} ${won?'won':'lost'} a ${r.name}${won?' and earned $'+fmtCash(r.reward):''}`);
     } else if(action<0.75){
-      // NPC bids on auction
       const aSnap=await db.collection('auctions').where('status','==','active').limit(8).get();
       const now=new Date();
       const valid=aSnap.docs.filter(d=>{const t=d.data().ends_at?.toDate?.();return t&&t>now&&d.data().seller_id!==npc.id;});
@@ -1096,7 +1501,6 @@ async function runNPCActivity(){
         }
       }
     } else {
-      // NPC buys a car from market
       const affordable=CAR_DATA.filter(c=>{const p=marketPrices[c.name]?.current_price||c.base_price;return p<=(npc.cash||0)&&p<200000;});
       if(affordable.length){
         const car=affordable[Math.floor(Math.random()*affordable.length)];
@@ -1109,12 +1513,10 @@ async function runNPCActivity(){
     }
   }catch(e){console.warn('NPC activity error:',e.message);}
 }
-
-// Create new NPC accounts periodically
 async function maybeCreateNPC(){
   if(!currentUser)return;
   const snap=await db.collection('profiles').where('is_npc','==',true).get();
-  if(snap.size>=20)return; // cap at 20 NPCs
+  if(snap.size>=20)return;
   const adj=NPC_ADJECTIVES[Math.floor(Math.random()*NPC_ADJECTIVES.length)];
   const noun=NPC_NOUNS[Math.floor(Math.random()*NPC_NOUNS.length)];
   const num=Math.floor(Math.random()*999);
@@ -1123,26 +1525,20 @@ async function maybeCreateNPC(){
   const startCash=15000+Math.floor(Math.random()*50000);
   const npcRef=db.collection('profiles').doc();
   await npcRef.set({uid:npcRef.id,username,email,cash:startCash,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0,role:'player',is_banned:false,is_npc:true,daily_streak:0,last_daily:null,achievements:[],created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  // Give starter car
   const car=CAR_DATA.find(c=>c.name==='Toyota Supra MK5')||CAR_DATA[17];
   await db.collection('player_cars').add({player_id:npcRef.id,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:0,is_active:true,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
   npcAccounts.push({id:npcRef.id,username,cash:startCash,wins:0,losses:0,is_npc:true});
   showFeed(`🆕 ${username} joined REDLINE and hit the streets!`);
 }
-// Create NPCs every 30-60 minutes
 setInterval(()=>{if(currentUser)maybeCreateNPC().catch(()=>{});},1800000+Math.random()*1800000);
 
-// NPC Activity Feed
 function showFeed(msg){
   const feed=document.getElementById('npc-feed');
   if(!feed)return;
   const item=document.createElement('div');
-  item.className='feed-item';
-  item.textContent=msg;
+  item.className='feed-item';item.textContent=msg;
   feed.appendChild(item);
-  // Max 4 items
   while(feed.children.length>4)feed.removeChild(feed.firstChild);
-  // Auto-fade after 8s
   setTimeout(()=>{item.classList.add('fade');setTimeout(()=>item.remove(),300);},8000);
 }
 
@@ -1155,7 +1551,7 @@ function adminSec(sec,el){
 }
 async function loadAdminPanel(){
   if(!['admin','owner'].includes(profile?.role)){
-    document.getElementById('admin-content').innerHTML='<div class="empty"><div class="empty-icon">🚫</div>Access denied.<br>Restricted to admin and owner roles.</div>';return;
+    document.getElementById('admin-content').innerHTML='<div class="empty"><div class="empty-icon">🚫</div>Access denied.</div>';return;
   }
   const arb=document.getElementById('admin-role-badge');
   if(arb){arb.textContent=profile.role.toUpperCase();arb.className=`role-badge role-${profile.role}`;}
@@ -1204,7 +1600,7 @@ function filterAdminUsers(q){
   const el=document.getElementById('admin-user-tbl');if(el)el.innerHTML=userTable(f);
 }
 function userTable(users){
-  const ROLES=['admin','moderator','player']; // owner can only be set by another owner, admins can't set owner
+  const ROLES=['admin','moderator','player'];
   return `<table class="admin-table"><thead><tr><th>Username</th><th>Role</th><th>Lvl</th><th>Cash</th><th>W/L</th><th>Status</th><th>Actions</th></tr></thead>
   <tbody>${users.map(u=>`<tr style="${u.is_banned?'opacity:.4':''}">
     <td><strong>${u.username||'?'}</strong>${u.id===currentUser.uid?' <span style="font-size:9px;color:var(--text3)">(you)</span>':''}</td>
@@ -1228,9 +1624,7 @@ function userTable(users){
 }
 async function setRole(uid,name,role){
   if(uid===currentUser.uid){toast("Can't change your own role",'t-error');return;}
-  // Admins cannot assign owner role
   if(role==='owner'&&profile.role!=='owner'){toast('Only the owner can assign the owner role','t-error');return;}
-  // Admins cannot change other admins or owners
   const targetSnap=await db.collection('profiles').doc(uid).get();
   const target=targetSnap.data();
   if(target.role==='owner'){toast("Cannot change the owner's role",'t-error');return;}
@@ -1449,11 +1843,6 @@ async function adminEconomy(el){
         <div style="flex:1"><div style="font-weight:700;font-family:var(--disp);font-size:13px;letter-spacing:.5px">Emergency Stimulus</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Give $5000 to anyone with less than $1000</div></div>
         <button class="btn btn-green" onclick="emergencyStimulus()">Give Stimulus</button>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="flex:1"><div style="font-weight:700;font-family:var(--disp);font-size:13px;letter-spacing:.5px">Daily Bonus Multiplier</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Multiply all daily bonus amounts (1x = normal)</div></div>
-        <input class="admin-search" type="number" id="econ-daily-mult" placeholder="1" style="width:80px" min="0.5" max="10" step="0.5">
-        <button class="btn btn-ghost" onclick="setDailyMult()">Set</button>
-      </div>
     </div>`;
 }
 async function giveAllCash(){
@@ -1464,7 +1853,7 @@ async function giveAllCash(){
   const batch=db.batch();
   snap.docs.filter(d=>!d.data().is_npc).forEach(d=>batch.update(d.ref,{cash:firebase.firestore.FieldValue.increment(amt)}));
   await batch.commit();
-  toast(`Gave $${fmtCash(amt)} to ${snap.size} players!`,'t-success');
+  toast(`Gave $${fmtCash(amt)} to players!`,'t-success');
   logActivity('econ_give_all',{amount:amt}).catch(()=>{});
 }
 async function taxAll(){
@@ -1484,13 +1873,6 @@ async function emergencyStimulus(){
   snap.docs.filter(d=>!d.data().is_npc).forEach(d=>batch.update(d.ref,{cash:5000}));
   await batch.commit();toast(`Stimulus given to ${snap.size} players`,'t-success');
   logActivity('econ_stimulus',{count:snap.size}).catch(()=>{});
-}
-async function setDailyMult(){
-  const mult=parseFloat(document.getElementById('econ-daily-mult').value);
-  if(!mult||mult<0.5){toast('Enter a valid multiplier (0.5+)','t-error');return;}
-  await db.collection('settings').doc('game').set({daily_multiplier:mult},{merge:true});
-  toast(`Daily multiplier set to ${mult}x`,'t-success');
-  logActivity('set_daily_mult',{mult}).catch(()=>{});
 }
 async function adminRaces(el){
   const [rSnap,todaySnap]=await Promise.all([
@@ -1514,17 +1896,16 @@ async function adminBroadcast(el){
   el.innerHTML=`
     <div style="font-family:var(--disp);font-size:12px;font-weight:700;color:var(--red2);letter-spacing:2px;margin-bottom:16px;text-transform:uppercase">System Broadcast</div>
     <div style="display:flex;flex-direction:column;gap:12px">
-      <div><label class="form-label">Message (shown as toast to all active users)</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Type your announcement here..." style="resize:vertical;font-family:var(--body)"></textarea></div>
-      <div><label class="form-label">Notification Type</label>
+      <div><label class="form-label">Message</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Type your announcement here..." style="resize:vertical;font-family:var(--body)"></textarea></div>
+      <div><label class="form-label">Type</label>
         <select class="form-input" id="bc-type">
-          <option value="t-info">📢 Info (default)</option>
-          <option value="t-success">✅ Success (green)</option>
-          <option value="t-error">🚨 Alert (red)</option>
+          <option value="t-info">📢 Info</option>
+          <option value="t-success">✅ Success</option>
+          <option value="t-error">🚨 Alert</option>
         </select>
       </div>
-      <button class="btn btn-red btn-lg" onclick="sendBroadcast()">📢 Send to All Players</button>
+      <button class="btn btn-red btn-lg" onclick="sendBroadcast()">📢 Send Broadcast</button>
       <div class="divider"></div>
-      <div style="font-family:var(--disp);font-size:11px;font-weight:700;color:var(--amber2);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase">Recent Broadcasts</div>
       <div id="bc-history"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>`;
   const snap=await db.collection('broadcasts').orderBy('created_at','desc').limit(10).get();
@@ -1555,14 +1936,6 @@ async function adminSettings(el){
         </div>
       </div>
       <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-        <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">NPC Activity</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Current: <strong style="color:var(--amber2)">${sett.npc_enabled===false?'Disabled':'Enabled'}</strong></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-green" onclick="adminSaveSetting('npc_enabled',true)">Enable NPCs</button>
-          <button class="btn btn-ghost" onclick="adminSaveSetting('npc_enabled',false)">Disable NPCs</button>
-        </div>
-      </div>
-      <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
         <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Starting Cash (new accounts)</div>
         <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Current: <strong style="color:var(--amber2)">$${fmtCash(sett.starting_cash||50000)}</strong></div>
         <div style="display:flex;gap:8px">
@@ -1578,14 +1951,14 @@ async function adminSettings(el){
     </div>`;
 }
 async function adminSaveSetting(key,val){
-  if(val===undefined||val===null||isNaN(val)&&typeof val!=='boolean'){toast('Invalid value','t-error');return;}
+  if(val===undefined||val===null||(typeof val!=='boolean'&&isNaN(val))){toast('Invalid value','t-error');return;}
   await db.collection('settings').doc('game').set({[key]:val},{merge:true});
   toast(`Setting '${key}' updated to ${val}`,'t-success');
   logActivity('admin_setting',{key,val}).catch(()=>{});
   loadAdminSec('settings');
 }
 async function promoteSelfOwner(){
-  if(!confirm('Promote yourself to Owner? This cannot be undone by anyone except another Owner.'))return;
+  if(!confirm('Promote yourself to Owner? This grants full control.'))return;
   await db.collection('profiles').doc(currentUser.uid).update({role:'owner'});
   profile.role='owner';renderHUD();
   toast('You are now the Owner! 👑','t-success');
@@ -1597,3 +1970,348 @@ async function promoteSelfOwner(){
 async function logActivity(action,details){
   if(!currentUser||!profile)return;
   await db.collection('activity_logs').add({user_id:currentUser.uid,username:profile.username,action,details:details||{},created_at:firebase.firestore.FieldValue.serverTimestamp()});
+}
+</script>
+</head>
+<body>
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">REDLINE</div>
+    <div class="auth-sub">Street Racing Economy · Est. 2024</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup',this)">Register</button>
+    </div>
+    <div id="auth-login">
+      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="login-user" placeholder="YourRacerTag" autocomplete="username"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-auth" onclick="doLogin()">IGNITE ENGINE</button>
+    </div>
+    <div id="auth-signup" style="display:none">
+      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="su-user" placeholder="YourRacerTag" maxlength="20"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="su-email" placeholder="you@redline.gg"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="su-pass" placeholder="Min 6 chars" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <button class="btn-auth" onclick="doSignup()">JOIN THE GRID</button>
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+  </div>
+</div>
+
+<div class="daily-banner" id="daily-banner">
+  <div class="daily-box">
+    <div style="font-size:48px;margin-bottom:8px">🎁</div>
+    <div class="daily-title">DAILY BONUS</div>
+    <div class="daily-amount" id="daily-amount">$5,000</div>
+    <div class="daily-days" id="daily-days"></div>
+    <div class="daily-streak" id="daily-streak">Day 1 streak</div>
+    <button class="btn-auth" onclick="claimDaily()">CLAIM REWARD</button>
+  </div>
+</div>
+
+<div id="game">
+  <header class="header">
+    <div>
+      <div class="logo">REDLINE</div>
+      <span class="logo-sub">Street Racing Economy</span>
+    </div>
+    <div class="hud">
+      <div class="hud-pill" onclick="showTab('profile')" style="cursor:pointer"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
+      <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
+      <div class="hud-pill"><div class="lbl">Wins</div><div class="val val-wins"><span id="hud-wins">0</span></div></div>
+      <div class="hud-pill" style="display:none" id="hud-car-pill"><div class="lbl">Ride</div><div class="val" style="font-size:18px" id="hud-car-emoji">🚗</div></div>
+      <div class="hud-avatar" id="avatar-btn" onclick="toggleHudMenu()">
+        <span id="avatar-init">R</span>
+        <div class="hud-menu" id="hud-menu">
+          <div class="hud-menu-top">
+            <div style="font-size:13px;font-weight:700;font-family:var(--disp);letter-spacing:1px;color:var(--steel)" id="menu-username">Driver</div>
+            <div id="menu-role" style="margin-top:5px"></div>
+          </div>
+          <div class="hud-menu-item" onclick="showTab('profile')">👤 Profile</div>
+          <div class="hud-menu-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
+          <div class="hud-menu-item" onclick="showTab('challenges')">🎯 Challenges</div>
+          <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
+          <div class="hud-menu-divider"></div>
+          <div class="hud-menu-item" id="admin-menu-link" style="display:none" onclick="showTab('admin')">🛡️ Admin Panel</div>
+          <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="nav-tab active" onclick="showTab('garage',this)">🏠 Garage</button>
+    <button class="nav-tab" onclick="showTab('market',this)">🏪 Market</button>
+    <button class="nav-tab" onclick="showTab('auction',this)">🔨 Auction</button>
+    <button class="nav-tab" onclick="showTab('race',this)">🏁 Race</button>
+    <button class="nav-tab" onclick="showTab('challenges',this)">🎯 Challenges</button>
+    <button class="nav-tab" onclick="showTab('leaderboard',this)">🏆 Board</button>
+    <button class="nav-tab" onclick="showTab('profile',this)">👤 Profile</button>
+    <button class="nav-tab" id="admin-nav-tab" style="display:none" onclick="showTab('admin',this)">🛡️ Admin</button>
+  </nav>
+
+  <main class="main">
+    <!-- GARAGE -->
+    <div class="section active" id="tab-garage">
+      <div class="sec-head">
+        <div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars · click a car to manage it</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-steel btn-lg" onclick="showTab('auction')">🔨 Auction</button>
+          <button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button>
+        </div>
+      </div>
+      <div class="garage-layout">
+        <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
+        <div id="garage-sidebar" style="display:none">
+          <div class="panel" style="margin-bottom:12px">
+            <div class="panel-hd"><h3 id="sb-name">Car</h3><span id="sb-rarity" class="badge"></span></div>
+            <div style="text-align:center;font-size:64px;margin:14px 0;filter:drop-shadow(0 0 12px rgba(212,32,32,.3))" id="sb-emoji">🚗</div>
+            <div id="sb-stats"></div>
+            <div style="margin-top:12px;padding:10px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px"><span>Power Boost</span><span style="color:var(--red2)" id="sb-pb">+0 hp</span></div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px"><span>Race Rating</span><span style="color:var(--amber2)" id="sb-rating">—</span></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+              <button class="btn btn-red btn-lg" style="flex:1" onclick="setActiveCar()">⚡ Set Active</button>
+              <button class="btn btn-ghost" id="fav-btn" onclick="toggleFav()">♡</button>
+              <button class="btn btn-gold btn-sm" onclick="openSell()">Auction</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Upgrades</h3>
+            <div style="display:flex;gap:5px;margin-bottom:12px">
+              <button class="filter-btn active" onclick="showUpgrades('engine',this)">Engine</button>
+              <button class="filter-btn" onclick="showUpgrades('performance',this)">Perf</button>
+            </div>
+            <div id="upgrade-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKET -->
+    <div class="section" id="tab-market">
+      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>live demand-driven pricing · updates every 90s</div></div></div>
+      <div class="ticker-bar"><span class="rt-dot"></span> <span class="ticker-text" id="ticker-text">Loading market data...</span></div>
+      <div class="filter-bar">
+        <input class="filter-search" id="mkt-search" placeholder="Search cars..." oninput="renderMarket()">
+        <button class="filter-btn active" data-cls="all" onclick="setMktFilter(this)">All</button>
+        <button class="filter-btn" data-cls="Hypercar" onclick="setMktFilter(this)">Hypercar</button>
+        <button class="filter-btn" data-cls="Sports" onclick="setMktFilter(this)">Sports</button>
+        <button class="filter-btn" data-cls="Muscle" onclick="setMktFilter(this)">Muscle</button>
+        <button class="filter-btn" data-cls="EV" onclick="setMktFilter(this)">EV</button>
+        <button class="filter-btn" data-cls="SUV/Truck" onclick="setMktFilter(this)">SUV</button>
+        <select class="filter-search" id="mkt-sort" onchange="renderMarket()" style="width:130px;border-radius:20px">
+          <option value="demand">By Demand</option>
+          <option value="price_asc">Price ↑</option>
+          <option value="price_desc">Price ↓</option>
+          <option value="power">By Power</option>
+          <option value="speed">By Speed</option>
+        </select>
+      </div>
+      <div id="market-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
+    </div>
+
+    <!-- AUCTION -->
+    <div class="section" id="tab-auction">
+      <div class="sec-head">
+        <div><div class="sec-title">Auction House</div><div class="sec-sub"><span class="rt-dot"></span>live bidding · 5% seller fee · realtime bids</div></div>
+        <button class="btn btn-gold btn-lg" onclick="openListModal()">+ List Car</button>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-evt="all" onclick="setAuctFilter(this)">All</button>
+        <button class="filter-btn" data-evt="hypercar" onclick="setAuctFilter(this)">Hypercar</button>
+        <button class="filter-btn" data-evt="jdm_night" onclick="setAuctFilter(this)">JDM Night</button>
+        <button class="filter-btn" data-evt="muscle_madness" onclick="setAuctFilter(this)">Muscle</button>
+        <button class="filter-btn" data-evt="ending_soon" onclick="setAuctFilter(this)">🔥 Ending Soon</button>
+      </div>
+      <div id="auction-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
+    </div>
+
+    <!-- RACE -->
+    <div class="section" id="tab-race">
+      <div class="sec-head">
+        <div><div class="sec-title">Race Events</div><div class="sec-sub">Win cash · earn XP · unlock achievements</div></div>
+        <div id="active-car-chip" style="display:none;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--text2)">
+          Active: <span id="active-car-chip-name" style="color:var(--amber2)"></span>
+        </div>
+      </div>
+      <div id="race-grid" class="race-events-grid"></div>
+      <div class="race-arena" id="race-arena">
+        <div class="arena-header">
+          <div class="arena-title" id="arena-title">Race</div>
+          <div class="arena-badge ready" id="arena-badge">READY</div>
+        </div>
+        <div class="phase-display" id="phase-disp"></div>
+        <div class="scoreboard" id="scoreboard" style="display:none">
+          <div class="score-box" id="score-box-p">
+            <div class="score-label">Your Score</div>
+            <div class="score-car" id="score-car-p">🚗</div>
+            <div class="score-name" id="score-name-p">YOU</div>
+            <div class="score-val" id="score-val-p">—</div>
+          </div>
+          <div class="score-box" id="score-box-o">
+            <div class="score-label">CPU Opponent</div>
+            <div class="score-car" id="opp-emoji">🏎️</div>
+            <div class="score-name" id="opp-name">CPU RACER</div>
+            <div class="score-val" id="score-val-o">—</div>
+          </div>
+        </div>
+        <div class="speed-bar-section">
+          <div class="speed-row"><div class="speed-label"><span class="speed-name" id="p-lbl">YOU</span><span class="speed-score" id="p-score"></span></div><div class="speed-track-bar"><div class="speed-fill fill-p" id="p-fill"></div></div></div>
+          <div class="speed-row" style="margin-top:8px"><div class="speed-label"><span class="speed-name" id="opp-lbl">OPPONENT</span><span class="speed-score" id="o-score"></span></div><div class="speed-track-bar"><div class="speed-fill fill-o" id="o-fill"></div></div></div>
+        </div>
+        <div class="race-track">
+          <div class="track-header"><span id="p-lane-name">PLAYER</span><span id="opp-lane-name">OPPONENT</span><span>FINISH</span></div>
+          <div class="track-inner">
+            <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.1s"></div><div class="road-stripe" style="animation-delay:-.4s;left:55%"></div><div class="road-stripe" style="animation-delay:-.7s;left:25%"></div></div><div class="lane-label" id="player-lane-lbl">YOU</div><div class="lane-car" id="r-player" style="left:3%">🚗</div><div class="lane-finish"></div></div>
+            <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.25s;animation-duration:.65s"></div><div class="road-stripe" style="animation-delay:-.55s;animation-duration:.65s;left:60%"></div></div><div class="lane-label" id="opp-lane-label">CPU</div><div class="lane-car opp" id="r-opp" style="left:3%">🏎️</div><div class="lane-finish"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="result-box" id="race-result"></div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <div class="section" id="tab-challenges">
+      <div class="sec-head"><div><div class="sec-title">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
+      <div class="grid-2">
+        <div>
+          <div class="panel" style="margin-bottom:16px">
+            <h3>📅 Daily Challenges</h3>
+            <div id="daily-challenges"><div class="loading-screen"><div class="spinner"></div></div></div>
+          </div>
+          <div class="panel">
+            <h3>📋 Weekly Missions</h3>
+            <div id="weekly-challenges"><div class="loading-screen"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>🏅 Achievements</h3>
+          <div id="achievements-grid" class="ach-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="section" id="tab-leaderboard">
+      <div class="sec-head"><div><div class="sec-title">Leaderboard</div><div class="sec-sub">Top drivers worldwide · updated live</div></div></div>
+      <div class="grid-2">
+        <div class="panel"><h3>🏆 Top Racers</h3><table class="lb-table" id="lb-wins"></table></div>
+        <div class="panel"><h3>💰 Richest</h3><table class="lb-table" id="lb-cash"></table></div>
+        <div class="panel"><h3>🔥 Longest Streaks</h3><table class="lb-table" id="lb-streak"></table></div>
+        <div class="panel"><h3>🚗 Most Cars</h3><table class="lb-table" id="lb-garage"></table></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="section" id="tab-profile">
+      <div class="profile-hero">
+        <div class="prof-avatar" id="prof-av">R</div>
+        <div>
+          <div class="prof-name-big" id="prof-name">Driver</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:4px 0">LEVEL <span id="prof-lvl">1</span> · <span id="prof-rep">0</span> REP · <span id="prof-streak-cnt">0</span> 🔥 STREAK</div>
+          <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px"><span id="xp-curr">0</span>/<span id="xp-next">1000</span> XP to next level</div>
+          <div style="margin-top:8px" id="prof-role"></div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><div class="pnum val-wins" id="ps-wins">0</div><div class="plbl">Wins</div></div>
+          <div class="profile-stat"><div class="pnum" style="color:var(--red2)" id="ps-losses">0</div><div class="plbl">Losses</div></div>
+          <div class="profile-stat"><div class="pnum val-cash" id="ps-cash">$0</div><div class="plbl">Net Worth</div></div>
+          <div class="profile-stat"><div class="pnum" style="color:var(--amber2)" id="ps-best">0</div><div class="plbl">Best Streak</div></div>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="panel" style="grid-column:1/3">
+          <h3>Race History</h3>
+          <div id="race-hist"><div class="loading-screen"><div class="spinner"></div></div></div>
+        </div>
+        <div>
+          <div class="panel" style="margin-bottom:16px">
+            <h3>Stats</h3>
+            <div id="prof-stats-detail"></div>
+          </div>
+          <div class="panel">
+            <h3>Daily Login</h3>
+            <div id="prof-daily-info" style="font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="section" id="tab-admin">
+      <div class="sec-head">
+        <div><div class="sec-title" style="color:var(--red2)">⚙ Admin Panel</div><div class="sec-sub">system control · restricted access</div></div>
+        <span id="admin-role-badge" class="role-badge"></span>
+      </div>
+      <div class="admin-layout">
+        <div class="admin-sidebar">
+          <div class="admin-nav-item active" onclick="adminSec('overview',this)">📊 Overview</div>
+          <div class="admin-nav-item" onclick="adminSec('users',this)">👥 Players</div>
+          <div class="admin-nav-item" onclick="adminSec('npcs',this)">🤖 NPC Control</div>
+          <div class="admin-nav-item" onclick="adminSec('logs',this)">📋 Activity</div>
+          <div class="admin-nav-item" onclick="adminSec('market',this)">📈 Market</div>
+          <div class="admin-nav-item" onclick="adminSec('auctions',this)">🔨 Auctions</div>
+          <div class="admin-nav-item" onclick="adminSec('economy',this)">💰 Economy</div>
+          <div class="admin-nav-item" onclick="adminSec('races',this)">🏁 Races</div>
+          <div class="admin-nav-item" onclick="adminSec('broadcast',this)">📢 Broadcast</div>
+          <div class="admin-nav-item" onclick="adminSec('settings',this)">⚙ Settings</div>
+        </div>
+        <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- NPC FEED -->
+<div class="feed-container" id="npc-feed"></div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-bid">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-bid')">✕</button>
+    <div class="modal-title">Place Bid</div>
+    <div id="bid-car-info" style="margin-bottom:16px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Current Bid</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--amber2)">$<span id="bid-curr">0</span></div></div>
+      <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Your Cash</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--green2)">$<span id="bid-mycash">0</span></div></div>
+    </div>
+    <div class="form-group"><label class="form-label">Your Bid</label><input class="form-input" type="number" id="bid-input" placeholder="Enter amount"></div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">Min bid: $<span id="bid-min">0</span> · Buyout: $<span id="bid-buyout-disp">N/A</span></div>
+    <div id="bid-hist-list" style="max-height:140px;overflow-y:auto;margin-bottom:14px"></div>
+    <button class="btn btn-red btn-lg" style="width:100%" onclick="submitBid()">⚡ Place Bid</button>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-sell">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-sell')">✕</button>
+    <div class="modal-title">List for Auction</div>
+    <div id="sell-car-info" style="margin-bottom:14px"></div>
+    <div class="form-group"><label class="form-label">Starting Price ($)</label><input class="form-input" type="number" id="sell-start"></div>
+    <div class="form-group"><label class="form-label">Buyout Price (optional)</label><input class="form-input" type="number" id="sell-buyout" placeholder="Leave blank for no buyout"></div>
+    <div class="form-group"><label class="form-label">Duration</label>
+      <select class="form-input" id="sell-dur">
+        <option value="1">1 hour</option><option value="3">3 hours</option><option value="6" selected>6 hours</option><option value="12">12 hours</option><option value="24">24 hours</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Event Type</label>
+      <select class="form-input" id="sell-evt">
+        <option value="standard">Standard</option><option value="hypercar">🏆 Hypercar Night</option><option value="jdm_night">🎌 JDM Night</option><option value="muscle_madness">💪 Muscle Madness</option>
+      </select>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:14px;padding:8px;background:var(--amber3);border:1px solid rgba(200,120,32,.25);border-radius:var(--r)">⚠ 5% fee deducted from final sale price</div>
+    <button class="btn btn-gold btn-lg" style="width:100%" onclick="submitAuction()">🔨 List Now</button>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-car"><div class="modal"><button class="modal-close" onclick="closeModal('modal-car')">✕</button><div id="modal-car-body"></div></div></div>
+<div class="modal-overlay" id="modal-user">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
+    <div class="modal-title" id="modal-user-title">Player</div>
+    <div id="modal-user-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+</body>
+</html>
