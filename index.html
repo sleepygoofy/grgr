@@ -377,7 +377,7 @@ input,select,textarea{font-family:var(--body);}
 <!-- GAME -->
 <div id="game">
   <header class="header">
-    <div class="logo">REDLINE</div>
+    <div class="logo">VELOVERSE</div>
     <div class="hud">
       <div class="hud-pill"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
       <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
@@ -726,7 +726,7 @@ async function doSignup(){
     const uid=cred.user.uid;
     await db.collection('profiles').doc(uid).set({uid,username,email,cash:50000,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0,role:'player',is_banned:false,ban_reason:null,daily_streak:0,last_daily:null,created_at:firebase.firestore.FieldValue.serverTimestamp()});
     await giveStarterCar(uid);
-    setMsg('Welcome to REDLINE! 🏎️','ok');
+    setMsg('Welcome to VELOVERSE! 🏎️','ok');
   }catch(e){setMsg(e.message);}
 }
 function setMsg(msg,type='err'){
