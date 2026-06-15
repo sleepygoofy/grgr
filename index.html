@@ -992,9 +992,10 @@ function showAuthErr(msg, isErr=true) {
 }
 
 async function doLogout() {
-  await logActivity('logout', {username: profile?.username});
+  try { await logActivity('logout', {username: profile?.username}); } catch {}
   await sb.auth.signOut();
-  window.location.reload();
+  // onAuthStateChange SIGNED_OUT fires automatically and resets all state + shows auth screen
+  // No reload needed — state is fully reset in the SIGNED_OUT handler
 }
 
 // ═══════════════════════════════════════════════
@@ -1066,52 +1067,60 @@ function applyRoleFeatures() {
 }
 
 // ═══════════════════════════════════════════════
-// INIT ON AUTH
+// INIT ON AUTH — single source of truth
 // ═══════════════════════════════════════════════
-// ─── Session persistence: check existing session FIRST before listening ───────
-// This prevents the "logged out on reload" bug caused by the auth listener
-// firing SIGNED_OUT before the session is restored from localStorage.
+// We use onAuthStateChange as the ONLY entry point.
+// Supabase v2 fires INITIAL_SESSION on page load (including reloads)
+// with the stored session from localStorage — this replaces the old
+// bootGame()/getSession() approach which had race conditions.
+
 let _gameInitialized = false;
 
-async function bootGame() {
-  // Supabase v2 stores session in localStorage automatically.
-  // getSession() reads it synchronously without a network round-trip.
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('game').style.display = 'block';
-    if (!_gameInitialized) {
-      _gameInitialized = true;
-      await initGame();
-    }
-  } else {
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('game').style.display = 'none';
-  }
+function showGame() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
+}
+function showAuth() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('game').style.display = 'none';
 }
 
-// Listen for future auth changes (login, logout, token refresh)
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session?.user && !_gameInitialized) {
-    currentUser = session.user;
-    _gameInitialized = true;
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('game').style.display = 'block';
-    await initGame();
+  if (event === 'INITIAL_SESSION') {
+    // Fires on every page load — has the stored session if logged in
+    if (session?.user) {
+      currentUser = session.user;
+      showGame();
+      if (!_gameInitialized) {
+        _gameInitialized = true;
+        await initGame();
+      }
+    } else {
+      showAuth();
+    }
+  } else if (event === 'SIGNED_IN') {
+    if (session?.user && !_gameInitialized) {
+      currentUser = session.user;
+      _gameInitialized = true;
+      showGame();
+      await initGame();
+    }
   } else if (event === 'SIGNED_OUT') {
     _gameInitialized = false;
     currentUser = null;
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('game').style.display = 'none';
+    profile = null;
+    playerCars = [];
+    allCars = [];
+    marketPrices = {};
+    clearInterval(window._marketTicker);
+    clearInterval(window._auctionTicker);
+    clearInterval(window._countdownTick);
+    if (realtimeChannel) { sb.removeChannel(realtimeChannel); realtimeChannel = null; }
+    showAuth();
   } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-    // Just update the user reference, don't re-init
     currentUser = session.user;
   }
 });
-
-// Boot immediately on page load
-bootGame();
 
 async function initGame() {
   // Load cars FIRST so market prices fallback can reference allCars
@@ -1142,32 +1151,47 @@ async function initGame() {
 // DATA LOADERS
 // ═══════════════════════════════════════════════
 async function loadProfile() {
-  const {data,error} = await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-  if (error || !data) {
-    const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
-    const {data:newProf} = await sb.from('profiles').upsert({
-      id:currentUser.id, username, cash:50000, role:'player'
-    }).select().single();
-    profile = newProf || {id:currentUser.id,username,cash:50000,level:1,xp:0,wins:0,losses:0,win_streak:0,best_win_streak:0,reputation:0,role:'player'};
-  } else {
-    profile = data;
+  try {
+    const {data, error} = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (error || !data) {
+      const username = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'Driver';
+      const {data: newProf} = await sb.from('profiles').upsert({
+        id: currentUser.id, username, cash: 50000, role: 'player'
+      }).select().single();
+      profile = newProf || {
+        id: currentUser.id, username, cash: 50000, level: 1, xp: 0,
+        wins: 0, losses: 0, win_streak: 0, best_win_streak: 0,
+        reputation: 0, role: 'player', is_banned: false
+      };
+    } else {
+      profile = data;
+    }
+
+    if (profile?.is_banned) {
+      showAuthErr(`Account suspended: ${profile.ban_reason || 'Contact support'}`);
+      await sb.auth.signOut();
+      return;
+    }
+
+    // Non-fatal log + starter car
+    logActivity('login', {role: profile?.role, level: profile?.level}).catch(() => {});
+    try {
+      const {count} = await sb.from('player_cars').select('*', {count:'exact',head:true}).eq('player_id', currentUser.id);
+      const lsGarage = JSON.parse(localStorage.getItem('redline_local_garage') || '[]');
+      const localCount = lsGarage.filter(lc => lc.player_id === currentUser.id).length;
+      if ((count || 0) === 0 && localCount === 0) await giveStarterCar();
+    } catch {}
+
+  } catch (e) {
+    console.warn('[REDLINE] loadProfile error:', e.message);
+    if (!profile) {
+      profile = {
+        id: currentUser.id, username: currentUser.email?.split('@')[0] || 'Driver',
+        cash: 50000, level: 1, xp: 0, wins: 0, losses: 0,
+        win_streak: 0, best_win_streak: 0, reputation: 0, role: 'player'
+      };
+    }
   }
-
-  // Check ban
-  if (profile.is_banned) {
-    await sb.auth.signOut();
-    document.getElementById('auth-screen').style.display='flex';
-    document.getElementById('game').style.display='none';
-    showAuthErr(`Account suspended: ${profile.ban_reason||'Contact support'}`);
-    return;
-  }
-
-  // Log login
-  await logActivity('login', {role: profile.role, level: profile.level});
-
-  // Give starter car if new
-  const {count} = await sb.from('player_cars').select('*',{count:'exact',head:true}).eq('player_id',currentUser.id);
-  if (count === 0) await giveStarterCar();
 }
 
 // ─── BUILT-IN CAR DATA (fallback when DB table is empty / not seeded) ──────
@@ -1264,8 +1288,32 @@ async function loadMarketPrices() {
 }
 
 async function loadPlayerCars() {
-  const {data} = await sb.from('player_cars').select('*, car:cars(*)').eq('player_id',currentUser.id);
-  playerCars = data || [];
+  // Load DB cars
+  const {data: dbCars} = await sb.from('player_cars')
+    .select('*, car:cars(*)')
+    .eq('player_id', currentUser.id);
+
+  // Load local garage (for fallback/builtin cars)
+  let localCars = [];
+  try {
+    const raw = JSON.parse(localStorage.getItem('redline_local_garage') || '[]');
+    localCars = raw
+      .filter(lc => lc.player_id === currentUser.id)
+      .map(lc => ({
+        ...lc,
+        car: lc.car || allCars.find(c => c.id === lc.car_id) || null
+      }))
+      .filter(lc => lc.car); // only keep entries with valid car data
+  } catch {}
+
+  // Merge — DB cars take priority; add local cars whose car_id isn't already in DB
+  const dbCarIds = new Set((dbCars || []).map(pc => pc.car_id));
+  const merged = [
+    ...(dbCars || []).map(pc => ({ ...pc, car: pc.car || allCars.find(c => c.id === pc.car_id) })),
+    ...localCars.filter(lc => !dbCarIds.has(lc.car_id))
+  ];
+
+  playerCars = merged.filter(pc => pc.car); // guard against null car refs
 }
 
 async function loadUpgradeCatalog() {
@@ -1274,17 +1322,42 @@ async function loadUpgradeCatalog() {
 }
 
 async function giveStarterCar() {
-  const supra = allCars.find(c => c.name === 'Toyota Supra MK5') || allCars.find(c => c.class === 'Sports') || allCars[0];
+  const supra = allCars.find(c => c.name === 'Toyota Supra MK5')
+    || allCars.find(c => c.class === 'Sports' && c.rarity === 'Rare')
+    || allCars[0];
   if (!supra) return;
-  const {error} = await sb.from('player_cars').insert({
-    player_id: currentUser.id,
-    car_id: supra.id,
-    purchase_price: 0,
-    is_active: true
-  });
-  if (!error) {
-    toast(`🎉 Welcome! You received a ${supra.name} as your starter car!`, 't-success');
+
+  const isBuiltinId = supra.id.startsWith('bc-');
+
+  if (!isBuiltinId) {
+    // Real DB car
+    const {error} = await sb.from('player_cars').insert({
+      player_id: currentUser.id,
+      car_id: supra.id,
+      purchase_price: 0,
+      is_active: true
+    });
+    if (error) console.warn('Could not give starter car via DB:', error.message);
+  } else {
+    // Fallback — local garage
+    const lsGarage = JSON.parse(localStorage.getItem('redline_local_garage') || '[]');
+    const alreadyOwns = lsGarage.some(lc => lc.player_id === currentUser.id && lc.car_id === supra.id);
+    if (!alreadyOwns) {
+      lsGarage.push({
+        id: 'lg-starter-' + currentUser.id,
+        player_id: currentUser.id,
+        car_id: supra.id,
+        car: supra,
+        purchase_price: 0,
+        is_active: true,
+        is_favorite: false,
+        power_boost: 0, handling_boost: 0, speed_boost: 0,
+        acquired_at: new Date().toISOString()
+      });
+      localStorage.setItem('redline_local_garage', JSON.stringify(lsGarage));
+    }
   }
+  toast(`🎉 Welcome! You received a ${supra.name} as your starter car!`, 't-success');
 }
 
 // ═══════════════════════════════════════════════
@@ -1421,22 +1494,44 @@ function carStatsHTML(c, pc) {
 
 async function setActiveCar() {
   if (!selectedPlayerCarId) return;
-  await sb.from('player_cars').update({is_active:false}).eq('player_id',currentUser.id);
-  await sb.from('player_cars').update({is_active:true}).eq('id',selectedPlayerCarId);
+  const pc = playerCars.find(x => x.id === selectedPlayerCarId);
+  if (!pc) return;
+  const isLocal = selectedPlayerCarId.startsWith('lg-');
+
+  if (!isLocal) {
+    await sb.from('player_cars').update({is_active: false}).eq('player_id', currentUser.id);
+    await sb.from('player_cars').update({is_active: true}).eq('id', selectedPlayerCarId);
+  } else {
+    // Update local garage
+    const lsGarage = JSON.parse(localStorage.getItem('redline_local_garage') || '[]');
+    lsGarage.forEach(lc => { lc.is_active = lc.id === selectedPlayerCarId; });
+    localStorage.setItem('redline_local_garage', JSON.stringify(lsGarage));
+    // Also deactivate DB cars
+    await sb.from('player_cars').update({is_active: false}).eq('player_id', currentUser.id).catch(()=>{});
+  }
   await loadPlayerCars();
   renderPlayerCars();
   renderHUD();
-  toast('Active car updated!','t-success');
+  toast('Active car updated!', 't-success');
 }
 
 async function toggleFavCar() {
-  const pc = playerCars.find(x=>x.id===selectedPlayerCarId);
+  const pc = playerCars.find(x => x.id === selectedPlayerCarId);
   if (!pc) return;
   const newFav = !pc.is_favorite;
-  await sb.from('player_cars').update({is_favorite:newFav}).eq('id',selectedPlayerCarId);
+  const isLocal = selectedPlayerCarId.startsWith('lg-');
+
+  if (!isLocal) {
+    await sb.from('player_cars').update({is_favorite: newFav}).eq('id', selectedPlayerCarId);
+  } else {
+    const lsGarage = JSON.parse(localStorage.getItem('redline_local_garage') || '[]');
+    const entry = lsGarage.find(lc => lc.id === selectedPlayerCarId);
+    if (entry) entry.is_favorite = newFav;
+    localStorage.setItem('redline_local_garage', JSON.stringify(lsGarage));
+  }
   await loadPlayerCars();
   renderPlayerCars();
-  toast(newFav?'Added to favourites ❤️':'Removed from favourites','t-info');
+  toast(newFav ? 'Added to favourites ❤️' : 'Removed from favourites', 't-info');
 }
 
 function showUpgrades(cat, btn) {
@@ -1589,42 +1684,70 @@ function setMarketFilter(btn) {
 function filterMarket() { renderMarket(); }
 
 async function buyCar(carId, price) {
-  if (!profile) { toast('Not logged in','t-error'); return; }
+  if (!profile || !currentUser) { toast('Not logged in','t-error'); return; }
   if (profile.cash < price) { toast('Not enough cash! Win races to earn more.','t-error'); return; }
-  const ownedIds = new Set(playerCars.map(pc=>pc.car_id));
+  const ownedIds = new Set(playerCars.map(pc => pc.car_id));
   if (ownedIds.has(carId)) { toast('You already own this car!','t-error'); return; }
 
-  // Insert player car record
-  const {error} = await sb.from('player_cars').insert({
-    player_id: currentUser.id, car_id: carId, purchase_price: price
-  });
-  if (error) { toast('Purchase failed: '+error.message,'t-error'); return; }
+  const car = allCars.find(x => x.id === carId);
+  if (!car) { toast('Car not found','t-error'); return; }
 
-  // Deduct cash
-  await sb.from('profiles').update({cash: profile.cash - price}).eq('id', currentUser.id);
-  profile.cash -= price;
+  // Deduct cash from profile (optimistic)
+  const newCash = profile.cash - price;
 
-  // Update demand score (local + try DB)
+  // ── Try DB insert first ──
+  const isBuiltinId = carId.startsWith('bc-');
+
+  if (!isBuiltinId) {
+    // Car is in the real DB — do a proper FK insert
+    const {error} = await sb.from('player_cars').insert({
+      player_id: currentUser.id,
+      car_id: carId,
+      purchase_price: price,
+      is_active: playerCars.length === 0  // first car is auto-active
+    });
+    if (error) {
+      toast('Purchase failed: ' + error.message, 't-error');
+      return;
+    }
+  } else {
+    // Fallback builtin car — store in localStorage garage
+    const lsGarage = JSON.parse(localStorage.getItem('redline_local_garage') || '[]');
+    lsGarage.push({
+      id: 'lg-' + Date.now(),
+      player_id: currentUser.id,
+      car_id: carId,
+      car: car,
+      purchase_price: price,
+      is_active: playerCars.length === 0,
+      is_favorite: false,
+      power_boost: 0, handling_boost: 0, speed_boost: 0,
+      acquired_at: new Date().toISOString()
+    });
+    localStorage.setItem('redline_local_garage', JSON.stringify(lsGarage));
+  }
+
+  // Update cash in DB
+  await sb.from('profiles').update({ cash: newCash }).eq('id', currentUser.id);
+  profile.cash = newCash;
+
+  // Update demand (local cache always, DB non-blocking)
   const mp = marketPrices[carId];
   if (mp) {
     const newPrice = Math.round(mp.current_price * 1.03);
-    const newDemand = Math.min(100, (mp.demand_score||50) + 5);
+    const newDemand = Math.min(100, (mp.demand_score || 50) + 5);
     marketPrices[carId].current_price = newPrice;
     marketPrices[carId].demand_score = newDemand;
-    // Try DB update (non-blocking)
-    sb.from('market_prices').update({
-      current_price: newPrice,
-      demand_score: newDemand,
-      sales_last_24h: (mp.sales_last_24h||0) + 1
-    }).eq('car_id', carId).catch(()=>{});
+    if (!isBuiltinId) {
+      sb.from('market_prices').update({ current_price: newPrice, demand_score: newDemand }).eq('car_id', carId).catch(() => {});
+    }
   }
 
   await loadPlayerCars();
   renderMarket();
   renderHUD();
-  const c = allCars.find(x=>x.id===carId);
-  logActivity('buy_car', {car: c?.name, price, car_id: carId}).catch(()=>{});
-  toast(`🚗 Purchased: ${c?.name}!`, 't-success');
+  logActivity('buy_car', { car: car.name, price, car_id: carId }).catch(() => {});
+  toast(`🚗 Purchased: ${car.name}!`, 't-success');
 }
 
 // ═══════════════════════════════════════════════
