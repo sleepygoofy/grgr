@@ -1068,40 +1068,74 @@ function applyRoleFeatures() {
 // ═══════════════════════════════════════════════
 // INIT ON AUTH
 // ═══════════════════════════════════════════════
-sb.auth.onAuthStateChange(async (event, session) => {
+// ─── Session persistence: check existing session FIRST before listening ───────
+// This prevents the "logged out on reload" bug caused by the auth listener
+// firing SIGNED_OUT before the session is restored from localStorage.
+let _gameInitialized = false;
+
+async function bootGame() {
+  // Supabase v2 stores session in localStorage automatically.
+  // getSession() reads it synchronously without a network round-trip.
+  const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('game').style.display = 'block';
-    await initGame();
+    if (!_gameInitialized) {
+      _gameInitialized = true;
+      await initGame();
+    }
   } else {
     document.getElementById('auth-screen').style.display = 'flex';
     document.getElementById('game').style.display = 'none';
   }
+}
+
+// Listen for future auth changes (login, logout, token refresh)
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user && !_gameInitialized) {
+    currentUser = session.user;
+    _gameInitialized = true;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+    await initGame();
+  } else if (event === 'SIGNED_OUT') {
+    _gameInitialized = false;
+    currentUser = null;
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('game').style.display = 'none';
+  } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+    // Just update the user reference, don't re-init
+    currentUser = session.user;
+  }
 });
 
+// Boot immediately on page load
+bootGame();
+
 async function initGame() {
-  await Promise.all([loadProfile(), loadAllCars(), loadMarketPrices(), loadUpgradeCatalog()]);
+  // Load cars FIRST so market prices fallback can reference allCars
+  await loadAllCars();
+  await Promise.all([loadProfile(), loadMarketPrices(), loadUpgradeCatalog()]);
   await loadPlayerCars();
   renderHUD();
   renderRaceEvents();
+  // Set first nav tab as active
+  const firstTab = document.querySelector('.nav-tab');
+  if (firstTab && !document.querySelector('.nav-tab.active')) firstTab.classList.add('active');
+  renderPlayerCars();
   setupRealtime();
-  if (document.querySelector('.nav-tab.active')?.textContent.includes('Garage')) {
-    renderPlayerCars();
-  }
 
   // ── Run initial NPC seed + market tick on load ──
-  await seedDemoAuctions();   // populate auction house immediately
-  runMarketTick();            // kick off first market price update
+  seedDemoAuctions().catch(console.warn);  // non-blocking
+  runMarketTick().catch(console.warn);     // kick off first price update
 
   // ── Background tickers ──
-  // Market prices drift every 90 seconds
   clearInterval(window._marketTicker);
-  window._marketTicker = setInterval(runMarketTick, 90_000);
+  window._marketTicker = setInterval(()=>runMarketTick().catch(()=>{}), 90_000);
 
-  // Auction health-check every 5 minutes: expire old, seed new NPC auctions
   clearInterval(window._auctionTicker);
-  window._auctionTicker = setInterval(runAuctionTick, 300_000);
+  window._auctionTicker = setInterval(()=>runAuctionTick().catch(()=>{}), 300_000);
 }
 
 // ═══════════════════════════════════════════════
@@ -1136,14 +1170,97 @@ async function loadProfile() {
   if (count === 0) await giveStarterCar();
 }
 
+// ─── BUILT-IN CAR DATA (fallback when DB table is empty / not seeded) ──────
+// This mirrors the SQL seed data so the game works immediately without
+// running the schema SQL first. When the DB IS populated, DB data takes priority.
+const BUILTIN_CARS = [
+  // HYPERCARS
+  {id:'bc-mclaren720s',name:'McLaren 720S',brand:'McLaren',class:'Hypercar',rarity:'Legendary',emoji:'🦋',base_price:280000,top_speed:212,acceleration:96,handling:94,braking:92,power:720,weight:2829,description:'Aeroblade active aero. 0-60 in 2.8s.'},
+  {id:'bc-mclarenp1',name:'McLaren P1',brand:'McLaren',class:'Hypercar',rarity:'Mythic',emoji:'🟠',base_price:1400000,top_speed:218,acceleration:97,handling:95,braking:94,power:903,weight:3075,description:'Hybrid hypercar. F1 tech on the street.'},
+  {id:'bc-mclarensenna',name:'McLaren Senna',brand:'McLaren',class:'Hypercar',rarity:'Mythic',emoji:'🔶',base_price:1000000,top_speed:208,acceleration:98,handling:97,braking:96,power:789,weight:2641,description:'Track-focused weapon. Downforce king.'},
+  {id:'bc-chiron',name:'Bugatti Chiron',brand:'Bugatti',class:'Hypercar',rarity:'Mythic',emoji:'🔵',base_price:3000000,top_speed:304,acceleration:96,handling:88,braking:90,power:1500,weight:4398,description:'Quad-turbo W16. Top speed royalty.'},
+  {id:'bc-veyron',name:'Bugatti Veyron',brand:'Bugatti',class:'Hypercar',rarity:'Legendary',emoji:'💙',base_price:1500000,top_speed:268,acceleration:95,handling:85,braking:88,power:1001,weight:4162,description:'The original 1000hp street car.'},
+  {id:'bc-jesko',name:'Koenigsegg Jesko',brand:'Koenigsegg',class:'Hypercar',rarity:'Mythic',emoji:'🟡',base_price:3000000,top_speed:300,acceleration:99,handling:96,braking:95,power:1600,weight:3131,description:'300mph capable. Light Speed Transmission.'},
+  {id:'bc-agera',name:'Koenigsegg Agera RS',brand:'Koenigsegg',class:'Hypercar',rarity:'Mythic',emoji:'⚪',base_price:2500000,top_speed:278,acceleration:98,handling:95,braking:94,power:1341,weight:3075,description:'World record holder. Pure Swedish fury.'},
+  {id:'bc-huayra',name:'Pagani Huayra',brand:'Pagani',class:'Hypercar',rarity:'Mythic',emoji:'🎨',base_price:2700000,top_speed:238,acceleration:94,handling:90,braking:90,power:730,weight:2822,description:'Twin-turbo V12 art piece.'},
+  {id:'bc-nevera',name:'Rimac Nevera',brand:'Rimac',class:'Hypercar',rarity:'Mythic',emoji:'⚡',base_price:2400000,top_speed:258,acceleration:100,handling:93,braking:95,power:1914,weight:4740,description:'Fastest EV ever. 0-60 in 1.85s.'},
+  {id:'bc-sf90',name:'Ferrari SF90 Stradale',brand:'Ferrari',class:'Hypercar',rarity:'Legendary',emoji:'🔴',base_price:620000,top_speed:211,acceleration:99,handling:95,braking:93,power:986,weight:3461,description:"Ferrari's most powerful road car."},
+  {id:'bc-laferrari',name:'Ferrari LaFerrari',brand:'Ferrari',class:'Hypercar',rarity:'Mythic',emoji:'🐎',base_price:2000000,top_speed:217,acceleration:98,handling:96,braking:94,power:950,weight:2767,description:'The hybrid F-car. Ultra-rare.'},
+  {id:'bc-aventador',name:'Lamborghini Aventador SVJ',brand:'Lamborghini',class:'Hypercar',rarity:'Legendary',emoji:'🐂',base_price:500000,top_speed:217,acceleration:96,handling:93,braking:91,power:770,weight:3363,description:'ALA aero. V12 NA screamer.'},
+  {id:'bc-huracan',name:'Lamborghini Huracan STO',brand:'Lamborghini',class:'Hypercar',rarity:'Epic',emoji:'🏆',base_price:330000,top_speed:193,acceleration:95,handling:96,braking:93,power:631,weight:2932,description:'Super Trofeo Omologata. Track-bred V10.'},
+  {id:'bc-918',name:'Porsche 918 Spyder',brand:'Porsche',class:'Hypercar',rarity:'Mythic',emoji:'🕷️',base_price:850000,top_speed:214,acceleration:97,handling:95,braking:94,power:887,weight:3715,description:'Hybrid V8. Nürburgring record holder.'},
+  // SPORTS
+  {id:'bc-gt3rs',name:'Porsche 911 GT3 RS',brand:'Porsche',class:'Sports',rarity:'Epic',emoji:'🏆',base_price:250000,top_speed:184,acceleration:96,handling:99,braking:97,power:518,weight:3153,description:'The ultimate NA sports car. Track weapon.'},
+  {id:'bc-turbos',name:'Porsche 911 Turbo S',brand:'Porsche',class:'Sports',rarity:'Epic',emoji:'💛',base_price:220000,top_speed:205,acceleration:98,handling:94,braking:93,power:640,weight:3516,description:'AWD daily monster. 0-60 in 2.6s.'},
+  {id:'bc-gtrnismo',name:'Nissan GT-R Nismo',brand:'Nissan',class:'Sports',rarity:'Epic',emoji:'🇯🇵',base_price:200000,top_speed:196,acceleration:95,handling:92,braking:91,power:600,weight:3803,description:'Godzilla. AWD. Track-tuned icon.'},
+  {id:'bc-supra5',name:'Toyota Supra MK5',brand:'Toyota',class:'Sports',rarity:'Rare',emoji:'🟠',base_price:65000,top_speed:155,acceleration:88,handling:85,braking:84,power:382,weight:3370,description:'B58 inline-6. Born to be modded.'},
+  {id:'bc-supra4',name:'Toyota Supra MK4',brand:'Toyota',class:'Sports',rarity:'Epic',emoji:'🏁',base_price:120000,top_speed:177,acceleration:90,handling:88,braking:86,power:320,weight:3197,description:'2JZ legend. Unlimited potential.'},
+  {id:'bc-silvia',name:'Nissan Silvia S15',brand:'Nissan',class:'Sports',rarity:'Rare',emoji:'⚪',base_price:45000,top_speed:155,acceleration:82,handling:86,braking:80,power:247,weight:2767,description:'JDM drift icon. SR20DET platform.'},
+  {id:'bc-370z',name:'Nissan 370Z',brand:'Nissan',class:'Sports',rarity:'Common',emoji:'🔵',base_price:35000,top_speed:155,acceleration:80,handling:82,braking:80,power:332,weight:3232,description:'VQ37 naturally aspirated fun.'},
+  {id:'bc-rx7',name:'Mazda RX-7 FD',brand:'Mazda',class:'Sports',rarity:'Epic',emoji:'🔴',base_price:95000,top_speed:156,acceleration:87,handling:88,braking:85,power:276,weight:2723,description:'Rotary soul. 13B twin-turbo perfection.'},
+  {id:'bc-mx5',name:'Mazda MX-5',brand:'Mazda',class:'Sports',rarity:'Common',emoji:'🎌',base_price:30000,top_speed:136,acceleration:74,handling:82,braking:78,power:181,weight:2381,description:"Lightweight roadster. Driver's car."},
+  {id:'bc-nsxr',name:'Honda NSX Type R',brand:'Honda',class:'Sports',rarity:'Legendary',emoji:'⬜',base_price:450000,top_speed:174,acceleration:90,handling:95,braking:93,power:324,weight:2712,description:'The original NSX. Pure analog perfection.'},
+  {id:'bc-nsxs',name:'Acura NSX Type S',brand:'Acura',class:'Sports',rarity:'Epic',emoji:'🔴',base_price:175000,top_speed:191,acceleration:93,handling:93,braking:90,power:600,weight:3868,description:'Hybrid supercar. AWD precision.'},
+  {id:'bc-ctyr',name:'Honda Civic Type R',brand:'Honda',class:'Sports',rarity:'Common',emoji:'🔴',base_price:45000,top_speed:169,acceleration:85,handling:88,braking:85,power:315,weight:2998,description:'The hot hatch king. FWP lap record.'},
+  {id:'bc-wrxsti',name:'Subaru WRX STI',brand:'Subaru',class:'Sports',rarity:'Rare',emoji:'🔵',base_price:50000,top_speed:155,acceleration:82,handling:84,braking:82,power:310,weight:3388,description:'Rally-bred AWD icon.'},
+  {id:'bc-evox',name:'Mitsubishi Evo X',brand:'Mitsubishi',class:'Sports',rarity:'Rare',emoji:'⬜',base_price:48000,top_speed:155,acceleration:83,handling:85,braking:82,power:291,weight:3263,description:'The last Evo. AWD evolved.'},
+  // MUSCLE
+  {id:'bc-hellcat',name:'Dodge Hellcat Redeye Widebody',brand:'Dodge',class:'Muscle',rarity:'Epic',emoji:'👁️',base_price:95000,top_speed:203,acceleration:92,handling:74,braking:76,power:797,weight:4473,description:'797hp supercharged fury.'},
+  {id:'bc-viper',name:'Dodge Viper ACR',brand:'Dodge',class:'Muscle',rarity:'Legendary',emoji:'🐍',base_price:135000,top_speed:177,acceleration:92,handling:98,braking:97,power:645,weight:3374,description:'V10 analog monster. Track record holder.'},
+  {id:'bc-gt500',name:'Ford Mustang Shelby GT500',brand:'Ford',class:'Muscle',rarity:'Epic',emoji:'🐍',base_price:80000,top_speed:180,acceleration:90,handling:84,braking:83,power:760,weight:4225,description:'Predator V8. Most powerful Ford ever.'},
+  {id:'bc-darkhorse',name:'Ford Mustang Dark Horse',brand:'Ford',class:'Muscle',rarity:'Rare',emoji:'🐴',base_price:58000,top_speed:155,acceleration:88,handling:86,braking:84,power:500,weight:4020,description:'Coyote tuned. Dark aesthetic.'},
+  {id:'bc-z06',name:'Chevrolet Corvette Z06',brand:'Chevrolet',class:'Muscle',rarity:'Epic',emoji:'🏎️',base_price:120000,top_speed:196,acceleration:93,handling:95,braking:93,power:670,weight:3366,description:'LT6 flat-plane V8. 8600 RPM fury.'},
+  {id:'bc-zl1',name:'Chevrolet Camaro ZL1',brand:'Chevrolet',class:'Muscle',rarity:'Epic',emoji:'🐎',base_price:80000,top_speed:190,acceleration:90,handling:88,braking:87,power:650,weight:3940,description:'1LE track pack. Nürburgring tuned.'},
+  {id:'bc-c8',name:'Chevrolet Corvette C8',brand:'Chevrolet',class:'Muscle',rarity:'Rare',emoji:'🏁',base_price:75000,top_speed:194,acceleration:90,handling:90,braking:88,power:495,weight:3366,description:'Mid-engine revolution. LT2 V8.'},
+  // EV
+  {id:'bc-plaid',name:'Tesla Model S Plaid',brand:'Tesla',class:'EV',rarity:'Epic',emoji:'⚡',base_price:120000,top_speed:200,acceleration:100,handling:80,braking:85,power:1020,weight:4766,description:'1020hp. 1.99s 0-60. Tri-motor insanity.'},
+  {id:'bc-roadster',name:'Tesla Roadster',brand:'Tesla',class:'EV',rarity:'Legendary',emoji:'🚀',base_price:250000,top_speed:250,acceleration:100,handling:85,braking:88,power:1000,weight:2756,description:'SpaceX package. Sub-1s 0-60 claimed.'},
+  {id:'bc-taycan',name:'Porsche Taycan Turbo S',brand:'Porsche',class:'EV',rarity:'Epic',emoji:'🟡',base_price:190000,top_speed:161,acceleration:97,handling:89,braking:91,power:750,weight:5060,description:'Dual-motor EV. Most athletic EV chassis.'},
+  {id:'bc-lucid',name:'Lucid Air Sapphire',brand:'Lucid',class:'EV',rarity:'Legendary',emoji:'💎',base_price:250000,top_speed:205,acceleration:99,handling:83,braking:87,power:1234,weight:5182,description:'1234hp. Range and speed combined.'},
+  // SUV/TRUCK
+  {id:'bc-urus',name:'Lamborghini Urus Performante',brand:'Lamborghini',class:'SUV/Truck',rarity:'Legendary',emoji:'🐂',base_price:260000,top_speed:190,acceleration:90,handling:88,braking:86,power:657,weight:4850,description:'The fastest SUV alive.'},
+  {id:'bc-trackhawk',name:'Jeep Trackhawk',brand:'Jeep',class:'SUV/Truck',rarity:'Rare',emoji:'🦅',base_price:85000,top_speed:180,acceleration:88,handling:72,braking:74,power:707,weight:5363,description:'Hellcat-powered Jeep.'},
+  {id:'bc-raptor',name:'Ford Raptor R',brand:'Ford',class:'SUV/Truck',rarity:'Rare',emoji:'🦅',base_price:100000,top_speed:115,acceleration:82,handling:66,braking:68,power:700,weight:5950,description:'Supercharged off-road king.'},
+  {id:'bc-trx',name:'Ram TRX',brand:'Ram',class:'SUV/Truck',rarity:'Rare',emoji:'🛻',base_price:95000,top_speed:118,acceleration:80,handling:64,braking:68,power:702,weight:6350,description:'Hellcat truck.'},
+];
+
 async function loadAllCars() {
-  const {data} = await sb.from('cars').select('*').order('base_price');
-  allCars = data || [];
+  const {data, error} = await sb.from('cars').select('*').order('base_price');
+  if (data && data.length > 0) {
+    allCars = data;
+  } else {
+    // DB table empty or not seeded — use built-in fallback
+    console.warn('[REDLINE] cars table empty, using built-in fallback data');
+    allCars = BUILTIN_CARS;
+    // Silently try to seed the DB in the background
+    seedCarsDB().catch(()=>{});
+  }
+}
+
+async function seedCarsDB() {
+  // Try to insert built-in cars into DB (may fail due to RLS — that's OK)
+  for (const c of BUILTIN_CARS) {
+    const {id, ...rest} = c; // don't send our client-side IDs
+    await sb.from('cars').upsert({...rest}, {onConflict:'name'}).select().maybeSingle().catch(()=>{});
+  }
 }
 
 async function loadMarketPrices() {
   const {data} = await sb.from('market_prices').select('*');
-  if (data) data.forEach(mp => { marketPrices[mp.car_id] = mp; });
+  if (data && data.length > 0) {
+    data.forEach(mp => { marketPrices[mp.car_id] = mp; });
+  } else {
+    // Build market prices from allCars (called after loadAllCars)
+    allCars.forEach(c => {
+      marketPrices[c.id] = {
+        car_id: c.id,
+        current_price: c.base_price,
+        base_price: c.base_price,
+        demand_score: 50,
+        sales_last_24h: 0
+      };
+    });
+  }
 }
 
 async function loadPlayerCars() {
@@ -1157,11 +1274,17 @@ async function loadUpgradeCatalog() {
 }
 
 async function giveStarterCar() {
-  // Give Toyota Supra MK5 as starter
-  const supra = allCars.find(c=>c.name==='Toyota Supra MK5');
+  const supra = allCars.find(c => c.name === 'Toyota Supra MK5') || allCars.find(c => c.class === 'Sports') || allCars[0];
   if (!supra) return;
-  await sb.from('player_cars').insert({player_id:currentUser.id,car_id:supra.id,purchase_price:0,is_active:true});
-  toast('🎉 Welcome! You received a Toyota Supra MK5 as your starter car!','t-success');
+  const {error} = await sb.from('player_cars').insert({
+    player_id: currentUser.id,
+    car_id: supra.id,
+    purchase_price: 0,
+    is_active: true
+  });
+  if (!error) {
+    toast(`🎉 Welcome! You received a ${supra.name} as your starter car!`, 't-success');
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -1466,26 +1589,42 @@ function setMarketFilter(btn) {
 function filterMarket() { renderMarket(); }
 
 async function buyCar(carId, price) {
+  if (!profile) { toast('Not logged in','t-error'); return; }
   if (profile.cash < price) { toast('Not enough cash! Win races to earn more.','t-error'); return; }
   const ownedIds = new Set(playerCars.map(pc=>pc.car_id));
   if (ownedIds.has(carId)) { toast('You already own this car!','t-error'); return; }
-  const {error} = await sb.from('player_cars').insert({player_id:currentUser.id,car_id:carId,purchase_price:price});
+
+  // Insert player car record
+  const {error} = await sb.from('player_cars').insert({
+    player_id: currentUser.id, car_id: carId, purchase_price: price
+  });
   if (error) { toast('Purchase failed: '+error.message,'t-error'); return; }
-  await sb.from('profiles').update({cash:profile.cash-price}).eq('id',currentUser.id);
+
+  // Deduct cash
+  await sb.from('profiles').update({cash: profile.cash - price}).eq('id', currentUser.id);
   profile.cash -= price;
-  // Update demand score
+
+  // Update demand score (local + try DB)
   const mp = marketPrices[carId];
   if (mp) {
-    const newPrice = Math.round(mp.current_price * 1.03); // demand drives price up
-    await sb.from('market_prices').update({current_price:newPrice,demand_score:Math.min(100,(mp.demand_score||50)+5),sales_last_24h:(mp.sales_last_24h||0)+1}).eq('car_id',carId);
+    const newPrice = Math.round(mp.current_price * 1.03);
+    const newDemand = Math.min(100, (mp.demand_score||50) + 5);
+    marketPrices[carId].current_price = newPrice;
+    marketPrices[carId].demand_score = newDemand;
+    // Try DB update (non-blocking)
+    sb.from('market_prices').update({
+      current_price: newPrice,
+      demand_score: newDemand,
+      sales_last_24h: (mp.sales_last_24h||0) + 1
+    }).eq('car_id', carId).catch(()=>{});
   }
+
   await loadPlayerCars();
-  await loadMarketPrices();
   renderMarket();
   renderHUD();
   const c = allCars.find(x=>x.id===carId);
-  await logActivity('buy_car', {car: c?.name, price, car_id: carId});
-  toast(`🚗 Purchased: ${c?.name}!`,'t-success');
+  logActivity('buy_car', {car: c?.name, price, car_id: carId}).catch(()=>{});
+  toast(`🚗 Purchased: ${c?.name}!`, 't-success');
 }
 
 // ═══════════════════════════════════════════════
@@ -1529,93 +1668,154 @@ const CLASS_EVENT = {
 
 function npcPick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 
+// ─── NPC AUCTION STATE (localStorage fallback) ────────────────────────────
+const AUCTION_LS_KEY = 'redline_npc_auctions_v3';
+
+function lsGetAuctions() {
+  try { return JSON.parse(localStorage.getItem(AUCTION_LS_KEY)||'[]'); } catch { return []; }
+}
+function lsSaveAuctions(list) {
+  try { localStorage.setItem(AUCTION_LS_KEY, JSON.stringify(list.slice(0,30))); } catch {}
+}
+
 async function seedDemoAuctions() {
-  if (!allCars.length || !currentUser) return;
+  if (!allCars.length) return;
 
-  // Check how many active NPC auctions exist
-  const {count:active} = await sb.from('auctions')
-    .select('*',{count:'exact',head:true})
-    .eq('status','active')
-    .gt('ends_at', new Date().toISOString());
-
-  // Target: keep at least 12 active auctions running at all times
-  const target = 12;
-  if ((active||0) >= target) { renderAuctionsFromDB(); return; }
-
-  const needed = target - (active||0);
+  const TARGET = 12;
   const now = Date.now();
-  const inserted = [];
 
-  for (let i = 0; i < needed; i++) {
+  // ── 1. Try to get active DB auctions ──
+  let dbAuctions = [];
+  try {
+    const {data} = await sb.from('auctions')
+      .select('*, car:cars(*), seller:profiles(username), bids(count)')
+      .eq('status','active')
+      .gt('ends_at', new Date().toISOString())
+      .order('ends_at').limit(30);
+    dbAuctions = data || [];
+  } catch {}
+
+  // ── 2. Load cached NPC auctions from localStorage ──
+  let cached = lsGetAuctions().filter(a => new Date(a.ends_at) > new Date());
+
+  // ── 3. Merge — DB auctions override cached ones with same car ──
+  const allActive = [...dbAuctions];
+  // Add cached NPC ones that don't already exist in DB
+  const dbCarIds = new Set(dbAuctions.map(a=>a.car_id));
+  cached.forEach(a => { if (!dbCarIds.has(a.car_id)) allActive.push(a); });
+
+  // ── 4. Generate new NPC auctions to hit target ──
+  const needed = Math.max(0, TARGET - allActive.length);
+  const usedCarIds = new Set(allActive.map(a=>a.car_id||a._car_id));
+  const newNPC = [];
+
+  for (let i = 0; i < needed + 4; i++) { // generate a few extra for variety
+    if (newNPC.length >= needed) break;
     const tmpl = npcPick(NPC_AUCTION_TEMPLATES);
-    // Pick a car matching rarity AND optionally class affinity
-    const candidates = allCars.filter(c => tmpl.rarities.includes(c.rarity));
-    if (!candidates.length) continue;
+    const candidates = allCars.filter(c => tmpl.rarities.includes(c.rarity) && !usedCarIds.has(c.id));
+    if (!candidates.length) {
+      // Allow repeat if we're running dry
+      const any = allCars.filter(c => tmpl.rarities.includes(c.rarity));
+      if (!any.length) continue;
+      candidates.push(...any);
+    }
     const car = npcPick(candidates);
+    usedCarIds.add(car.id);
 
-    // Pick event type: if car has a natural affinity, honour it 60% of the time
     const naturalEvent = CLASS_EVENT[car.class] || 'standard';
-    const eventType = Math.random() < 0.6 ? naturalEvent : tmpl.event;
-
+    const eventType = Math.random() < 0.65 ? naturalEvent : tmpl.event;
     const durationHours = npcPick(tmpl.durationHours);
-    // Stagger end times so they don't all expire together
-    const jitterMs = Math.random() * 3600000; // up to 1h random offset
-    const endsAt = new Date(now + durationHours*3600000 + jitterMs).toISOString();
-
+    const jitterMs = Math.random() * 3600000;
+    const endsAt = new Date(now + durationHours * 3600000 + jitterMs).toISOString();
     const basePrice = marketPrices[car.id]?.current_price || car.base_price;
     const startPrice = Math.round(basePrice * tmpl.startPct);
     const buyoutPrice = Math.round(basePrice * tmpl.buyoutPct);
-
     const npcName = npcPick(NPC_NAMES);
-    const title = `${car.name} — ${npcName}`;
 
-    const {error} = await sb.from('auctions').insert({
-      seller_id: currentUser.id,
+    // Build full auction object (works even without DB)
+    const auctionObj = {
+      id: 'npc-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
       car_id: car.id,
-      player_car_id: null,
-      title,
+      car,
+      seller: { username: npcName },
+      title: `${car.name} — ${npcName}`,
       starting_price: startPrice,
       current_price: startPrice,
       buyout_price: buyoutPrice,
       ends_at: endsAt,
       event_type: eventType,
-      status: 'active'
-    });
+      status: 'active',
+      seller_id: currentUser?.id || null,
+      bids: [{ count: 0 }],
+      _is_npc: true
+    };
 
-    if (!error) inserted.push(car.name);
+    // Try to persist to DB (non-blocking, may fail due to RLS — that's fine)
+    if (currentUser) {
+      sb.from('auctions').insert({
+        seller_id: currentUser.id,
+        car_id: car.id,
+        title: auctionObj.title,
+        starting_price: startPrice,
+        current_price: startPrice,
+        buyout_price: buyoutPrice,
+        ends_at: endsAt,
+        event_type: eventType,
+        status: 'active'
+      }).then(({ data: ins }) => {
+        if (ins?.[0]?.id) auctionObj.id = ins[0].id;
+      }).catch(() => {});
+    }
+
+    newNPC.push(auctionObj);
+    allActive.push(auctionObj);
   }
 
-  if (inserted.length) console.log(`[NPC Auctions] Seeded ${inserted.length}: ${inserted.join(', ')}`);
+  // ── 5. Cache new NPC auctions ──
+  const toCache = [...cached, ...newNPC].filter(a => new Date(a.ends_at) > new Date());
+  lsSaveAuctions(toCache.map(a => ({
+    id: a.id, car_id: a.car_id, seller: a.seller,
+    title: a.title, starting_price: a.starting_price,
+    current_price: a.current_price, buyout_price: a.buyout_price,
+    ends_at: a.ends_at, event_type: a.event_type, status: 'active',
+    bids: [{count:0}], _is_npc: true
+  })));
 
-  // Now load & render the real data
-  await renderAuctionsFromDB();
+  // ── 6. Filter and render ──
+  const filtered = currentAuctionFilter === 'all'
+    ? allActive
+    : allActive.filter(a => a.event_type === currentAuctionFilter);
+
+  // Re-attach car data for cached auctions that lost it
+  const enriched = filtered.map(a => {
+    if (!a.car && a.car_id) a.car = allCars.find(c=>c.id===a.car_id) || null;
+    return a;
+  }).filter(a => a.car); // must have car data to display
+
+  const grid = document.getElementById('auction-grid');
+  if (!enriched.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div>No auctions in this category.<br>Try "All" to see everything.</div>`;
+    return;
+  }
+
+  // Sort by ending soonest
+  enriched.sort((a,b) => new Date(a.ends_at) - new Date(b.ends_at));
+  renderAuctions(enriched);
 }
 
 async function renderAuctionsFromDB() {
-  const grid = document.getElementById('auction-grid');
-  let query = sb.from('auctions')
-    .select('*, car:cars(*), seller:profiles(username), bids(count)')
-    .eq('status','active')
-    .gt('ends_at', new Date().toISOString())
-    .order('ends_at');
-  if (currentAuctionFilter !== 'all') query = query.eq('event_type', currentAuctionFilter);
-  const {data} = await query;
-  if (!data?.length) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div>No auctions found. Check back soon!</div>`;
-    return;
-  }
-  renderAuctions(data);
+  // Just call seedDemoAuctions which handles DB + fallback
+  await seedDemoAuctions();
 }
 
 // ── Market auto-simulation ─────────────────────────────
-// Periodically adjusts market prices based on demand scores
-// and adds light randomness to make prices feel alive.
 async function runMarketTick() {
   if (!allCars.length) return;
   const updates = [];
-  Object.values(marketPrices).forEach(mp => {
-    const car = allCars.find(c=>c.id===mp.car_id);
-    if (!car) return;
+  Object.keys(marketPrices).forEach(carId => {
+    const mp = marketPrices[carId];
+    const car = allCars.find(c=>c.id===carId);
+    if (!car || !mp) return;
     const demand = mp.demand_score || 50;
     const demandPush = (demand - 50) * 0.001;
     const randomWalk = (Math.random() - 0.495) * 0.008;
@@ -1624,36 +1824,42 @@ async function runMarketTick() {
       Math.round(car.base_price * 0.3),
       Math.round(mp.current_price * (1 + demandPush + randomWalk) + decayToBase)
     );
-    if (newPrice !== mp.current_price) {
-      updates.push({ car_id: mp.car_id, current_price: newPrice,
-        demand_score: Math.max(10, Math.min(100, demand + (Math.random()*4-2))),
-        old_price: mp.current_price, car_name: car.name });
-    }
+    const newDemand = Math.max(10, Math.min(100, demand + (Math.random()*4-2)));
+    updates.push({ car_id: carId, current_price: newPrice, demand_score: newDemand,
+      old_price: mp.current_price, car_name: car.name });
   });
+
   const batch = updates.sort(()=>Math.random()-.5).slice(0,8);
-  for (const upd of batch) {
-    await sb.from('market_prices')
-      .update({ current_price: upd.current_price, demand_score: Math.round(upd.demand_score), updated_at: new Date().toISOString() })
-      .eq('car_id', upd.car_id);
+
+  // ALWAYS update local cache first (so UI updates even without DB)
+  batch.forEach(upd => {
     if (marketPrices[upd.car_id]) {
       marketPrices[upd.car_id].current_price = upd.current_price;
       marketPrices[upd.car_id].demand_score = Math.round(upd.demand_score);
     }
-  }
+  });
+
+  // Try DB writes in background (non-blocking)
+  batch.forEach(upd => {
+    sb.from('market_prices')
+      .update({ current_price: upd.current_price, demand_score: Math.round(upd.demand_score), updated_at: new Date().toISOString() })
+      .eq('car_id', upd.car_id)
+      .catch(() => {});
+  });
 
   // Update ticker banner
   if (batch.length) {
     const tickerItems = batch.map(u => {
       const dir = u.current_price > u.old_price ? '▲' : '▼';
       const col = u.current_price > u.old_price ? '#4ade80' : '#ff4560';
-      const pct = Math.abs(((u.current_price - u.old_price)/u.old_price)*100).toFixed(1);
+      const pct = u.old_price > 0 ? Math.abs(((u.current_price - u.old_price)/u.old_price)*100).toFixed(1) : '0.0';
       return `<span style="margin-right:28px;"><span style="color:${col};">${dir} ${u.car_name}</span> $${fmtCash(u.current_price)} <span style="color:${col};">(${dir}${pct}%)</span></span>`;
     }).join('');
     const tickerEl = document.getElementById('market-ticker-text');
-    if (tickerEl) tickerEl.innerHTML = tickerItems + tickerItems; // doubled for smooth scroll
+    if (tickerEl) tickerEl.innerHTML = tickerItems + tickerItems;
   }
 
-  // Refresh market UI if visible
+  // Refresh market UI
   if (document.getElementById('tab-market').classList.contains('active')) {
     const rendered = document.querySelectorAll('.market-live-price').length > 0;
     if (rendered) patchMarketPrices();
@@ -1663,14 +1869,19 @@ async function runMarketTick() {
 
 // Expire ended auctions and top them back up with new NPC ones
 async function runAuctionTick() {
-  // Mark any expired auctions as 'ended'
-  await sb.from('auctions')
+  // Expire ended auctions in DB (non-blocking)
+  sb.from('auctions')
     .update({status:'ended'})
     .eq('status','active')
-    .lt('ends_at', new Date().toISOString());
-  // Re-seed
+    .lt('ends_at', new Date().toISOString())
+    .catch(()=>{});
+
+  // Expire cached NPC auctions
+  const fresh = lsGetAuctions().filter(a => new Date(a.ends_at) > new Date());
+  lsSaveAuctions(fresh);
+
+  // Re-seed to keep auctions flowing
   await seedDemoAuctions();
-  // Refresh UI if visible
   if (document.getElementById('tab-auction').classList.contains('active')) loadAuctions();
 }
 
