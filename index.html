@@ -74,7 +74,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .daily-day.today{background:var(--amber);border-color:var(--amber2);color:#000;box-shadow:var(--glow-amber);}
 #game{display:none;min-height:100vh;position:relative;z-index:1;}
 .header{background:rgba(5,6,10,.98);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;}
-.logo{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:7px;color:var(--red2);text-shadow:var(--glow-red);}
+.logo{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:5px;background:linear-gradient(135deg,#f03535,#d08010,#d42020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px rgba(212,32,32,.35));line-height:1;}
 .logo-sub{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:2px;line-height:1;margin-top:2px;display:block;}
 .hud{display:flex;gap:6px;align-items:center;}
 .hud-pill{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;text-align:center;min-width:64px;transition:border-color .2s;cursor:default;}
@@ -321,6 +321,32 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .npc-stat{text-align:center;}
 .npc-stat-val{font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber2);}
 .npc-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;}
+.chat-fab{position:fixed;bottom:24px;right:24px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--amber));display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 6px 24px rgba(212,32,32,.4);z-index:600;border:none;transition:transform .15s;}
+.chat-fab:hover{transform:scale(1.08);}
+.chat-fab .chat-badge{position:absolute;top:-4px;right:-4px;background:var(--red2);color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;border-radius:10px;padding:2px 6px;min-width:16px;text-align:center;display:none;}
+.chat-panel{position:fixed;bottom:24px;right:24px;width:340px;height:460px;background:rgba(10,11,20,.97);border:1px solid var(--border2);border-radius:var(--r2);box-shadow:0 24px 64px rgba(0,0,0,.8);backdrop-filter:blur(20px);z-index:601;display:none;flex-direction:column;overflow:hidden;}
+.chat-panel.open{display:flex;animation:chatPop .2s ease;}
+@keyframes chatPop{from{transform:translateY(12px) scale(.97);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
+.chat-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--panel2);flex-shrink:0;}
+.chat-head-title{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:1.5px;color:var(--steel2);display:flex;align-items:center;gap:6px;}
+.chat-close{cursor:pointer;color:var(--text3);font-size:16px;background:none;border:none;padding:2px 6px;}
+.chat-close:hover{color:var(--text);}
+.chat-messages{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+.chat-msg{font-size:12px;line-height:1.4;animation:feedSlide .25s ease;}
+.chat-msg .chat-author{font-weight:700;font-family:var(--disp);font-size:11px;letter-spacing:.5px;margin-right:5px;}
+.chat-msg .chat-time{font-family:var(--mono);font-size:8px;color:var(--text4);margin-left:5px;}
+.chat-msg.own{align-self:flex-end;max-width:88%;text-align:right;}
+.chat-msg.own .chat-bubble{background:linear-gradient(135deg,var(--red3),rgba(212,32,32,.18));border:1px solid rgba(212,32,32,.3);}
+.chat-bubble{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:6px 10px;display:inline-block;color:var(--text2);max-width:100%;word-break:break-word;}
+.chat-msg.npc .chat-author{color:var(--text3);}
+.chat-msg.mod .chat-author,.chat-msg.admin .chat-author{color:var(--red2);}
+.chat-msg.owner .chat-author{color:var(--purple2);}
+.chat-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);background:var(--panel2);flex-shrink:0;}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:8px 14px;color:var(--text);font-family:var(--body);font-size:12px;outline:none;}
+.chat-input:focus{border-color:var(--red);}
+.chat-send{width:34px;height:34px;border-radius:50%;background:var(--red);border:none;color:#fff;cursor:pointer;font-size:14px;flex-shrink:0;}
+.chat-send:hover{background:var(--red2);}
+@media(max-width:500px){.chat-panel{width:calc(100vw - 24px);right:12px;bottom:84px;height:55vh;}.chat-fab{bottom:16px;right:16px;}}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);}
@@ -364,6 +390,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
   <div style="position:relative;z-index:2;width:100%;max-width:400px;padding:16px;">
     <div style="background:rgba(10,11,20,.88);border:1px solid rgba(212,32,32,.28);border-radius:var(--r2);padding:36px;backdrop-filter:blur(24px);box-shadow:0 24px 64px rgba(0,0,0,.75);position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);"></div>
+      <div style="width:56px;height:56px;margin:0 auto 10px;border-radius:14px;background:linear-gradient(135deg,#f03535,#d08010);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 28px rgba(212,32,32,.4);">🏁</div>
       <div style="font-family:var(--disp);font-weight:900;font-size:44px;letter-spacing:10px;text-align:center;margin-bottom:3px;background:linear-gradient(135deg,#f03535,#d08010,#d42020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(212,32,32,.4));">REDLINE</div>
       <div style="text-align:center;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:22px;text-transform:uppercase;">Street Racing Economy</div>
       <div style="display:flex;margin-bottom:20px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r);padding:3px;gap:3px;">
@@ -402,7 +429,10 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <!-- GAME -->
 <div id="game" style="display:none;min-height:100vh;position:relative;z-index:1;">
   <header class="header">
-    <div><div class="logo">REDLINE</div><span class="logo-sub">Street Racing Economy</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#f03535,#d08010);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 16px rgba(212,32,32,.35);flex-shrink:0">🏁</div>
+      <div><div class="logo">REDLINE</div><span class="logo-sub">Street Racing Economy</span></div>
+    </div>
     <div class="hud">
       <div class="hud-pill" onclick="showTab('profile')" style="cursor:pointer"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
       <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
@@ -567,6 +597,20 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <!-- NPC FEED -->
 <div class="feed-container" id="npc-feed"></div>
 
+<!-- CHAT -->
+<button class="chat-fab" id="chat-fab" onclick="toggleChat()">💬<span class="chat-badge" id="chat-badge">0</span></button>
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-head">
+    <div class="chat-head-title"><span class="rt-dot"></span>GLOBAL CHAT</div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages"><div class="loading-screen"><div class="spinner"></div></div></div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" placeholder="Say something..." maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
+    <button class="chat-send" onclick="sendChatMsg()">➤</button>
+  </div>
+</div>
+
 <!-- MODALS -->
 <div class="modal-overlay" id="modal-bid"><div class="modal"><button class="modal-close" onclick="closeModal('modal-bid')">✕</button><div class="modal-title">Place Bid</div><div id="bid-car-info" style="margin-bottom:16px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Current Bid</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--amber2)">$<span id="bid-curr">0</span></div></div><div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Your Cash</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--green2)">$<span id="bid-mycash">0</span></div></div></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Your Bid</label><input class="form-input" type="number" id="bid-input"></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">Min: $<span id="bid-min">0</span> · Buyout: $<span id="bid-buyout-disp">N/A</span></div><div id="bid-hist-list" style="max-height:140px;overflow-y:auto;margin-bottom:14px"></div><button class="btn btn-red btn-lg" style="width:100%" onclick="submitBid()">⚡ Place Bid</button></div></div>
 <div class="modal-overlay" id="modal-sell"><div class="modal"><button class="modal-close" onclick="closeModal('modal-sell')">✕</button><div class="modal-title">List for Auction</div><div id="sell-car-info" style="margin-bottom:14px"></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Starting Price</label><input class="form-input" type="number" id="sell-start"></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Buyout Price (optional)</label><input class="form-input" type="number" id="sell-buyout" placeholder="Leave blank"></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Duration</label><select class="form-input" id="sell-dur"><option value="1">1 hour</option><option value="3">3 hours</option><option value="6" selected>6 hours</option><option value="12">12 hours</option><option value="24">24 hours</option></select></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Event Type</label><select class="form-input" id="sell-evt"><option value="standard">Standard</option><option value="hypercar">🏆 Hypercar Night</option><option value="jdm_night">🎌 JDM Night</option><option value="muscle_madness">💪 Muscle Madness</option></select></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:14px;padding:8px;background:var(--amber3);border:1px solid rgba(200,120,32,.25);border-radius:var(--r)">⚠ 5% fee deducted from final sale</div><button class="btn btn-gold btn-lg" style="width:100%" onclick="submitAuction()">🔨 List Now</button></div></div>
@@ -654,14 +698,17 @@ const UPGRADES=[
 ];
 
 const RACE_EVENTS=[
-{id:'drag',name:'Drag Strip',desc:'Raw horsepower from 0 to ¼ mile. Torque at launch decides it.',emoji:'🏁',diff:'easy',reward:10000,xp:150,opp:520,oppEmoji:'🚗',oppName:'Street Racer',formula:s=>s.power*0.5+s.acceleration*8},
-{id:'street',name:'Street Sprint',desc:'Short burst through traffic. Pure acceleration wins.',emoji:'🏙️',diff:'easy',reward:10000,xp:150,opp:540,oppEmoji:'🚕',oppName:'City Drifter',formula:s=>s.acceleration*10+s.power*0.3},
-{id:'circuit',name:'Road Circuit',desc:'Mixed straights and technical corners. Balanced build required.',emoji:'🔄',diff:'medium',reward:25000,xp:300,opp:1100,oppEmoji:'🏎️',oppName:'Circuit Pro',formula:s=>s.handling*8+s.power*0.4+s.top_speed*2},
-{id:'highway',name:'Highway Pull',desc:'Top speed endurance. No corners. Power is everything.',emoji:'🛣️',diff:'medium',reward:25000,xp:300,opp:1050,oppEmoji:'🚗',oppName:'Highway King',formula:s=>s.power*0.7+s.top_speed*4},
-{id:'ev',name:'EV Battle',desc:'Electric torque vs combustion. Tesla/Rimac get 500pt bonus.',emoji:'⚡',diff:'medium',reward:25000,xp:300,opp:900,oppEmoji:'⚡',oppName:'Volt Striker',formula:(s,c)=>s.power*0.3+s.acceleration*8+(['Tesla Model S Plaid','Tesla Roadster','Rimac Nevera','Lucid Air Sapphire'].includes(c?.name)?500:0)},
-{id:'offroad',name:'Off-Road Rally',desc:'Dirt, rocks, jumps. SUVs and trucks get a massive edge.',emoji:'🌲',diff:'hard',reward:75000,xp:600,opp:1400,oppEmoji:'🚙',oppName:'Dirt Devil',formula:(s,c)=>s.power*0.4+s.handling*5+(c?.class==='SUV/Truck'?600:0)},
-{id:'drift',name:'Drift Battle',desc:'Angle, smoke, style. Handling stat is everything.',emoji:'💨',diff:'hard',reward:75000,xp:600,opp:1500,oppEmoji:'🚗',oppName:'Smoke King',formula:s=>s.handling*15+s.power*0.15},
-{id:'midnight',name:'Midnight Run',desc:'Full endurance at top speed. Every stat is equally weighted.',emoji:'🌙',diff:'elite',reward:200000,xp:1500,opp:2500,oppEmoji:'🏎️',oppName:'Ghost Racer',formula:s=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5}
+{id:'drag',name:'Drag Strip',desc:'Launch off the line — raw torque and HP from 0 to ¼ mile. No corners, no mercy.',emoji:'🏁',diff:'easy',reward:14000,fee:2000,xp:150,opp:520,oppEmoji:'🚗',oppName:'Street Racer',formula:s=>s.power*0.5+s.acceleration*8},
+{id:'street',name:'Street Sprint',desc:'3 blocks of pure speed through city traffic. First reaction wins. Acceleration is king.',emoji:'🏙️',diff:'easy',reward:14000,fee:2000,xp:150,opp:540,oppEmoji:'🚕',oppName:'City Drifter',formula:s=>s.acceleration*10+s.power*0.3},
+{id:'touge',name:'Touge Pass',desc:'Winding mountain road. Every corner punishes understeer. Handling and braking dominate.',emoji:'⛰️',diff:'medium',reward:32000,fee:6000,xp:280,opp:1000,oppEmoji:'🚗',oppName:'Mountain Ghost',formula:s=>s.handling*10+s.braking*6+s.power*0.2},
+{id:'circuit',name:'Road Circuit',desc:'Pro track layout — long straights into hairpins. A perfectly balanced build wins here.',emoji:'🔄',diff:'medium',reward:35000,fee:7000,xp:300,opp:1100,oppEmoji:'🏎️',oppName:'Circuit Pro',formula:s=>s.handling*8+s.power*0.4+s.top_speed*2},
+{id:'highway',name:'Highway Pull',desc:'Open freeway, 150mph+. Top speed is all that matters. Big engine or go home.',emoji:'🛣️',diff:'medium',reward:35000,fee:7000,xp:300,opp:1050,oppEmoji:'🚗',oppName:'Highway King',formula:s=>s.power*0.7+s.top_speed*4},
+{id:'ev',name:'EV Shootout',desc:'Silent war — electric torque vs combustion scream. Tesla, Rimac & Lucid get +500 bonus.',emoji:'⚡',diff:'medium',reward:32000,fee:6000,xp:300,opp:900,oppEmoji:'⚡',oppName:'Volt Striker',formula:(s,c)=>s.power*0.3+s.acceleration*8+(['Tesla Model S Plaid','Tesla Roadster','Rimac Nevera','Lucid Air Sapphire'].includes(c?.name)?500:0)},
+{id:'offroad',name:'Off-Road Rally',desc:'Dirt, rocks and big air. SUVs and trucks get a +600 class bonus. Smooth roads need not apply.',emoji:'🌲',diff:'hard',reward:90000,fee:15000,xp:600,opp:1400,oppEmoji:'🚙',oppName:'Dirt Devil',formula:(s,c)=>s.power*0.4+s.handling*5+(c?.class==='SUV/Truck'?600:0)},
+{id:'drift',name:'Drift Battle',desc:'Style, angle and smoke on demand. Handling is everything — raw power is a liability.',emoji:'💨',diff:'hard',reward:90000,fee:15000,xp:600,opp:1500,oppEmoji:'🚗',oppName:'Smoke King',formula:s=>s.handling*15+s.power*0.15},
+{id:'canyon',name:'Canyon Run',desc:'Blind turns on 1000ft drops. Braking precision and nerve decide survival. Pure driver.',emoji:'🏔️',diff:'hard',reward:100000,fee:18000,xp:700,opp:1600,oppEmoji:'🏎️',oppName:'Canyon Phantom',formula:s=>s.braking*12+s.handling*8+s.acceleration*3},
+{id:'midnight',name:'Midnight Run',desc:'Full city endurance from dusk to dawn. All stats matter equally. This separates the legends.',emoji:'🌙',diff:'elite',reward:250000,fee:40000,xp:1500,opp:2500,oppEmoji:'🏎️',oppName:'Ghost Racer',formula:s=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5},
+{id:'hypercar',name:'Hypercar Invitational',desc:'Legendary machinery only. If your car is Common or Rare you have no chance. Buy up.',emoji:'🦋',diff:'elite',reward:350000,fee:60000,xp:2000,opp:3200,oppEmoji:'🟠',oppName:'McLaren Ace',formula:(s,c)=>s.power*0.6+s.top_speed*4+s.handling*6+(['Hypercar'].includes(c?.class)?800:0)}
 ];
 
 const ACHIEVEMENTS=[
@@ -758,7 +805,9 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('game').style.display='none';
     auctUnsubs.forEach(u=>u());auctUnsubs=[];
     clearInterval(window._mktTick);clearInterval(window._auctTick);clearInterval(window._cdTick);
-    clearInterval(window._npcTick);clearInterval(window._npcSpawn);
+    clearInterval(window._npcTick);clearInterval(window._npcSpawn);clearInterval(window._npcChatTick);
+    chatUnsub=null;chatOpen=false;chatUnread=0;
+    document.getElementById('chat-panel')?.classList.remove('open');
   }
 });
 
@@ -767,10 +816,10 @@ async function initGame(){
   await Promise.all([loadProfile(),ensureMarketSeeded()]);
   await Promise.all([loadPlayerCars(),loadMarketPrices()]);
   renderHUD();renderRaceEvents();renderPlayerCars();
-  setupAuctionListener();startMarketTicker();
+  setupAuctionListener();startMarketTicker();setupChatListener();
   // Daily bonus - check server-side to prevent exploit
   checkDailyBonus();
-  startNPCEngine();
+  startNPCEngine();startNPCChat();
   checkAchievements();
   logActivity('login',{}).catch(()=>{});
 }
@@ -1218,17 +1267,39 @@ function openSell(){if(!selectedPCar){toast('Select a car first','t-error');retu
 // ═══ RACING ═══
 function renderRaceEvents(){
   const DIFF={easy:'pip-easy',medium:'pip-medium',hard:'pip-hard',elite:'pip-elite'};
-  document.getElementById('race-grid').innerHTML=RACE_EVENTS.map(r=>`
-    <div class="race-card ${r.diff}" onclick="startRace('${r.id}')">
-      <div style="font-size:32px;margin-bottom:8px">${r.emoji}</div>
-      <span class="diff-pip ${DIFF[r.diff]}">${r.diff.toUpperCase()}</span>
+  document.getElementById('race-grid').innerHTML=RACE_EVENTS.map(r=>{
+    const canAfford=profile&&profile.cash>=r.fee;
+    const net=r.reward-r.fee;
+    return `<div class="race-card ${r.diff}" onclick="startRace('${r.id}')" style="${!canAfford?'opacity:.5':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="font-size:28px;line-height:1">${r.emoji}</div>
+        <span class="diff-pip ${DIFF[r.diff]}">${r.diff.toUpperCase()}</span>
+      </div>
       <div class="race-name">${r.name}</div>
       <div class="race-desc">${r.desc}</div>
-      <div class="race-footer">
-        <div><div class="race-reward">+$${r.reward.toLocaleString()}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">+${r.xp} XP</div></div>
-        <button class="btn btn-red btn-sm" onclick="event.stopPropagation();startRace('${r.id}')">RACE ▶</button>
+      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Entry Fee</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--red2);font-weight:700">-$${fmtCash(r.fee)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Win Prize</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--green2);font-weight:700">+$${fmtCash(r.reward)}</span>
+        </div>
+        <div style="height:1px;background:var(--border);margin:5px 0"></div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Net Win</span>
+          <span style="font-family:var(--disp);font-size:13px;font-weight:700;color:var(--amber2)">+$${fmtCash(net)}</span>
+        </div>
       </div>
-    </div>`).join('');
+      <div class="race-footer">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">+${r.xp} XP • vs ${r.oppName}</div>
+        ${canAfford
+          ?`<button class="btn btn-red btn-sm" onclick="event.stopPropagation();startRace('${r.id}')">RACE ▶</button>`
+          :`<span style="font-family:var(--mono);font-size:9px;color:var(--red2)">Need $${fmtCash(r.fee)}</span>`}
+      </div>
+    </div>`;
+  }).join('');
 }
 const RACE_TIPS={drag:'More HP + Turbo upgrades win drags.',circuit:'Handling + HP = circuit king.',street:'Acceleration upgrades are key.',highway:'Max power and top speed builds.',offroad:'SUV/Truck gets a massive +600 bonus!',drift:'Max handling upgrades dominate drifts.',midnight:'Balance ALL stats for endurance.',ev:'Tesla, Rimac, Lucid get 500pt bonus!'};
 
@@ -1237,6 +1308,13 @@ async function startRace(rid){
   const r=RACE_EVENTS.find(x=>x.id===rid);if(!r)return;
   const pc=playerCars.find(p=>p.is_active)||playerCars[0];
   if(!pc){toast('Set an active car in Garage first!','t-error');return;}
+  // Charge entry fee upfront
+  if(profile.cash<r.fee){toast(`Need $${fmtCash(r.fee)} entry fee to race!`,'t-error');return;}
+  // Deduct fee immediately
+  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-r.fee)});
+  profile.cash-=r.fee;
+  renderHUD();renderRaceEvents();
+  toast(`Entry fee: -$${fmtCash(r.fee)} 🏁`,'t-info');
   const c=pc.car||{};
   const s={power:(c.power||300)+(pc.power_boost||0),top_speed:(c.top_speed||150)+(pc.speed_boost||0),acceleration:c.acceleration||50,handling:(c.handling||50)+(pc.handling_boost||0),braking:c.braking||50};
   isRacing=true;
@@ -1286,32 +1364,43 @@ async function startRace(rid){
   document.getElementById('score-val-o').textContent=Math.round(oppScore);
   document.getElementById('score-box-p').className='score-box '+(won?'winner':'loser');
   document.getElementById('score-box-o').className='score-box '+(won?'loser':'winner');
-  const cashGain=won?r.reward:0,newWins=(profile.wins||0)+(won?1:0),newLosses=(profile.losses||0)+(won?0:1);
+  // Fee already deducted — if won, add full reward; if lost, fee is already gone
+  const cashGain=won?r.reward:0;
+  const netResult=won?r.reward-r.fee:-r.fee; // net for display
+  const newWins=(profile.wins||0)+(won?1:0),newLosses=(profile.losses||0)+(won?0:1);
   const newStreak=won?(profile.win_streak||0)+1:0,newBestStreak=Math.max(profile.best_win_streak||0,newStreak);
   const newXp=(profile.xp||0)+r.xp,newLevel=Math.floor(newXp/1000)+1,levUp=newLevel>(profile.level||1);
   const newRep=(profile.reputation||0)+(won?12:3);
-  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(cashGain),wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep});
-  profile={...profile,cash:profile.cash+cashGain,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
-  db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),reward:cashGain,xp:r.xp,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-  logActivity('race',{race:r.name,result:won?'win':'loss',reward:cashGain}).catch(()=>{});
-  renderHUD();
+  // Only update wins/stats and add prize if won (fee already deducted)
+  const updateData={wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
+  if(won)updateData.cash=firebase.firestore.FieldValue.increment(cashGain);
+  await db.collection('profiles').doc(currentUser.uid).update(updateData);
+  if(won)profile.cash+=cashGain;
+  profile={...profile,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
+  db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),fee:r.fee,reward:cashGain,net:netResult,xp:r.xp,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  logActivity('race',{race:r.name,result:won?'win':'loss',fee:r.fee,reward:cashGain,net:netResult}).catch(()=>{});
+  renderHUD();renderRaceEvents();
   await sleep(400);
   const rb=document.getElementById('race-result');rb.style.display='block';rb.className='result-box '+(won?'result-win':'result-lose');
   rb.innerHTML=won?`<div style="font-size:52px;margin-bottom:10px">🏆</div><div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
     <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(cashGain)}</div><div class="result-rew-lbl">Cash</div></div>
+      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+$${fmtCash(r.reward)}</div><div class="result-rew-lbl">Prize</div></div>
+      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee</div></div>
+      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(netResult)}</div><div class="result-rew-lbl">Net</div></div>
       <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--purple2)">+12</div><div class="result-rew-lbl">Rep</div></div>
     </div>
     ${newStreak>2?`<div class="result-detail">🔥 ${newStreak}-race streak!</div>`:''}
     ${levUp?`<div style="margin-top:10px;padding:8px 14px;background:var(--amber3);border:1px solid rgba(200,120,32,.3);border-radius:var(--r);font-family:var(--disp);font-size:14px;font-weight:700;color:var(--amber2)">⬆️ LEVEL UP → ${newLevel}!</div>`:''}`
   :`<div style="font-size:52px;margin-bottom:10px">💥</div><div class="result-title">DEFEAT</div>
-    <div class="result-rewards"><div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div></div>
+    <div class="result-rewards">
+      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee Lost</div></div>
+      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
+    </div>
     <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
-    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]}</div>`;
+    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]||'Upgrade your car!'}</div>`;
   rb.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn btn-ghost" onclick="resetArena()">↺ Again</button><button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button></div>`;
-  if(won){toast(`Victory! +$${fmtCash(cashGain)}`,'t-success');showXpPop(`+${r.xp} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
-  else toast('Defeat — check tips!','t-error');
+  if(won){toast(`Victory! Net: +$${fmtCash(netResult)}`,'t-success');showXpPop(`+${r.xp} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
+  else toast(`Defeat! Lost entry fee: -$${fmtCash(r.fee)}`,'t-error');
   isRacing=false;checkAchievements();
 }
 function setArenaBadge(type,text){const el=document.getElementById('arena-badge');if(el){el.textContent=text;el.className='arena-badge '+type;}}
@@ -1564,6 +1653,81 @@ function showFeed(msg){
   feed.appendChild(item);
   while(feed.children.length>5)feed.removeChild(feed.firstChild);
   setTimeout(()=>{item.classList.add('fade');setTimeout(()=>item.remove(),300);},10000);
+}
+
+// ═══ GLOBAL CHAT ═══
+let chatOpen=false,chatUnsub=null,chatUnread=0,chatLastSeen=0,chatMsgCache=[];
+const NPC_CHAT_LINES=[
+  "anyone selling a Supra rn?","just won the midnight run, that fee was worth it 🔥","market's crashing again lol","who's got a hypercar for auction","drift battle is rigged i swear","new car who dis","gg on that race","saving up for a Bugatti, slow grind","anyone else broke after entry fees today","love the new touge pass track","circuit pro keeps wrecking me","bidding war on that GT-R is insane rn","just hit level 10 🎉","canyon run scared me half to death","is the EV bonus worth it?","grinding daily bonus every day, streak's at 7","who's the richest player rn","just bought my first hypercar!!","offroad rally + SUV = free wins ngl","anyone wanna race for fun"
+];
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open',chatOpen);
+  if(chatOpen){
+    chatUnread=0;updateChatBadge();
+    chatLastSeen=Date.now();
+    setTimeout(()=>{const el=document.getElementById('chat-input');el?.focus();},150);
+    scrollChatBottom();
+  }
+}
+function updateChatBadge(){
+  const b=document.getElementById('chat-badge');if(!b)return;
+  if(chatUnread>0){b.textContent=chatUnread>9?'9+':chatUnread;b.style.display='block';}
+  else b.style.display='none';
+}
+function scrollChatBottom(){
+  const el=document.getElementById('chat-messages');if(el)el.scrollTop=el.scrollHeight;
+}
+function renderChatMessages(msgs){
+  const el=document.getElementById('chat-messages');if(!el)return;
+  if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:20px 0">No messages yet — say hi! 👋</div>';return;}
+  el.innerHTML=msgs.map(m=>{
+    const isOwn=m.sender_id===currentUser?.uid;
+    const cls='chat-msg'+(isOwn?' own':'')+(m.is_npc?' npc':'')+(m.role==='admin'?' admin':'')+(m.role==='owner'?' owner':'')+(m.role==='moderator'?' mod':'');
+    const t=m.created_at?.toDate?.();
+    const timeStr=t?t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'';
+    const roleTag=m.role==='owner'?'👑':m.role==='admin'?'🛡️':m.role==='moderator'?'⚔️':m.is_npc?'🤖':'';
+    return `<div class="${cls}"><div><span class="chat-author">${roleTag?roleTag+' ':''}${m.sender_username||'?'}</span><span class="chat-time">${timeStr}</span></div><div class="chat-bubble">${escapeHtml(m.message||'')}</div></div>`;
+  }).join('');
+  scrollChatBottom();
+}
+function escapeHtml(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+function setupChatListener(){
+  if(chatUnsub)chatUnsub();
+  chatUnsub=db.collection('chat_messages').orderBy('created_at','desc').limit(50).onSnapshot(snap=>{
+    const msgs=snap.docs.map(d=>({id:d.id,...d.data()})).reverse();
+    chatMsgCache=msgs;
+    renderChatMessages(msgs);
+    if(!chatOpen&&msgs.length){
+      const latest=msgs[msgs.length-1];
+      const t=latest.created_at?.toDate?.()?.getTime()||0;
+      if(t>chatLastSeen&&latest.sender_id!==currentUser?.uid){chatUnread++;updateChatBadge();}
+    }
+  },err=>console.warn('Chat listener:',err.message));
+  auctUnsubs.push(chatUnsub);
+}
+async function sendChatMsg(){
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();
+  if(!msg||!currentUser||!profile)return;
+  if(msg.length>200){toast('Message too long','t-error');return;}
+  input.value='';
+  await db.collection('chat_messages').add({sender_id:currentUser.uid,sender_username:profile.username,role:profile.role||'player',is_npc:false,message:msg,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{toast('Failed to send','t-error');});
+}
+async function npcSendChat(npc){
+  if(!currentUser)return;
+  const line=NPC_CHAT_LINES[Math.floor(Math.random()*NPC_CHAT_LINES.length)];
+  await db.collection('chat_messages').add({sender_id:npc.id,sender_username:npc.username,role:'player',is_npc:true,message:line,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+}
+function startNPCChat(){
+  clearInterval(window._npcChatTick);
+  window._npcChatTick=setInterval(()=>{
+    if(!npcAccounts.length)return;
+    if(Math.random()<0.55){ // not every tick — keeps it natural
+      const npc=npcAccounts[Math.floor(Math.random()*npcAccounts.length)];
+      npcSendChat(npc).catch(()=>{});
+    }
+  },45000+Math.random()*60000);
 }
 
 // ═══ ADMIN PANEL ═══
