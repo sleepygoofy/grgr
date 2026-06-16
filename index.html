@@ -654,17 +654,14 @@ const UPGRADES=[
 ];
 
 const RACE_EVENTS=[
-{id:'drag',name:'Drag Strip',desc:'Launch off the line — raw torque and HP from 0 to ¼ mile. No corners, no mercy.',emoji:'🏁',diff:'easy',reward:14000,fee:2000,xp:150,opp:520,oppEmoji:'🚗',oppName:'Street Racer',formula:s=>s.power*0.5+s.acceleration*8},
-{id:'street',name:'Street Sprint',desc:'3 blocks of pure speed through city traffic. First reaction wins. Acceleration is king.',emoji:'🏙️',diff:'easy',reward:14000,fee:2000,xp:150,opp:540,oppEmoji:'🚕',oppName:'City Drifter',formula:s=>s.acceleration*10+s.power*0.3},
-{id:'touge',name:'Touge Pass',desc:'Winding mountain road. Every corner punishes understeer. Handling and braking dominate.',emoji:'⛰️',diff:'medium',reward:32000,fee:6000,xp:280,opp:1000,oppEmoji:'🚗',oppName:'Mountain Ghost',formula:s=>s.handling*10+s.braking*6+s.power*0.2},
-{id:'circuit',name:'Road Circuit',desc:'Pro track layout — long straights into hairpins. A perfectly balanced build wins here.',emoji:'🔄',diff:'medium',reward:35000,fee:7000,xp:300,opp:1100,oppEmoji:'🏎️',oppName:'Circuit Pro',formula:s=>s.handling*8+s.power*0.4+s.top_speed*2},
-{id:'highway',name:'Highway Pull',desc:'Open freeway, 150mph+. Top speed is all that matters. Big engine or go home.',emoji:'🛣️',diff:'medium',reward:35000,fee:7000,xp:300,opp:1050,oppEmoji:'🚗',oppName:'Highway King',formula:s=>s.power*0.7+s.top_speed*4},
-{id:'ev',name:'EV Shootout',desc:'Silent war — electric torque vs combustion scream. Tesla, Rimac & Lucid get +500 bonus.',emoji:'⚡',diff:'medium',reward:32000,fee:6000,xp:300,opp:900,oppEmoji:'⚡',oppName:'Volt Striker',formula:(s,c)=>s.power*0.3+s.acceleration*8+(['Tesla Model S Plaid','Tesla Roadster','Rimac Nevera','Lucid Air Sapphire'].includes(c?.name)?500:0)},
-{id:'offroad',name:'Off-Road Rally',desc:'Dirt, rocks and big air. SUVs and trucks get a +600 class bonus. Smooth roads need not apply.',emoji:'🌲',diff:'hard',reward:90000,fee:15000,xp:600,opp:1400,oppEmoji:'🚙',oppName:'Dirt Devil',formula:(s,c)=>s.power*0.4+s.handling*5+(c?.class==='SUV/Truck'?600:0)},
-{id:'drift',name:'Drift Battle',desc:'Style, angle and smoke on demand. Handling is everything — raw power is a liability.',emoji:'💨',diff:'hard',reward:90000,fee:15000,xp:600,opp:1500,oppEmoji:'🚗',oppName:'Smoke King',formula:s=>s.handling*15+s.power*0.15},
-{id:'canyon',name:'Canyon Run',desc:'Blind turns on 1000ft drops. Braking precision and nerve decide survival. Pure driver.',emoji:'🏔️',diff:'hard',reward:100000,fee:18000,xp:700,opp:1600,oppEmoji:'🏎️',oppName:'Canyon Phantom',formula:s=>s.braking*12+s.handling*8+s.acceleration*3},
-{id:'midnight',name:'Midnight Run',desc:'Full city endurance from dusk to dawn. All stats matter equally. This separates the legends.',emoji:'🌙',diff:'elite',reward:250000,fee:40000,xp:1500,opp:2500,oppEmoji:'🏎️',oppName:'Ghost Racer',formula:s=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5},
-{id:'hypercar',name:'Hypercar Invitational',desc:'Legendary machinery only. If your car is Common or Rare you have no chance. Buy up.',emoji:'🦋',diff:'elite',reward:350000,fee:60000,xp:2000,opp:3200,oppEmoji:'🟠',oppName:'McLaren Ace',formula:(s,c)=>s.power*0.6+s.top_speed*4+s.handling*6+(['Hypercar'].includes(c?.class)?800:0)}
+{id:'drag',name:'Drag Strip',desc:'Raw horsepower from 0 to ¼ mile. Torque at launch decides it.',emoji:'🏁',diff:'easy',reward:10000,xp:150,opp:520,oppEmoji:'🚗',oppName:'Street Racer',formula:s=>s.power*0.5+s.acceleration*8},
+{id:'street',name:'Street Sprint',desc:'Short burst through traffic. Pure acceleration wins.',emoji:'🏙️',diff:'easy',reward:10000,xp:150,opp:540,oppEmoji:'🚕',oppName:'City Drifter',formula:s=>s.acceleration*10+s.power*0.3},
+{id:'circuit',name:'Road Circuit',desc:'Mixed straights and technical corners. Balanced build required.',emoji:'🔄',diff:'medium',reward:25000,xp:300,opp:1100,oppEmoji:'🏎️',oppName:'Circuit Pro',formula:s=>s.handling*8+s.power*0.4+s.top_speed*2},
+{id:'highway',name:'Highway Pull',desc:'Top speed endurance. No corners. Power is everything.',emoji:'🛣️',diff:'medium',reward:25000,xp:300,opp:1050,oppEmoji:'🚗',oppName:'Highway King',formula:s=>s.power*0.7+s.top_speed*4},
+{id:'ev',name:'EV Battle',desc:'Electric torque vs combustion. Tesla/Rimac get 500pt bonus.',emoji:'⚡',diff:'medium',reward:25000,xp:300,opp:900,oppEmoji:'⚡',oppName:'Volt Striker',formula:(s,c)=>s.power*0.3+s.acceleration*8+(['Tesla Model S Plaid','Tesla Roadster','Rimac Nevera','Lucid Air Sapphire'].includes(c?.name)?500:0)},
+{id:'offroad',name:'Off-Road Rally',desc:'Dirt, rocks, jumps. SUVs and trucks get a massive edge.',emoji:'🌲',diff:'hard',reward:75000,xp:600,opp:1400,oppEmoji:'🚙',oppName:'Dirt Devil',formula:(s,c)=>s.power*0.4+s.handling*5+(c?.class==='SUV/Truck'?600:0)},
+{id:'drift',name:'Drift Battle',desc:'Angle, smoke, style. Handling stat is everything.',emoji:'💨',diff:'hard',reward:75000,xp:600,opp:1500,oppEmoji:'🚗',oppName:'Smoke King',formula:s=>s.handling*15+s.power*0.15},
+{id:'midnight',name:'Midnight Run',desc:'Full endurance at top speed. Every stat is equally weighted.',emoji:'🌙',diff:'elite',reward:200000,xp:1500,opp:2500,oppEmoji:'🏎️',oppName:'Ghost Racer',formula:s=>(s.power+s.top_speed*3+s.handling*10+s.acceleration*6)*0.5}
 ];
 
 const ACHIEVEMENTS=[
@@ -1221,39 +1218,17 @@ function openSell(){if(!selectedPCar){toast('Select a car first','t-error');retu
 // ═══ RACING ═══
 function renderRaceEvents(){
   const DIFF={easy:'pip-easy',medium:'pip-medium',hard:'pip-hard',elite:'pip-elite'};
-  document.getElementById('race-grid').innerHTML=RACE_EVENTS.map(r=>{
-    const canAfford=profile&&profile.cash>=r.fee;
-    const net=r.reward-r.fee;
-    return `<div class="race-card ${r.diff}" onclick="startRace('${r.id}')" style="${!canAfford?'opacity:.5':''}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div style="font-size:28px;line-height:1">${r.emoji}</div>
-        <span class="diff-pip ${DIFF[r.diff]}">${r.diff.toUpperCase()}</span>
-      </div>
+  document.getElementById('race-grid').innerHTML=RACE_EVENTS.map(r=>`
+    <div class="race-card ${r.diff}" onclick="startRace('${r.id}')">
+      <div style="font-size:32px;margin-bottom:8px">${r.emoji}</div>
+      <span class="diff-pip ${DIFF[r.diff]}">${r.diff.toUpperCase()}</span>
       <div class="race-name">${r.name}</div>
       <div class="race-desc">${r.desc}</div>
-      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Entry Fee</span>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--red2);font-weight:700">-$${fmtCash(r.fee)}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Win Prize</span>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--green2);font-weight:700">+$${fmtCash(r.reward)}</span>
-        </div>
-        <div style="height:1px;background:var(--border);margin:5px 0"></div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Net Win</span>
-          <span style="font-family:var(--disp);font-size:13px;font-weight:700;color:var(--amber2)">+$${fmtCash(net)}</span>
-        </div>
-      </div>
       <div class="race-footer">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">+${r.xp} XP • vs ${r.oppName}</div>
-        ${canAfford
-          ?`<button class="btn btn-red btn-sm" onclick="event.stopPropagation();startRace('${r.id}')">RACE ▶</button>`
-          :`<span style="font-family:var(--mono);font-size:9px;color:var(--red2)">Need $${fmtCash(r.fee)}</span>`}
+        <div><div class="race-reward">+$${r.reward.toLocaleString()}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">+${r.xp} XP</div></div>
+        <button class="btn btn-red btn-sm" onclick="event.stopPropagation();startRace('${r.id}')">RACE ▶</button>
       </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 const RACE_TIPS={drag:'More HP + Turbo upgrades win drags.',circuit:'Handling + HP = circuit king.',street:'Acceleration upgrades are key.',highway:'Max power and top speed builds.',offroad:'SUV/Truck gets a massive +600 bonus!',drift:'Max handling upgrades dominate drifts.',midnight:'Balance ALL stats for endurance.',ev:'Tesla, Rimac, Lucid get 500pt bonus!'};
 
@@ -1262,101 +1237,10 @@ async function startRace(rid){
   const r=RACE_EVENTS.find(x=>x.id===rid);if(!r)return;
   const pc=playerCars.find(p=>p.is_active)||playerCars[0];
   if(!pc){toast('Set an active car in Garage first!','t-error');return;}
-  // Charge entry fee upfront
-  if(profile.cash<r.fee){toast(`Need $${fmtCash(r.fee)} entry fee to race!`,'t-error');return;}
-  // Deduct fee immediately
-  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-r.fee)});
-  profile.cash-=r.fee;
-  renderHUD();renderRaceEvents();
-  toast(`Entry fee: -$${fmtCash(r.fee)} 🏁`,'t-info');
   const c=pc.car||{};
   const s={power:(c.power||300)+(pc.power_boost||0),top_speed:(c.top_speed||150)+(pc.speed_boost||0),acceleration:c.acceleration||50,handling:(c.handling||50)+(pc.handling_boost||0),braking:c.braking||50};
   isRacing=true;
   const arena=document.getElementById('race-arena');
-  arena.style.display='block';
-  document.getElementById('race-result').style.display='none';
-  document.getElementById('scoreboard').style.display='none';
-  document.getElementById('arena-title').textContent=r.name;
-  setArenaBadge('ready','READY');
-  document.getElementById('p-lbl').textContent=(profile.username||'YOU').toUpperCase();
-  document.getElementById('opp-lbl').textContent=r.oppName.toUpperCase();
-  document.getElementById('player-lane-lbl').textContent=(profile.username||'YOU').slice(0,8).toUpperCase();
-  document.getElementById('opp-lane-label').textContent=r.oppName.split(' ')[0].toUpperCase();
-  document.getElementById('score-car-p').textContent=pc.car_emoji||'🚗';
-  document.getElementById('score-name-p').textContent=(profile.username||'YOU').toUpperCase();
-  document.getElementById('opp-emoji').textContent=r.oppEmoji||'🏎️';
-  document.getElementById('opp-name').textContent=r.oppName;
-  document.getElementById('r-player').textContent=pc.car_emoji||'🚗';
-  document.getElementById('r-opp').textContent=r.oppEmoji||'🏎️';
-  ['p-fill','o-fill'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.width='0%';});
-  ['r-player','r-opp'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.left='3%';});
-  document.getElementById('p-score').textContent='';document.getElementById('o-score').textContent='';
-  document.getElementById('score-val-p').textContent='—';document.getElementById('score-val-o').textContent='—';
-  document.getElementById('score-box-p').className='score-box';document.getElementById('score-box-o').className='score-box';
-  const ph=document.getElementById('phase-disp');ph.style.display='block';
-  setArenaBadge('countdown','COUNTDOWN');
-  for(const[i,txt]of['3','2','1','GO!'].entries()){
-    await sleep(650);ph.textContent=txt;
-    ph.className='phase-display '+(i===3?'phase-go':'phase-cd');
-    ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
-  }
-  await sleep(250);ph.style.display='none';setArenaBadge('racing','RACING');
-  const myScore=r.formula(s,c),variance=r.opp*0.13,oppScore=r.opp+(Math.random()*variance*2-variance),won=myScore>oppScore;
-  const close=Math.abs(myScore-oppScore)<r.opp*0.06,mx=Math.max(myScore,oppScore,100);
-  const pp=Math.min(88,Math.round((myScore/mx)*88)),op=Math.min(88,Math.round((oppScore/mx)*88));
-  await sleep(100);
-  document.getElementById('p-fill').style.cssText=`transition:width 2.4s cubic-bezier(.2,.6,.3,1);width:${pp}%`;
-  document.getElementById('o-fill').style.cssText=`transition:width 2.8s cubic-bezier(.2,.6,.3,1);width:${op}%`;
-  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(212,32,32,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
-  document.getElementById('r-opp').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(200,80,80,.4));transition:left 2.8s cubic-bezier(.2,.6,.3,1);left:${op}%`;
-  document.getElementById('p-score').textContent='Score: '+Math.round(myScore);
-  document.getElementById('o-score').textContent='Score: '+Math.round(oppScore);
-  await sleep(2900);
-  setArenaBadge(won?'victory':'defeat',won?'VICTORY!':'DEFEAT');
-  document.getElementById('scoreboard').style.display='grid';
-  document.getElementById('score-val-p').textContent=Math.round(myScore);
-  document.getElementById('score-val-o').textContent=Math.round(oppScore);
-  document.getElementById('score-box-p').className='score-box '+(won?'winner':'loser');
-  document.getElementById('score-box-o').className='score-box '+(won?'loser':'winner');
-  // Fee already deducted — if won, add full reward; if lost, fee is already gone
-  const cashGain=won?r.reward:0;
-  const netResult=won?r.reward-r.fee:-r.fee; // net for display
-  const newWins=(profile.wins||0)+(won?1:0),newLosses=(profile.losses||0)+(won?0:1);
-  const newStreak=won?(profile.win_streak||0)+1:0,newBestStreak=Math.max(profile.best_win_streak||0,newStreak);
-  const newXp=(profile.xp||0)+r.xp,newLevel=Math.floor(newXp/1000)+1,levUp=newLevel>(profile.level||1);
-  const newRep=(profile.reputation||0)+(won?12:3);
-  // Only update wins/stats and add prize if won (fee already deducted)
-  const updateData={wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
-  if(won)updateData.cash=firebase.firestore.FieldValue.increment(cashGain);
-  await db.collection('profiles').doc(currentUser.uid).update(updateData);
-  if(won)profile.cash+=cashGain;
-  profile={...profile,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
-  db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),fee:r.fee,reward:cashGain,net:netResult,xp:r.xp,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-  logActivity('race',{race:r.name,result:won?'win':'loss',fee:r.fee,reward:cashGain,net:netResult}).catch(()=>{});
-  renderHUD();renderRaceEvents();
-  await sleep(400);
-  const rb=document.getElementById('race-result');rb.style.display='block';rb.className='result-box '+(won?'result-win':'result-lose');
-  rb.innerHTML=won?`<div style="font-size:52px;margin-bottom:10px">🏆</div><div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+$${fmtCash(r.reward)}</div><div class="result-rew-lbl">Prize</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(netResult)}</div><div class="result-rew-lbl">Net</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-    </div>
-    ${newStreak>2?`<div class="result-detail">🔥 ${newStreak}-race streak!</div>`:''}
-    ${levUp?`<div style="margin-top:10px;padding:8px 14px;background:var(--amber3);border:1px solid rgba(200,120,32,.3);border-radius:var(--r);font-family:var(--disp);font-size:14px;font-weight:700;color:var(--amber2)">⬆️ LEVEL UP → ${newLevel}!</div>`:''}`
-  :`<div style="font-size:52px;margin-bottom:10px">💥</div><div class="result-title">DEFEAT</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee Lost</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-    </div>
-    <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
-    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]||'Upgrade your car!'}</div>`;
-  rb.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn btn-ghost" onclick="resetArena()">↺ Again</button><button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button></div>`;
-  if(won){toast(`Victory! Net: +$${fmtCash(netResult)}`,'t-success');showXpPop(`+${r.xp} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
-  else toast(`Defeat! Lost entry fee: -$${fmtCash(r.fee)}`,'t-error');
-  isRacing=false;checkAchievements();
-}
   arena.style.display='block';
   document.getElementById('race-result').style.display='none';
   document.getElementById('scoreboard').style.display='none';
