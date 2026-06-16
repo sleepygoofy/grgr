@@ -32,36 +32,19 @@ input,select,textarea{font-family:var(--body);}
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:block;}
-#auth-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;}
-#auth-screen::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:1;}
-.auth-wrap{position:relative;z-index:2;width:100%;max-width:400px;padding:16px;}
-.auth-car-l,.auth-car-r{position:absolute;font-size:72px;opacity:.07;pointer-events:none;animation:floatCar 9s ease-in-out infinite;}
-.auth-car-l{left:-56px;top:38%;transform:translateY(-50%);}
-.auth-car-r{right:-56px;top:54%;transform:translateY(-50%) scaleX(-1);animation-delay:.5s;}
-@keyframes floatCar{0%,100%{transform:translateY(-50%) translateX(0);}50%{transform:translateY(-60%) translateX(6px);}}
-.auth-car-r{0%,100%{transform:translateY(-50%) scaleX(-1) translateX(0);}50%{transform:translateY(-60%) scaleX(-1) translateX(-6px);}}
 .auth-box{background:rgba(10,11,20,.85);border:1px solid rgba(212,32,32,.28);border-radius:var(--r2);padding:38px;backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);box-shadow:0 0 0 1px rgba(212,32,32,.07),0 28px 72px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.03);position:relative;overflow:hidden;}
 .auth-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);}
-.auth-box::after{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(212,32,32,.12) 0%,transparent 70%);pointer-events:none;border-radius:50%;}
-.auth-logo{font-family:var(--disp);font-weight:900;font-size:44px;letter-spacing:10px;text-align:center;margin-bottom:3px;background:linear-gradient(135deg,#f03535,#d08010,#d42020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(212,32,32,.45));position:relative;z-index:1;}
-.auth-sub{text-align:center;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:22px;text-transform:uppercase;position:relative;z-index:1;}
-.auth-lines{display:flex;justify-content:center;gap:3px;margin-bottom:22px;opacity:.25;}
-.auth-lines span{display:block;height:2px;border-radius:1px;background:var(--red);}
-.auth-tabs{display:flex;margin-bottom:20px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r);padding:3px;gap:3px;position:relative;z-index:1;}
 .auth-tab{flex:1;padding:9px;text-align:center;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;border:none;color:var(--text3);border-radius:3px;transition:all .18s;}
 .auth-tab.active{background:var(--red);color:#fff;}
 .auth-tab:not(.active):hover{color:var(--steel2);background:rgba(255,255,255,.04);}
-.form-group{margin-bottom:14px;position:relative;z-index:1;}
-.form-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;}
 .form-input{width:100%;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:14px;outline:none;transition:all .18s;font-family:var(--mono);}
 .form-input::placeholder{color:var(--text4);}
 .form-input:focus{border-color:var(--red);background:rgba(212,32,32,.06);box-shadow:0 0 0 2px rgba(212,32,32,.08);}
-.btn-auth{width:100%;padding:12px;background:linear-gradient(135deg,var(--red) 0%,#b01818 100%);border:none;border-radius:var(--r);color:#fff;font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .18s;margin-top:8px;box-shadow:0 4px 18px rgba(212,32,32,.28),inset 0 1px 0 rgba(255,255,255,.08);position:relative;z-index:1;}
+.btn-auth{width:100%;padding:12px;background:linear-gradient(135deg,var(--red) 0%,#b01818 100%);border:none;border-radius:var(--r);color:#fff;font-family:var(--disp);font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .18s;margin-top:8px;box-shadow:0 4px 18px rgba(212,32,32,.28),inset 0 1px 0 rgba(255,255,255,.08);}
 .btn-auth:hover{background:linear-gradient(135deg,var(--red2) 0%,var(--red) 100%);box-shadow:0 6px 26px rgba(212,32,32,.45);transform:translateY(-1px);}
-.auth-msg{font-size:11px;font-family:var(--mono);margin-top:10px;text-align:center;display:none;padding:8px;border-radius:var(--r);position:relative;z-index:1;}
+.auth-msg{font-size:11px;font-family:var(--mono);margin-top:10px;text-align:center;display:none;padding:8px;border-radius:var(--r);}
 .auth-msg.err{color:#e07070;background:rgba(180,30,30,.15);border:1px solid rgba(180,30,30,.3);}
 .auth-msg.ok{color:var(--green2);background:var(--green3);border:1px solid rgba(37,128,53,.3);}
-.auth-footer{text-align:center;margin-top:16px;font-family:var(--mono);font-size:9px;color:var(--text4);letter-spacing:1px;position:relative;z-index:1;}
 .daily-banner{position:fixed;inset:0;z-index:8000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);backdrop-filter:blur(4px);}
 .daily-banner.show{display:flex;}
 .daily-box{background:var(--panel);border:1px solid var(--amber);border-radius:var(--r2);padding:36px;text-align:center;max-width:360px;width:100%;box-shadow:var(--glow-amber),0 0 60px rgba(200,120,32,.08);}
@@ -72,7 +55,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .daily-day{width:38px;height:38px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:10px;font-weight:700;border:1px solid var(--border2);color:var(--text3);}
 .daily-day.done{background:var(--amber3);border-color:rgba(200,120,32,.4);color:var(--amber2);}
 .daily-day.today{background:var(--amber);border-color:var(--amber2);color:#000;box-shadow:var(--glow-amber);}
-#game{display:none;min-height:100vh;position:relative;z-index:1;}
 .header{background:rgba(5,6,10,.98);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;}
 .logo{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:7px;color:var(--red2);text-shadow:var(--glow-red);}
 .logo-sub{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:2px;line-height:1;margin-top:2px;display:block;}
@@ -206,7 +188,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .race-name{font-family:var(--disp);font-size:17px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;color:var(--steel);}
 .race-desc{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
 .race-footer{display:flex;justify-content:space-between;align-items:center;}
-.race-reward{font-family:var(--mono);font-size:11px;color:var(--amber2);font-weight:700;}
 .race-arena{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:16px;position:relative;overflow:hidden;}
 .race-arena::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,32,32,.04),transparent 60%);pointer-events:none;}
 .arena-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
@@ -317,10 +298,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .feed-item{background:rgba(10,11,20,.95);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;font-family:var(--mono);font-size:11px;color:var(--text2);max-width:290px;backdrop-filter:blur(8px);animation:feedSlide .3s ease;transition:opacity .3s;}
 .feed-item.fade{opacity:0;}
 @keyframes feedSlide{from{transform:translateX(-20px);opacity:0;}to{transform:translateX(0);opacity:1;}}
-.npc-stats-bar{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:12px;display:flex;gap:20px;flex-wrap:wrap;}
-.npc-stat{text-align:center;}
-.npc-stat-val{font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber2);}
-.npc-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);}
@@ -332,7 +309,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .empty-icon{font-size:36px;margin-bottom:10px;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.loading-screen{display:flex;align-items:center;justify-content:center;height:180px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--text3);}
+.loading-screen{display:flex;align-items:center;justify-content:height:180px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--text3);}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;font-size:12px;z-index:9000;transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none;max-width:290px;font-family:var(--mono);box-shadow:0 8px 24px rgba(0,0,0,.6);}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.t-success{border-color:rgba(37,128,53,.5);color:var(--green2);}
@@ -351,6 +328,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .challenge-prog{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden;}
 .challenge-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px;transition:width .5s;}
 .pulse-dot{display:inline-block;width:7px;height:7px;border-radius:50%;animation:rtPulse 2s infinite;margin-right:4px;}
+.npc-stat{text-align:center;}
+.npc-stat-val{font-family:var(--disp);font-size:20px;font-weight:700;color:var(--amber2);}
+.npc-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -367,8 +347,8 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       <div style="font-family:var(--disp);font-weight:900;font-size:44px;letter-spacing:10px;text-align:center;margin-bottom:3px;background:linear-gradient(135deg,#f03535,#d08010,#d42020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(212,32,32,.4));">REDLINE</div>
       <div style="text-align:center;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:22px;text-transform:uppercase;">Street Racing Economy</div>
       <div style="display:flex;margin-bottom:20px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r);padding:3px;gap:3px;">
-        <button class="auth-tab active" onclick="switchAuthTab('login',this)" style="flex:1;padding:9px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .18s;border:none;">Sign In</button>
-        <button class="auth-tab" onclick="switchAuthTab('signup',this)" style="flex:1;padding:9px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .18s;border:none;">Register</button>
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup',this)">Register</button>
       </div>
       <div id="auth-login">
         <div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Username</label><input class="form-input" id="login-user" placeholder="YourRacerTag" autocomplete="username"></div>
@@ -573,6 +553,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <div class="modal-overlay" id="modal-car"><div class="modal"><button class="modal-close" onclick="closeModal('modal-car')">✕</button><div id="modal-car-body"></div></div></div>
 <div class="modal-overlay" id="modal-user"><div class="modal"><button class="modal-close" onclick="closeModal('modal-user')">✕</button><div class="modal-title" id="modal-user-title">Player</div><div id="modal-user-body"></div></div></div>
 <div class="toast" id="toast"></div>
+
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDAPdNjRs8TkDymnNyYIdc3YpgtVbthvMc",authDomain:"redline-b4422.firebaseapp.com",projectId:"redline-b4422",storageBucket:"redline-b4422.firebasestorage.app",messagingSenderId:"725052073743",appId:"1:725052073743:web:c8ebd165a59f2fd9bbc07a"});
 const auth=firebase.auth(),db=firebase.firestore();
@@ -771,7 +752,6 @@ async function initGame(){
   await Promise.all([loadPlayerCars(),loadMarketPrices()]);
   renderHUD();renderRaceEvents();renderPlayerCars();
   setupAuctionListener();startMarketTicker();
-  // Daily bonus - check server-side to prevent exploit
   checkDailyBonus();
   startNPCEngine();
   checkAchievements();
@@ -807,15 +787,14 @@ async function giveStarterCar(uid){
   await db.collection('player_cars').add({player_id:uid,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:0,is_active:true,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
 }
 
-// ═══ DAILY BONUS — exploit-proof ═══
+// ═══ DAILY BONUS ═══
 async function checkDailyBonus(){
   if(!profile)return;
-  // Re-fetch from DB to get server-accurate last_daily (prevents client-side exploit)
   const freshDoc=await db.collection('profiles').doc(currentUser.uid).get();
   const fresh=freshDoc.data();
   const last=fresh.last_daily?.toDate?.()??null;
   const todayStr=new Date().toDateString();
-  if(last&&last.toDateString()===todayStr)return; // already claimed today on server
+  if(last&&last.toDateString()===todayStr)return;
   profile.last_daily=fresh.last_daily;
   profile.daily_streak=fresh.daily_streak||0;
   showDailyBonus();
@@ -831,7 +810,6 @@ function showDailyBonus(){
 }
 async function claimDaily(){
   if(!profile||!currentUser)return;
-  // Double-check server to prevent exploit — read fresh before writing
   const freshDoc=await db.collection('profiles').doc(currentUser.uid).get();
   const fresh=freshDoc.data();
   const last=fresh.last_daily?.toDate?.()??null;
@@ -846,7 +824,6 @@ async function claimDaily(){
   const newStreak=(last&&last.toDateString()===yesterday.toDateString())?(fresh.daily_streak||0)+1:1;
   const idx=Math.min(newStreak-1,DAILY_AMOUNTS.length-1);
   const amount=DAILY_AMOUNTS[idx];
-  // Atomic write with server timestamp — no client can fake this
   await db.collection('profiles').doc(currentUser.uid).update({
     cash:firebase.firestore.FieldValue.increment(amount),
     daily_streak:newStreak,
@@ -1255,23 +1232,34 @@ function renderRaceEvents(){
     </div>`;
   }).join('');
 }
+
 const RACE_TIPS={drag:'More HP + Turbo upgrades win drags.',circuit:'Handling + HP = circuit king.',street:'Acceleration upgrades are key.',highway:'Max power and top speed builds.',offroad:'SUV/Truck gets a massive +600 bonus!',drift:'Max handling upgrades dominate drifts.',midnight:'Balance ALL stats for endurance.',ev:'Tesla, Rimac, Lucid get 500pt bonus!'};
 
+// ═══ START RACE — single correct implementation ═══
 async function startRace(rid){
   if(isRacing)return;
   const r=RACE_EVENTS.find(x=>x.id===rid);if(!r)return;
   const pc=playerCars.find(p=>p.is_active)||playerCars[0];
   if(!pc){toast('Set an active car in Garage first!','t-error');return;}
-  // Charge entry fee upfront
   if(profile.cash<r.fee){toast(`Need $${fmtCash(r.fee)} entry fee to race!`,'t-error');return;}
-  // Deduct fee immediately
+
+  // Deduct entry fee upfront before race starts
   await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-r.fee)});
   profile.cash-=r.fee;
   renderHUD();renderRaceEvents();
   toast(`Entry fee: -$${fmtCash(r.fee)} 🏁`,'t-info');
+
   const c=pc.car||{};
-  const s={power:(c.power||300)+(pc.power_boost||0),top_speed:(c.top_speed||150)+(pc.speed_boost||0),acceleration:c.acceleration||50,handling:(c.handling||50)+(pc.handling_boost||0),braking:c.braking||50};
+  const s={
+    power:(c.power||300)+(pc.power_boost||0),
+    top_speed:(c.top_speed||150)+(pc.speed_boost||0),
+    acceleration:c.acceleration||50,
+    handling:(c.handling||50)+(pc.handling_boost||0),
+    braking:c.braking||50
+  };
   isRacing=true;
+
+  // Arena setup
   const arena=document.getElementById('race-arena');
   arena.style.display='block';
   document.getElementById('race-result').style.display='none';
@@ -1290,9 +1278,14 @@ async function startRace(rid){
   document.getElementById('r-opp').textContent=r.oppEmoji||'🏎️';
   ['p-fill','o-fill'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.width='0%';});
   ['r-player','r-opp'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.left='3%';});
-  document.getElementById('p-score').textContent='';document.getElementById('o-score').textContent='';
-  document.getElementById('score-val-p').textContent='—';document.getElementById('score-val-o').textContent='—';
-  document.getElementById('score-box-p').className='score-box';document.getElementById('score-box-o').className='score-box';
+  document.getElementById('p-score').textContent='';
+  document.getElementById('o-score').textContent='';
+  document.getElementById('score-val-p').textContent='—';
+  document.getElementById('score-val-o').textContent='—';
+  document.getElementById('score-box-p').className='score-box';
+  document.getElementById('score-box-o').className='score-box';
+
+  // Countdown
   const ph=document.getElementById('phase-disp');ph.style.display='block';
   setArenaBadge('countdown','COUNTDOWN');
   for(const[i,txt]of['3','2','1','GO!'].entries()){
@@ -1301,9 +1294,18 @@ async function startRace(rid){
     ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
   }
   await sleep(250);ph.style.display='none';setArenaBadge('racing','RACING');
-  const myScore=r.formula(s,c),variance=r.opp*0.13,oppScore=r.opp+(Math.random()*variance*2-variance),won=myScore>oppScore;
-  const close=Math.abs(myScore-oppScore)<r.opp*0.06,mx=Math.max(myScore,oppScore,100);
-  const pp=Math.min(88,Math.round((myScore/mx)*88)),op=Math.min(88,Math.round((oppScore/mx)*88));
+
+  // Score calculation
+  const myScore=r.formula(s,c);
+  const variance=r.opp*0.13;
+  const oppScore=r.opp+(Math.random()*variance*2-variance);
+  const won=myScore>oppScore;
+  const close=Math.abs(myScore-oppScore)<r.opp*0.06;
+  const mx=Math.max(myScore,oppScore,100);
+  const pp=Math.min(88,Math.round((myScore/mx)*88));
+  const op=Math.min(88,Math.round((oppScore/mx)*88));
+
+  // Animate race
   await sleep(100);
   document.getElementById('p-fill').style.cssText=`transition:width 2.4s cubic-bezier(.2,.6,.3,1);width:${pp}%`;
   document.getElementById('o-fill').style.cssText=`transition:width 2.8s cubic-bezier(.2,.6,.3,1);width:${op}%`;
@@ -1312,124 +1314,80 @@ async function startRace(rid){
   document.getElementById('p-score').textContent='Score: '+Math.round(myScore);
   document.getElementById('o-score').textContent='Score: '+Math.round(oppScore);
   await sleep(2900);
+
+  // Show result
   setArenaBadge(won?'victory':'defeat',won?'VICTORY!':'DEFEAT');
   document.getElementById('scoreboard').style.display='grid';
   document.getElementById('score-val-p').textContent=Math.round(myScore);
   document.getElementById('score-val-o').textContent=Math.round(oppScore);
   document.getElementById('score-box-p').className='score-box '+(won?'winner':'loser');
   document.getElementById('score-box-o').className='score-box '+(won?'loser':'winner');
-  // Fee already deducted — if won, add full reward; if lost, fee is already gone
+
+  // Fee already deducted upfront — only add prize money if won
   const cashGain=won?r.reward:0;
-  const netResult=won?r.reward-r.fee:-r.fee; // net for display
-  const newWins=(profile.wins||0)+(won?1:0),newLosses=(profile.losses||0)+(won?0:1);
-  const newStreak=won?(profile.win_streak||0)+1:0,newBestStreak=Math.max(profile.best_win_streak||0,newStreak);
-  const newXp=(profile.xp||0)+r.xp,newLevel=Math.floor(newXp/1000)+1,levUp=newLevel>(profile.level||1);
+  const netResult=won?r.reward-r.fee:-r.fee;
+  const newWins=(profile.wins||0)+(won?1:0);
+  const newLosses=(profile.losses||0)+(won?0:1);
+  const newStreak=won?(profile.win_streak||0)+1:0;
+  const newBestStreak=Math.max(profile.best_win_streak||0,newStreak);
+  const newXp=(profile.xp||0)+r.xp;
+  const newLevel=Math.floor(newXp/1000)+1;
+  const levUp=newLevel>(profile.level||1);
   const newRep=(profile.reputation||0)+(won?12:3);
-  // Only update wins/stats and add prize if won (fee already deducted)
+
   const updateData={wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
   if(won)updateData.cash=firebase.firestore.FieldValue.increment(cashGain);
   await db.collection('profiles').doc(currentUser.uid).update(updateData);
   if(won)profile.cash+=cashGain;
   profile={...profile,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
-  db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),fee:r.fee,reward:cashGain,net:netResult,xp:r.xp,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+
+  db.collection('races').add({
+    player_id:currentUser.uid,player_username:profile.username,
+    car_name:pc.car_name,race_type:r.id,difficulty:r.diff,
+    result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),
+    fee:r.fee,reward:cashGain,net:netResult,xp:r.xp,
+    created_at:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(()=>{});
   logActivity('race',{race:r.name,result:won?'win':'loss',fee:r.fee,reward:cashGain,net:netResult}).catch(()=>{});
+
   renderHUD();renderRaceEvents();
   await sleep(400);
-  const rb=document.getElementById('race-result');rb.style.display='block';rb.className='result-box '+(won?'result-win':'result-lose');
-  rb.innerHTML=won?`<div style="font-size:52px;margin-bottom:10px">🏆</div><div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+$${fmtCash(r.reward)}</div><div class="result-rew-lbl">Prize</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(netResult)}</div><div class="result-rew-lbl">Net</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-    </div>
-    ${newStreak>2?`<div class="result-detail">🔥 ${newStreak}-race streak!</div>`:''}
-    ${levUp?`<div style="margin-top:10px;padding:8px 14px;background:var(--amber3);border:1px solid rgba(200,120,32,.3);border-radius:var(--r);font-family:var(--disp);font-size:14px;font-weight:700;color:var(--amber2)">⬆️ LEVEL UP → ${newLevel}!</div>`:''}`
-  :`<div style="font-size:52px;margin-bottom:10px">💥</div><div class="result-title">DEFEAT</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee Lost</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-    </div>
-    <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
-    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]||'Upgrade your car!'}</div>`;
-  rb.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn btn-ghost" onclick="resetArena()">↺ Again</button><button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button></div>`;
+
+  const rb=document.getElementById('race-result');
+  rb.style.display='block';
+  rb.className='result-box '+(won?'result-win':'result-lose');
+  rb.innerHTML=won
+    ?`<div style="font-size:52px;margin-bottom:10px">🏆</div>
+      <div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
+      <div class="result-rewards">
+        <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+$${fmtCash(r.reward)}</div><div class="result-rew-lbl">Prize</div></div>
+        <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee</div></div>
+        <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(netResult)}</div><div class="result-rew-lbl">Net</div></div>
+        <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
+      </div>
+      ${newStreak>2?`<div class="result-detail">🔥 ${newStreak}-race streak!</div>`:''}
+      ${levUp?`<div style="margin-top:10px;padding:8px 14px;background:var(--amber3);border:1px solid rgba(200,120,32,.3);border-radius:var(--r);font-family:var(--disp);font-size:14px;font-weight:700;color:var(--amber2)">⬆️ LEVEL UP → ${newLevel}!</div>`:''}`
+    :`<div style="font-size:52px;margin-bottom:10px">💥</div>
+      <div class="result-title">DEFEAT</div>
+      <div class="result-rewards">
+        <div class="result-rew-item"><div class="result-rew-val" style="color:var(--red2)">-$${fmtCash(r.fee)}</div><div class="result-rew-lbl">Fee Lost</div></div>
+        <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
+      </div>
+      <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]||'Upgrade your car!'}</div>`;
+
+  rb.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+    <button class="btn btn-ghost" onclick="resetArena()">↺ Again</button>
+    <button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button>
+  </div>`;
+
   if(won){toast(`Victory! Net: +$${fmtCash(netResult)}`,'t-success');showXpPop(`+${r.xp} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
   else toast(`Defeat! Lost entry fee: -$${fmtCash(r.fee)}`,'t-error');
-  isRacing=false;checkAchievements();
+
+  isRacing=false;
+  checkAchievements();
 }
-  arena.style.display='block';
-  document.getElementById('race-result').style.display='none';
-  document.getElementById('scoreboard').style.display='none';
-  document.getElementById('arena-title').textContent=r.name;
-  setArenaBadge('ready','READY');
-  document.getElementById('p-lbl').textContent=(profile.username||'YOU').toUpperCase();
-  document.getElementById('opp-lbl').textContent=r.oppName.toUpperCase();
-  document.getElementById('player-lane-lbl').textContent=(profile.username||'YOU').slice(0,8).toUpperCase();
-  document.getElementById('opp-lane-label').textContent=r.oppName.split(' ')[0].toUpperCase();
-  document.getElementById('score-car-p').textContent=pc.car_emoji||'🚗';
-  document.getElementById('score-name-p').textContent=(profile.username||'YOU').toUpperCase();
-  document.getElementById('opp-emoji').textContent=r.oppEmoji||'🏎️';
-  document.getElementById('opp-name').textContent=r.oppName;
-  document.getElementById('r-player').textContent=pc.car_emoji||'🚗';
-  document.getElementById('r-opp').textContent=r.oppEmoji||'🏎️';
-  ['p-fill','o-fill'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.width='0%';});
-  ['r-player','r-opp'].forEach(id=>{const el=document.getElementById(id);el.style.transition='none';el.style.left='3%';});
-  document.getElementById('p-score').textContent='';document.getElementById('o-score').textContent='';
-  document.getElementById('score-val-p').textContent='—';document.getElementById('score-val-o').textContent='—';
-  document.getElementById('score-box-p').className='score-box';document.getElementById('score-box-o').className='score-box';
-  const ph=document.getElementById('phase-disp');ph.style.display='block';
-  setArenaBadge('countdown','COUNTDOWN');
-  for(const[i,txt]of['3','2','1','GO!'].entries()){
-    await sleep(650);ph.textContent=txt;
-    ph.className='phase-display '+(i===3?'phase-go':'phase-cd');
-    ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
-  }
-  await sleep(250);ph.style.display='none';setArenaBadge('racing','RACING');
-  const myScore=r.formula(s,c),variance=r.opp*0.13,oppScore=r.opp+(Math.random()*variance*2-variance),won=myScore>oppScore;
-  const close=Math.abs(myScore-oppScore)<r.opp*0.06,mx=Math.max(myScore,oppScore,100);
-  const pp=Math.min(88,Math.round((myScore/mx)*88)),op=Math.min(88,Math.round((oppScore/mx)*88));
-  await sleep(100);
-  document.getElementById('p-fill').style.cssText=`transition:width 2.4s cubic-bezier(.2,.6,.3,1);width:${pp}%`;
-  document.getElementById('o-fill').style.cssText=`transition:width 2.8s cubic-bezier(.2,.6,.3,1);width:${op}%`;
-  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(212,32,32,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
-  document.getElementById('r-opp').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(200,80,80,.4));transition:left 2.8s cubic-bezier(.2,.6,.3,1);left:${op}%`;
-  document.getElementById('p-score').textContent='Score: '+Math.round(myScore);
-  document.getElementById('o-score').textContent='Score: '+Math.round(oppScore);
-  await sleep(2900);
-  setArenaBadge(won?'victory':'defeat',won?'VICTORY!':'DEFEAT');
-  document.getElementById('scoreboard').style.display='grid';
-  document.getElementById('score-val-p').textContent=Math.round(myScore);
-  document.getElementById('score-val-o').textContent=Math.round(oppScore);
-  document.getElementById('score-box-p').className='score-box '+(won?'winner':'loser');
-  document.getElementById('score-box-o').className='score-box '+(won?'loser':'winner');
-  const cashGain=won?r.reward:0,newWins=(profile.wins||0)+(won?1:0),newLosses=(profile.losses||0)+(won?0:1);
-  const newStreak=won?(profile.win_streak||0)+1:0,newBestStreak=Math.max(profile.best_win_streak||0,newStreak);
-  const newXp=(profile.xp||0)+r.xp,newLevel=Math.floor(newXp/1000)+1,levUp=newLevel>(profile.level||1);
-  const newRep=(profile.reputation||0)+(won?12:3);
-  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(cashGain),wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep});
-  profile={...profile,cash:profile.cash+cashGain,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep};
-  db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),reward:cashGain,xp:r.xp,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-  logActivity('race',{race:r.name,result:won?'win':'loss',reward:cashGain}).catch(()=>{});
-  renderHUD();
-  await sleep(400);
-  const rb=document.getElementById('race-result');rb.style.display='block';rb.className='result-box '+(won?'result-win':'result-lose');
-  rb.innerHTML=won?`<div style="font-size:52px;margin-bottom:10px">🏆</div><div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
-    <div class="result-rewards">
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--amber2)">+$${fmtCash(cashGain)}</div><div class="result-rew-lbl">Cash</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div>
-      <div class="result-rew-item"><div class="result-rew-val" style="color:var(--purple2)">+12</div><div class="result-rew-lbl">Rep</div></div>
-    </div>
-    ${newStreak>2?`<div class="result-detail">🔥 ${newStreak}-race streak!</div>`:''}
-    ${levUp?`<div style="margin-top:10px;padding:8px 14px;background:var(--amber3);border:1px solid rgba(200,120,32,.3);border-radius:var(--r);font-family:var(--disp);font-size:14px;font-weight:700;color:var(--amber2)">⬆️ LEVEL UP → ${newLevel}!</div>`:''}`
-  :`<div style="font-size:52px;margin-bottom:10px">💥</div><div class="result-title">DEFEAT</div>
-    <div class="result-rewards"><div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+${r.xp}</div><div class="result-rew-lbl">XP</div></div></div>
-    <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
-    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]}</div>`;
-  rb.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn btn-ghost" onclick="resetArena()">↺ Again</button><button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button></div>`;
-  if(won){toast(`Victory! +$${fmtCash(cashGain)}`,'t-success');showXpPop(`+${r.xp} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
-  else toast('Defeat — check tips!','t-error');
-  isRacing=false;checkAchievements();
-}
+
 function setArenaBadge(type,text){const el=document.getElementById('arena-badge');if(el){el.textContent=text;el.className='arena-badge '+type;}}
 function resetArena(){document.getElementById('race-arena').style.display='none';document.getElementById('race-result').style.display='none';document.getElementById('scoreboard').style.display='none';}
 
@@ -1492,7 +1450,7 @@ async function loadLeaderboard(){
   document.getElementById('lb-garage').innerHTML=top.map(([uid,cnt],i)=>row({...(unames[uid]||{username:'?'}),id:uid},i,cnt+' cars')).join('');
 }
 
-// ═══ PROFILE — fixed: no continuous load ═══
+// ═══ PROFILE ═══
 async function renderProfile(){
   if(!profile)return;
   document.getElementById('prof-name').textContent=profile.username;
@@ -1523,7 +1481,6 @@ async function renderProfile(){
     <div style="font-size:12px;margin-bottom:8px">Next bonus: <span style="color:var(--amber2)">$${fmtCash(DAILY_AMOUNTS[Math.min((profile.daily_streak||0),DAILY_AMOUNTS.length-1)])}</span></div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Last claimed: ${last?timeAgo(last):'Never'}</div>
     ${(!last||last.toDateString()!==todayStr)?'<button class="btn btn-gold" style="width:100%" onclick="checkDailyBonus()">🎁 Claim Today</button>':'<div style="font-family:var(--mono);font-size:10px;color:var(--green2)">✓ Claimed today!</div>'}`;
-  // FIXED: only load race history once per profile visit — guard with raceHistLoaded
   if(raceHistLoaded)return;
   raceHistLoaded=true;
   document.getElementById('race-hist').innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
@@ -1541,27 +1498,18 @@ async function renderProfile(){
   }catch(e){document.getElementById('race-hist').innerHTML='<div class="empty">Error loading races.</div>';}
 }
 
-// ═══ NPC ENGINE — No cap, always active, runs the game world ═══
+// ═══ NPC ENGINE ═══
 async function startNPCEngine(){
-  // Load existing NPC accounts
   const snap=await db.collection('profiles').where('is_npc','==',true).get();
   npcAccounts=snap.docs.map(d=>({id:d.id,...d.data()}));
-  // Ensure we have at least 5 NPCs to start with
   const needed=Math.max(0,5-npcAccounts.length);
-  for(let i=0;i<needed;i++){
-    const n=await createNPC().catch(()=>null);
-    if(n)npcAccounts.push(n);
-  }
-  // Run NPC activity every 20-40 seconds — always keeping the world alive
+  for(let i=0;i<needed;i++){const n=await createNPC().catch(()=>null);if(n)npcAccounts.push(n);}
   clearInterval(window._npcTick);
-  window._npcTick=setInterval(()=>runNPCBatch().catch(()=>{}), 20000+Math.random()*20000);
-  // Spawn new NPC every 8-15 minutes — NO CAP
+  window._npcTick=setInterval(()=>runNPCBatch().catch(()=>{}),20000+Math.random()*20000);
   clearInterval(window._npcSpawn);
-  window._npcSpawn=setInterval(()=>createNPC().catch(()=>{}), 480000+Math.random()*420000);
-  // Start first activity quickly
-  setTimeout(()=>runNPCBatch().catch(()=>{}), 5000);
+  window._npcSpawn=setInterval(()=>createNPC().catch(()=>{}),480000+Math.random()*420000);
+  setTimeout(()=>runNPCBatch().catch(()=>{}),5000);
 }
-
 async function createNPC(){
   if(!currentUser)return null;
   const adj=NPC_ADJ[Math.floor(Math.random()*NPC_ADJ.length)];
@@ -1573,7 +1521,6 @@ async function createNPC(){
   try{
     const npcRef=db.collection('profiles').doc();
     await npcRef.set({uid:npcRef.id,username,email,cash:startCash,level:Math.floor(Math.random()*5)+1,xp:0,wins:Math.floor(Math.random()*20),losses:Math.floor(Math.random()*10),win_streak:0,best_win_streak:0,reputation:Math.floor(Math.random()*50),role:'player',is_banned:false,is_npc:true,daily_streak:0,last_daily:null,achievements:[],created_at:firebase.firestore.FieldValue.serverTimestamp()});
-    // Give NPC a random starter car
     const starterCars=CAR_DATA.filter(c=>['Common','Rare'].includes(c.rarity));
     const car=starterCars[Math.floor(Math.random()*starterCars.length)];
     await db.collection('player_cars').add({player_id:npcRef.id,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:0,is_active:true,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
@@ -1583,53 +1530,36 @@ async function createNPC(){
     return newNpc;
   }catch(e){console.warn('createNPC error:',e.message);return null;}
 }
-
 async function runNPCBatch(){
   if(!currentUser||!npcAccounts.length)return;
-  // Pick 2-4 random NPCs to be active each tick
   const count=2+Math.floor(Math.random()*3);
   const shuffled=[...npcAccounts].sort(()=>Math.random()-.5).slice(0,count);
-  for(const npc of shuffled){
-    await runSingleNPCAction(npc).catch(()=>{});
-    await sleep(800); // stagger actions
-  }
-  // Refresh leaderboard if visible
+  for(const npc of shuffled){await runSingleNPCAction(npc).catch(()=>{});await sleep(800);}
   if(document.getElementById('tab-leaderboard')?.classList.contains('active'))loadLeaderboard();
 }
-
 async function runSingleNPCAction(npc){
-  // Refill broke NPCs immediately
   if((npc.cash||0)<2000){
     const refill=15000+Math.floor(Math.random()*25000);
     await db.collection('profiles').doc(npc.id).update({cash:refill}).catch(()=>{});
-    npc.cash=refill;
-    return;
+    npc.cash=refill;return;
   }
   const roll=Math.random();
   if(roll<0.45){
-    // RACE — most common NPC action
     const r=RACE_EVENTS[Math.floor(Math.random()*RACE_EVENTS.length)];
     const won=Math.random()>0.38;
     const cashGain=won?r.reward:0;
     const newCash=Math.max(1000,(npc.cash||5000)+cashGain);
-    const newWins=(npc.wins||0)+(won?1:0);
-    const newLosses=(npc.losses||0)+(won?0:1);
-    const newXp=(npc.xp||0)+r.xp;
-    const newLevel=Math.floor(newXp/1000)+1;
-    const newStreak=won?(npc.win_streak||0)+1:0;
-    const newBestStreak=Math.max(npc.best_win_streak||0,newStreak);
+    const newWins=(npc.wins||0)+(won?1:0),newLosses=(npc.losses||0)+(won?0:1);
+    const newXp=(npc.xp||0)+r.xp,newLevel=Math.floor(newXp/1000)+1;
+    const newStreak=won?(npc.win_streak||0)+1:0,newBestStreak=Math.max(npc.best_win_streak||0,newStreak);
     await db.collection('profiles').doc(npc.id).update({cash:newCash,wins:newWins,losses:newLosses,xp:newXp,level:newLevel,win_streak:newStreak,best_win_streak:newBestStreak,reputation:firebase.firestore.FieldValue.increment(won?10:2)}).catch(()=>{});
     npc.cash=newCash;npc.wins=newWins;npc.losses=newLosses;npc.xp=newXp;npc.level=newLevel;npc.win_streak=newStreak;
     if(won)showFeed(`🤖 ${npc.username} won ${r.name} · +$${fmtCash(r.reward)}`);
     else if(Math.random()<0.3)showFeed(`🤖 ${npc.username} lost ${r.name}`);
-  } else if(roll<0.68){
-    // BID on auction
+  }else if(roll<0.68){
     const aSnap=await db.collection('auctions').where('status','==','active').limit(12).get();
     const now=new Date();
-    const valid=aSnap.docs.filter(d=>{
-      const a=d.data(),t=a.ends_at?.toDate?.();
-      return t&&t>now&&a.seller_id!==npc.id&&a.highest_bidder_id!==npc.id;
-    });
+    const valid=aSnap.docs.filter(d=>{const a=d.data(),t=a.ends_at?.toDate?.();return t&&t>now&&a.seller_id!==npc.id&&a.highest_bidder_id!==npc.id;});
     if(valid.length&&(npc.cash||0)>5000){
       const aDoc=valid[Math.floor(Math.random()*valid.length)];
       const a=aDoc.data();
@@ -1645,8 +1575,7 @@ async function runSingleNPCAction(npc){
         if(document.getElementById('tab-auction')?.classList.contains('active'))renderAuctions();
       }
     }
-  } else if(roll<0.82){
-    // BUY a car from market
+  }else if(roll<0.82){
     const affordable=CAR_DATA.filter(c=>{const p=marketPrices[c.name]?.current_price||c.base_price;return p<=(npc.cash||0)*0.6&&p<400000;});
     if(affordable.length){
       const car=affordable[Math.floor(Math.random()*affordable.length)];
@@ -1656,16 +1585,14 @@ async function runSingleNPCAction(npc){
       npc.cash=(npc.cash||0)-price;
       showFeed(`🤖 ${npc.username} bought a ${car.name}`);
     }
-  } else {
-    // LIST a car for auction
+  }else{
     const carsSnap=await db.collection('player_cars').where('player_id','==',npc.id).get();
     if(carsSnap.size>1){
       const carDoc=carsSnap.docs[Math.floor(Math.random()*carsSnap.docs.length)];
       const cd=carDoc.data();
       const carData=CAR_DATA.find(c=>c.name===cd.car_name)||{base_price:20000,rarity:'Common'};
       const base=marketPrices[cd.car_name]?.current_price||carData.base_price;
-      const start=Math.round(base*0.55);
-      const dur=2+Math.floor(Math.random()*5);
+      const start=Math.round(base*0.55),dur=2+Math.floor(Math.random()*5);
       const evts=['standard','jdm_night','muscle_madness','hypercar'];
       await db.collection('auctions').add({seller_id:npc.id,seller_username:npc.username+' (NPC)',car_name:cd.car_name,car_emoji:cd.car_emoji,car_class:cd.car_class||'',car_rarity:carData.rarity||'Common',event_type:evts[Math.floor(Math.random()*evts.length)],starting_price:start,current_price:start,buyout_price:Math.round(start*1.7),highest_bidder_id:null,highest_bidder_username:null,bid_count:0,status:'active',ends_at:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+dur*3600000)),created_at:firebase.firestore.FieldValue.serverTimestamp()});
       showFeed(`🤖 ${npc.username} listed ${cd.car_name} for auction`);
@@ -1673,7 +1600,6 @@ async function runSingleNPCAction(npc){
     }
   }
 }
-
 function showFeed(msg){
   const feed=document.getElementById('npc-feed');if(!feed)return;
   const item=document.createElement('div');item.className='feed-item';item.textContent=msg;
@@ -1712,7 +1638,7 @@ async function adminOverview(el){
   el.innerHTML=`
     <div class="admin-stat-grid">
       <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--steel2)">${real.length}</div><div class="admin-stat-lbl">Real Players</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--text3)">${npcs.length}</div><div class="admin-stat-lbl">NPCs (No Cap)</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--text3)">${npcs.length}</div><div class="admin-stat-lbl">NPCs</div></div>
       <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--amber2)">${aSnap.size}</div><div class="admin-stat-lbl">Live Auctions</div></div>
       <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2)">${rSnap.size}</div><div class="admin-stat-lbl">Total Races</div></div>
       <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--green2);font-size:18px">$${fmtCash(totalCash)}</div><div class="admin-stat-lbl">Economy Size</div></div>
@@ -1810,7 +1736,7 @@ async function adminNPCs(el){
       <button class="btn btn-gold" onclick="bulkCreateNPCs(5)">📦 Bulk Create (5)</button>
       <button class="btn btn-ghost" onclick="clearNPCAccounts()">🗑️ Delete All NPCs</button>
     </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:12px;padding:8px;background:var(--panel2);border-radius:var(--r);border:1px solid var(--border)">⚡ NPCs race, bid, and buy cars every 20-40s automatically. No cap — they keep the world alive 24/7.</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:12px;padding:8px;background:var(--panel2);border-radius:var(--r);border:1px solid var(--border)">⚡ NPCs race, bid, and buy cars every 20-40s automatically.</div>
     <table class="admin-table"><thead><tr><th>Username</th><th>Level</th><th>Cash</th><th>W/L</th><th>Created</th><th></th></tr></thead>
     <tbody>${npcs.sort((a,b)=>(b.wins||0)-(a.wins||0)).map(u=>`<tr>
       <td>🤖 <strong>${u.username}</strong></td>
@@ -1913,101 +1839,8 @@ async function adminRaces(el){
 }
 async function adminBroadcast(el){
   el.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
-    <div><label class="form-label">Message</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Announcement..." style="resize:vertical;font-family:var(--body)"></textarea></div>
-    <div><label class="form-label">Type</label><select class="form-input" id="bc-type"><option value="t-info">📢 Info</option><option value="t-success">✅ Success</option><option value="t-error">🚨 Alert</option></select></div>
+    <div><label class="form-label" style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Message</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Announcement..." style="resize:vertical;font-family:var(--body)"></textarea></div>
+    <div><label class="form-label" style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Type</label><select class="form-input" id="bc-type"><option value="t-info">📢 Info</option><option value="t-success">✅ Success</option><option value="t-error">🚨 Alert</option></select></div>
     <button class="btn btn-red btn-lg" onclick="sendBroadcast()">📢 Send Broadcast</button>
     <div class="divider"></div>
-    <div id="bc-history"><div class="loading-screen"><div class="spinner"></div></div></div>
-  </div>`;
-  const snap=await db.collection('broadcasts').orderBy('created_at','desc').limit(10).get();
-  document.getElementById('bc-history').innerHTML=snap.empty?'<div class="empty">No broadcasts yet.</div>':snap.docs.map(d=>{const b=d.data();return `<div style="padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px"><div style="font-size:13px;margin-bottom:4px">${b.message}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">by ${b.sender||'admin'} · ${timeAgo(b.created_at?.toDate())}</div></div>`;}).join('');
-}
-async function sendBroadcast(){
-  const msg=document.getElementById('bc-msg').value.trim(),type=document.getElementById('bc-type').value;
-  if(!msg){toast('Enter a message','t-error');return;}
-  await db.collection('broadcasts').add({message:msg,type,sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  toast(msg,type);logActivity('broadcast',{message:msg}).catch(()=>{});toast('Broadcast sent!','t-success');loadAdminSec('broadcast');
-}
-async function adminSettings(el){
-  const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
-  const sett=settDoc?.exists?settDoc.data():{};
-  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
-    <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Daily Bonus Multiplier</div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Current: <strong style="color:var(--amber2)">${sett.daily_multiplier||1}x</strong></div>
-      <div style="display:flex;gap:8px"><input class="admin-search" type="number" id="set-daily-mult" value="${sett.daily_multiplier||1}" min="0.5" max="50" step="0.5" style="width:80px"><button class="btn btn-gold" onclick="adminSaveSetting('daily_multiplier',parseFloat(document.getElementById('set-daily-mult').value))">Save</button></div>
-    </div>
-    <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">NPC Activity Interval (seconds)</div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">How often NPCs act (default: 20-40s). Lower = more active world</div>
-      <div style="display:flex;gap:8px"><input class="admin-search" type="number" id="set-npc-int" value="20" min="5" max="300" style="width:80px"><button class="btn btn-steel" onclick="applyNPCInterval()">Apply Now</button></div>
-    </div>
-    <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Starting Cash (new accounts)</div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Current: <strong style="color:var(--amber2)">$${fmtCash(sett.starting_cash||50000)}</strong></div>
-      <div style="display:flex;gap:8px"><input class="admin-search" type="number" id="set-start-cash" value="${sett.starting_cash||50000}" style="width:120px"><button class="btn btn-gold" onclick="adminSaveSetting('starting_cash',parseInt(document.getElementById('set-start-cash').value))">Save</button></div>
-    </div>
-    <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Promote Yourself to Owner</div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Grant yourself full control of the game.</div>
-      <button class="btn btn-purple" onclick="promoteSelfOwner()">👑 Set as Owner</button>
-    </div>
-  </div>`;
-}
-async function adminSaveSetting(key,val){if(isNaN(val)){toast('Invalid value','t-error');return;}await db.collection('settings').doc('game').set({[key]:val},{merge:true});toast(`${key} → ${val}`,'t-success');logActivity('admin_setting',{key,val}).catch(()=>{});loadAdminSec('settings');}
-function applyNPCInterval(){const secs=parseInt(document.getElementById('set-npc-int').value)||20;clearInterval(window._npcTick);window._npcTick=setInterval(()=>runNPCBatch().catch(()=>{}),secs*1000);toast(`NPC interval set to ${secs}s`,'t-success');}
-async function promoteSelfOwner(){if(!confirm('Promote yourself to Owner?'))return;await db.collection('profiles').doc(currentUser.uid).update({role:'owner'});profile.role='owner';renderHUD();toast('You are now the Owner! 👑','t-success');logActivity('self_promote_owner',{}).catch(()=>{});loadAdminSec('settings');}
-
-async function logActivity(action,details){
-  if(!currentUser||!profile)return;
-  await db.collection('activity_logs').add({user_id:currentUser.uid,username:profile.username,action,details:details||{},created_at:firebase.firestore.FieldValue.serverTimestamp()});
-}
-</script>
-
-<!-- 3D ANIMATED BACKGROUND -->
-<script>
-(function(){
-  const canvas=document.getElementById('bg-canvas');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  let W,H,t=0;
-  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  const COLORS=['rgba(212,32,32,','rgba(200,120,32,','rgba(88,40,160,','rgba(24,88,160,'];
-  const stars=Array.from({length:180},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.3+.2,o:Math.random()*.6+.1,tw:Math.random()*Math.PI*2}));
-  const orbs=[
-    {x:.15,y:.35,r:.22,c:'rgba(212,32,32,',a:.06,sp:.0004,ph:0},
-    {x:.85,y:.65,r:.26,c:'rgba(88,40,160,',a:.05,sp:.0003,ph:2.1},
-    {x:.5,y:.08,r:.18,c:'rgba(200,120,32,',a:.04,sp:.0005,ph:1.2},
-    {x:.7,y:.92,r:.2,c:'rgba(24,88,160,',a:.04,sp:.00035,ph:3.8},
-  ];
-  const speedLines=Array.from({length:20},()=>({y:Math.random(),x:Math.random(),len:Math.random()*.1+.03,spd:Math.random()*.003+.001,alpha:Math.random()*.1+.02,c:COLORS[Math.floor(Math.random()*COLORS.length)]}));
-  const particles=Array.from({length:100},()=>({x:Math.random()*1000,y:Math.random()*800,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.3,r:Math.random()*1.8+.4,c:COLORS[Math.floor(Math.random()*COLORS.length)],a:Math.random()*.5+.1,life:Math.random()*Math.PI*2}));
-  function drawGrid(){
-    const vx=W*.5,vy=H*.52,ga=.055+Math.sin(t*.3)*.008;
-    ctx.strokeStyle=`rgba(212,32,32,${ga})`;ctx.lineWidth=.5;
-    for(let i=0;i<=12;i++){const p=i/12,y=vy+(H-vy)*Math.pow(p,1.8),s=W*.88*Math.pow(p,1.2);ctx.beginPath();ctx.moveTo(vx-s/2,y);ctx.lineTo(vx+s/2,y);ctx.stroke();}
-    for(let i=0;i<=14;i++){const p=i/14,bx=vx+(p-.5)*W*.88;ctx.beginPath();ctx.moveTo(vx,vy);ctx.lineTo(bx,H);ctx.stroke();}
-  }
-  function frame(){
-    ctx.clearRect(0,0,W,H);t+=.01;
-    const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#05060a');bg.addColorStop(1,'#07080f');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-    orbs.forEach(orb=>{
-      const ox=orb.x*W+Math.sin(t*orb.sp*100+orb.ph)*W*.04,oy=orb.y*H+Math.cos(t*orb.sp*80+orb.ph)*H*.03,r=orb.r*Math.min(W,H);
-      const ga=orb.a+Math.sin(t*orb.sp*200+orb.ph)*.015;
-      const g=ctx.createRadialGradient(ox,oy,0,ox,oy,r);
-      g.addColorStop(0,orb.c+(ga*2)+')');g.addColorStop(.5,orb.c+ga+')');g.addColorStop(1,orb.c+'0)');
-      ctx.fillStyle=g;ctx.beginPath();ctx.arc(ox,oy,r,0,Math.PI*2);ctx.fill();
-    });
-    stars.forEach(s=>{s.tw+=.015;const a=s.o*(0.6+0.4*Math.sin(s.tw));ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();});
-    drawGrid();
-    speedLines.forEach(sl=>{sl.x-=sl.spd;if(sl.x+sl.len<0)sl.x=1+sl.len;const g=ctx.createLinearGradient(sl.x*W,0,(sl.x+sl.len)*W,0);g.addColorStop(0,sl.c+'0)');g.addColorStop(.5,sl.c+sl.alpha+')');g.addColorStop(1,sl.c+'0)');ctx.strokeStyle=g;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sl.x*W,sl.y*H);ctx.lineTo((sl.x+sl.len)*W,sl.y*H);ctx.stroke();});
-    particles.forEach(p=>{p.life+=.02;p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;const a=p.a*(0.5+0.5*Math.sin(p.life));ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c+a+')';ctx.fill();});
-    for(let i=0;i<particles.length;i++){for(let j=i+1;j<particles.length;j++){const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<75){const a=(1-dist/75)*.035;ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(212,32,32,${a})`;ctx.lineWidth=.5;ctx.stroke();}}}
-    requestAnimationFrame(frame);
-  }
-  frame();
-})();
-</script>
-</body>
-</html>
+    <div id="bc-history"><div class="loading-screen
