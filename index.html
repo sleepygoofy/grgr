@@ -74,9 +74,21 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .daily-day.done{background:var(--amber3);border-color:rgba(255,122,61,.4);color:var(--amber2);}
 .daily-day.today{background:var(--amber);border-color:var(--amber2);color:#000;box-shadow:var(--glow-amber);}
 #game{display:none;min-height:100vh;position:relative;z-index:1;}
-.header{background:rgba(5,6,10,.98);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;}
-.logo{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:5px;background:linear-gradient(135deg,#ff2e8b,#b160ff,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 10px rgba(255,46,139,.4));line-height:1;}
-.logo-sub{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:2px;line-height:1;margin-top:2px;display:block;}
+.app-shell{display:flex;min-height:100vh;}
+.sidebar{width:208px;flex-shrink:0;background:rgba(8,7,22,.97);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;z-index:250;display:flex;flex-direction:column;}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:18px 16px;border-bottom:1px solid var(--border);}
+.sidebar-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#ff2e8b,#b160ff);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 0 14px rgba(255,46,139,.35);transform:rotate(-4deg);}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:1px;}
+.side-tab{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;font-family:var(--body);font-weight:600;font-size:13px;color:var(--text2);cursor:pointer;transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;white-space:nowrap;}
+.side-tab .side-ico{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.85;}
+.side-tab:hover{background:rgba(255,46,139,.06);color:var(--text);}
+.side-tab.active{background:rgba(255,46,139,.1);color:var(--red2);}
+.side-tab.active::before{content:'';position:absolute;}
+.sidebar-foot{padding:10px 8px;border-top:1px solid var(--border);}
+.main-col{flex:1;margin-left:208px;display:flex;flex-direction:column;min-width:0;}
+.header{background:rgba(5,6,10,.9);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:flex-end;height:54px;position:sticky;top:0;z-index:200;backdrop-filter:blur(10px);}
+.logo{font-family:var(--disp);font-weight:900;font-size:19px;letter-spacing:4px;background:linear-gradient(135deg,#ff2e8b,#b160ff,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 8px rgba(255,46,139,.35));line-height:1;}
+.logo-sub{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;line-height:1;margin-top:3px;display:block;}
 .hud{display:flex;gap:6px;align-items:center;}
 .hud-pill{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;text-align:center;min-width:64px;transition:border-color .2s;cursor:default;}
 .hud-pill:hover{border-color:var(--border2);}
@@ -85,7 +97,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .val-cash{color:var(--amber2);}
 .val-level{color:var(--steel);}
 .val-wins{color:var(--green2);}
-.hud-avatar{width:32px;height:32px;border-radius:50%;background:var(--red3);border:1px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:13px;color:var(--red2);cursor:pointer;position:relative;transition:all .15s;}
+.hud-avatar{width:32px;height:32px;border-radius:50%;background:var(--red3);border:1px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:13px;color:var(--red2);cursor:pointer;position:relative;transition:all .15s;margin-left:4px;}
 .hud-avatar:hover{box-shadow:var(--glow-red);}
 .hud-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r2);min-width:200px;z-index:300;display:none;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.6);}
 .hud-menu.open{display:block;}
@@ -94,11 +106,16 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .hud-menu-item:hover{background:var(--panel3);}
 .hud-menu-item.danger{color:#ff7a9e;}
 .hud-menu-divider{height:1px;background:var(--border);margin:4px 0;}
-.nav{background:rgba(5,6,10,.96);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 12px;gap:2px;}
-.nav-tab{padding:12px 16px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0;background:none;border-left:none;border-right:none;border-top:none;}
-.nav-tab:hover{color:var(--steel2);}
-.nav-tab.active{color:var(--red2);border-bottom-color:var(--red);}
-.main{padding:20px;max-width:1380px;margin:0 auto;}
+.main{padding:22px 26px 40px;max-width:1320px;}
+@media(max-width:860px){
+  .sidebar{width:100%;height:auto;position:fixed;top:0;bottom:auto;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;align-items:center;}
+  .sidebar-brand{border-bottom:none;padding:10px 12px;}
+  .sidebar-nav{flex-direction:row;overflow-x:auto;overflow-y:visible;padding:6px 8px;flex:1;}
+  .side-tab{flex-shrink:0;padding:8px 10px;}
+  .side-tab span.side-label{display:none;}
+  .sidebar-foot{display:none;}
+  .main-col{margin-left:0;margin-top:58px;}
+}
 .section{display:none;}
 .section.active{display:block;}
 .sec-head{margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
@@ -186,18 +203,20 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .bid-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
 .bid-row:last-child{border-bottom:none;}
 .bid-amount{font-family:var(--mono);color:var(--amber2);}
-.race-events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:24px;}
+.race-events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:24px;grid-auto-flow:dense;}
 .race-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.race-card.elite{grid-column:span 2;}
+@media(max-width:640px){.race-card.elite{grid-column:span 1;}}
 .race-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;pointer-events:none;}
-.race-card.easy::before{background:radial-gradient(ellipse at 0% 100%,rgba(37,128,53,.08),transparent 70%);}
-.race-card.medium::before{background:radial-gradient(ellipse at 0% 100%,rgba(255,122,61,.08),transparent 70%);}
-.race-card.hard::before{background:radial-gradient(ellipse at 0% 100%,rgba(255,46,139,.08),transparent 70%);}
-.race-card.elite::before{background:radial-gradient(ellipse at 0% 100%,rgba(138,43,232,.1),transparent 70%);}
+.race-card.easy::before{background:radial-gradient(ellipse at 0% 100%,rgba(37,128,53,.07),transparent 70%);}
+.race-card.medium::before{background:radial-gradient(ellipse at 0% 100%,rgba(255,122,61,.07),transparent 70%);}
+.race-card.hard::before{background:radial-gradient(ellipse at 0% 100%,rgba(255,46,139,.07),transparent 70%);}
+.race-card.elite::before{background:radial-gradient(ellipse at 0% 100%,rgba(138,43,232,.09),transparent 70%);}
 .race-card:hover::before{opacity:1;}
-.race-card:hover{transform:translateY(-3px);}
+.race-card:hover{transform:translateY(-2px);}
 .race-card.easy:hover{border-color:rgba(37,128,53,.4);}
 .race-card.medium:hover{border-color:rgba(255,122,61,.4);}
-.race-card.hard:hover{border-color:rgba(255,46,139,.45);}
+.race-card.hard:hover{border-color:rgba(255,46,139,.4);}
 .race-card.elite:hover{border-color:rgba(138,43,232,.4);}
 .diff-pip{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 8px;border-radius:3px;text-transform:uppercase;margin-bottom:10px;}
 .pip-easy{background:var(--green3);color:var(--green2);border:1px solid rgba(37,128,53,.3);}
@@ -404,11 +423,13 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <!-- AUTH -->
 <div id="auth-screen" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;">
   <div style="position:relative;z-index:2;width:100%;max-width:400px;padding:16px;">
-    <div style="background:rgba(10,11,20,.88);border:1px solid rgba(255,46,139,.32);border-radius:var(--r2);padding:36px;backdrop-filter:blur(24px);box-shadow:0 24px 64px rgba(0,0,0,.75);position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);"></div>
-      <div style="width:56px;height:56px;margin:0 auto 10px;border-radius:14px;background:linear-gradient(135deg,#ff2e8b,#b160ff);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 28px rgba(255,46,139,.45);">🏁</div>
-      <div style="font-family:var(--disp);font-weight:900;font-size:44px;letter-spacing:10px;text-align:center;margin-bottom:3px;background:linear-gradient(135deg,#ff2e8b,#b160ff,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 18px rgba(255,46,139,.45));">REDLINE</div>
-      <div style="text-align:center;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:22px;text-transform:uppercase;">Vice City Street Racing</div>
+    <div style="background:rgba(10,11,20,.88);border:1px solid rgba(255,46,139,.32);border-radius:var(--r2);padding:34px 32px;backdrop-filter:blur(24px);box-shadow:0 24px 64px rgba(0,0,0,.75);position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:24px;width:120px;height:2px;background:linear-gradient(90deg,var(--red),var(--amber));"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <div style="width:42px;height:42px;flex-shrink:0;border-radius:10px;background:linear-gradient(135deg,#ff2e8b,#b160ff);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 0 22px rgba(255,46,139,.4);transform:rotate(-4deg);">🏁</div>
+        <div style="font-family:var(--disp);font-weight:900;font-size:32px;letter-spacing:6px;background:linear-gradient(135deg,#ff2e8b,#b160ff,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 14px rgba(255,46,139,.4));">REDLINE</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:24px;text-transform:uppercase;padding-left:54px;">Vice City Street Racing</div>
       <div style="display:flex;margin-bottom:20px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r);padding:3px;gap:3px;">
         <button class="auth-tab active" onclick="switchAuthTab('login',this)" style="flex:1;padding:9px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .18s;border:none;">Sign In</button>
         <button class="auth-tab" onclick="switchAuthTab('signup',this)" style="flex:1;padding:9px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .18s;border:none;">Register</button>
@@ -444,53 +465,56 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 
 <!-- GAME -->
 <div id="game" style="display:none;min-height:100vh;position:relative;z-index:1;">
-  <header class="header">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#ff2e8b,#b160ff);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 16px rgba(255,46,139,.4);flex-shrink:0">🏁</div>
-      <div><div class="logo">REDLINE</div><span class="logo-sub">Vice City Street Racing</span></div>
-    </div>
-    <div class="hud">
-      <div class="hud-pill" onclick="showTab('profile')" style="cursor:pointer"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
-      <div class="hud-pill" onclick="openHeatModal()" style="cursor:pointer" id="hud-heat-pill"><div class="lbl">Heat</div><div class="val" id="hud-heat">🚨 0</div></div>
-      <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
-      <div class="hud-pill"><div class="lbl">Wins</div><div class="val val-wins"><span id="hud-wins">0</span></div></div>
-      <div class="hud-pill" style="display:none" id="hud-car-pill"><div class="lbl">Ride</div><div class="val" style="font-size:18px" id="hud-car-emoji">🚗</div></div>
-      <div class="hud-avatar" id="avatar-btn" onclick="toggleHudMenu()">
-        <span id="avatar-init">R</span>
-        <div class="hud-menu" id="hud-menu">
-          <div class="hud-menu-top"><div style="font-size:13px;font-weight:700;font-family:var(--disp);letter-spacing:1px;color:var(--steel)" id="menu-username">Driver</div><div id="menu-role" style="margin-top:5px"></div></div>
-          <div class="hud-menu-item" onclick="showTab('profile')">👤 Profile</div>
-          <div class="hud-menu-item" onclick="showTab('leaderboard')">🏆 Leaderboard</div>
-          <div class="hud-menu-item" onclick="showTab('challenges')">🎯 Challenges</div>
-          <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
-          <div class="hud-menu-divider"></div>
-          <div class="hud-menu-item" id="admin-menu-link" style="display:none" onclick="showTab('admin')">🛡️ Admin Panel</div>
-          <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
-        </div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-mark">🏁</div>
+        <div><div class="logo">REDLINE</div><span class="logo-sub">Vice City Racing</span></div>
       </div>
-    </div>
-  </header>
-  <div id="event-banner" style="display:none;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:linear-gradient(90deg,rgba(255,46,139,.18),rgba(0,229,255,.18));border-bottom:1px solid var(--border2);font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--steel2);">
-    <span style="font-size:16px">🎉</span><span id="event-banner-text">Event active!</span>
-  </div>
-  <nav class="nav">
-    <button class="nav-tab active" onclick="showTab('garage',this)">🏠 Garage</button>
-    <button class="nav-tab" onclick="showTab('market',this)">🏪 Market</button>
-    <button class="nav-tab" onclick="showTab('auction',this)">🔨 Auction</button>
-    <button class="nav-tab" onclick="showTab('race',this)">🏁 Race</button>
-    <button class="nav-tab" onclick="showTab('challenges',this)">🎯 Goals</button>
-    <button class="nav-tab" onclick="showTab('leaderboard',this)">🏆 Board</button>
-    <button class="nav-tab" onclick="showTab('profile',this)">👤 Profile</button>
-    <button class="nav-tab" id="admin-nav-tab" style="display:none" onclick="showTab('admin',this)">🛡️ Admin</button>
-  </nav>
-  <main class="main">
-    <!-- GARAGE -->
-    <div class="section active" id="tab-garage">
-      <div class="sec-head"><div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div style="display:flex;gap:8px"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
-      <div class="garage-layout">
-        <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
-        <div id="garage-sidebar" style="display:none">
-          <div class="panel" style="margin-bottom:12px">
+      <nav class="sidebar-nav">
+        <button class="side-tab active" onclick="showTab('garage',this)"><span class="side-ico">🏠</span><span class="side-label">Garage</span></button>
+        <button class="side-tab" onclick="showTab('market',this)"><span class="side-ico">🏪</span><span class="side-label">Market</span></button>
+        <button class="side-tab" onclick="showTab('auction',this)"><span class="side-ico">🔨</span><span class="side-label">Auction</span></button>
+        <button class="side-tab" onclick="showTab('race',this)"><span class="side-ico">🏁</span><span class="side-label">Race</span></button>
+        <button class="side-tab" onclick="showTab('challenges',this)"><span class="side-ico">🎯</span><span class="side-label">Goals</span></button>
+        <button class="side-tab" onclick="showTab('leaderboard',this)"><span class="side-ico">🏆</span><span class="side-label">Board</span></button>
+        <button class="side-tab" onclick="showTab('profile',this)"><span class="side-ico">👤</span><span class="side-label">Profile</span></button>
+        <button class="side-tab" id="admin-nav-tab" style="display:none" onclick="showTab('admin',this)"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <button class="side-tab" onclick="doLogout()" style="color:#ff7a9e"><span class="side-ico">⏻</span><span class="side-label">Sign Out</span></button>
+      </div>
+    </aside>
+    <div class="main-col">
+      <header class="header">
+        <div class="hud">
+          <div class="hud-pill" onclick="showTab('profile')" style="cursor:pointer"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
+          <div class="hud-pill" onclick="openHeatModal()" style="cursor:pointer" id="hud-heat-pill"><div class="lbl">Heat</div><div class="val" id="hud-heat">🚨 0</div></div>
+          <div class="hud-pill"><div class="lbl">Level</div><div class="val val-level"><span id="hud-level">1</span></div></div>
+          <div class="hud-pill"><div class="lbl">Wins</div><div class="val val-wins"><span id="hud-wins">0</span></div></div>
+          <div class="hud-pill" style="display:none" id="hud-car-pill"><div class="lbl">Ride</div><div class="val" style="font-size:18px" id="hud-car-emoji">🚗</div></div>
+          <div class="hud-avatar" id="avatar-btn" onclick="toggleHudMenu()">
+            <span id="avatar-init">R</span>
+            <div class="hud-menu" id="hud-menu">
+              <div class="hud-menu-top"><div style="font-size:13px;font-weight:700;font-family:var(--disp);letter-spacing:1px;color:var(--steel)" id="menu-username">Driver</div><div id="menu-role" style="margin-top:5px"></div></div>
+              <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
+              <div class="hud-menu-divider"></div>
+              <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div id="event-banner" style="display:none;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:linear-gradient(90deg,rgba(255,46,139,.18),rgba(0,229,255,.18));border-bottom:1px solid var(--border2);font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--steel2);">
+        <span style="font-size:16px">🎉</span><span id="event-banner-text">Event active!</span>
+      </div>
+      <main class="main">
+        <!-- GARAGE -->
+        <div class="section active" id="tab-garage">
+          <div class="sec-head"><div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div style="display:flex;gap:8px"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
+          <div class="garage-layout">
+            <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
+            <div id="garage-sidebar" style="display:none">
+              <div class="panel" style="margin-bottom:12px">
             <div class="panel-hd"><h3 id="sb-name">Car</h3><span id="sb-rarity" class="badge"></span></div>
             <div style="text-align:center;font-size:64px;margin:14px 0;filter:drop-shadow(0 0 12px rgba(255,46,139,.3))" id="sb-emoji">🚗</div>
             <div id="sb-stats"></div>
@@ -634,7 +658,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
       </div>
     </div>
-  </main>
+      </main>
+    </div>
+  </div>
 </div>
 
 <!-- NPC FEED -->
@@ -1020,8 +1046,7 @@ function renderHUD(){
     if(ch){ch.style.display='';document.getElementById('active-car-chip-name').textContent=active.car_name||'';}
   }
   const isAdm=['admin','owner'].includes(profile.role);
-  document.getElementById('admin-nav-tab').style.display=isAdm?'':'none';
-  document.getElementById('admin-menu-link').style.display=isAdm?'':'none';
+  const adminTab=document.getElementById('admin-nav-tab');if(adminTab)adminTab.style.display=isAdm?'':'none';
   const av=document.getElementById('avatar-btn');
   if(profile.role==='owner')av.style.border='2px solid var(--purple2)';
   else if(profile.role==='admin')av.style.border='2px solid var(--red2)';
@@ -1060,9 +1085,10 @@ async function layLow(cost){
 // ═══ NAV ═══
 function showTab(t,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.side-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+t)?.classList.add('active');
   if(el)el.classList.add('active');
+  else document.querySelector(`.side-tab[onclick*="showTab('${t}'"]`)?.classList.add('active');
   document.getElementById('hud-menu')?.classList.remove('open');
   if(t==='garage')renderPlayerCars();
   if(t==='market'){loadMarketPrices().then(renderMarket);runMarketTick();}
@@ -1710,20 +1736,30 @@ async function checkAchievements(){
 
 // ═══ LEADERBOARD ═══
 async function loadLeaderboard(){
-  const safeGet=q=>q.get().catch(()=>({docs:[]}));
+  const safeGet=async(q,label)=>{
+    try{return await q.get();}
+    catch(e){console.error('Leaderboard query failed ['+label+']:',e.message);return {docs:[],_error:e.message};}
+  };
   const [wSnap,cSnap,sSnap,gSnap]=await Promise.all([
-    safeGet(db.collection('profiles').orderBy('wins','desc').limit(10)),
-    safeGet(db.collection('profiles').orderBy('cash','desc').limit(10)),
-    safeGet(db.collection('profiles').orderBy('best_win_streak','desc').limit(10)),
-    safeGet(db.collection('profiles').orderBy('car_count','desc').limit(10))
+    safeGet(db.collection('profiles').orderBy('wins','desc').limit(10),'wins'),
+    safeGet(db.collection('profiles').orderBy('cash','desc').limit(10),'cash'),
+    safeGet(db.collection('profiles').orderBy('best_win_streak','desc').limit(10),'streak'),
+    safeGet(db.collection('profiles').orderBy('car_count','desc').limit(10),'cars')
   ]);
-  const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${d.is_npc?'<span style="font-size:9px;color:var(--text3)"> 🤖</span>':''}${d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
-  document.getElementById('lb-wins').innerHTML=wSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().wins||0)+' W')).join('');
-  document.getElementById('lb-cash').innerHTML=cSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,'$'+fmtCash(d.data().cash))).join('');
-  document.getElementById('lb-streak').innerHTML=sSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().best_win_streak||0)+' 🔥')).join('');
+  const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${d.is_npc?'<span style="font-size:9px;color:var(--text3)"> 🤖</span>':''}${currentUser&&d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
+  const emptyRow=msg=>`<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:14px">${msg}</td></tr>`;
+  const fill=(elId,snap,getVal)=>{
+    const el=document.getElementById(elId);if(!el)return;
+    if(snap._error){el.innerHTML=emptyRow('⚠ Couldn\'t load — '+snap._error);return;}
+    if(!snap.docs.length){el.innerHTML=emptyRow('No data yet');return;}
+    el.innerHTML=snap.docs.map((d,i)=>row({...d.data(),id:d.id},i,getVal(d.data()))).join('');
+  };
+  fill('lb-wins',wSnap,d=>(d.wins||0)+' W');
+  fill('lb-cash',cSnap,d=>'$'+fmtCash(d.cash));
+  fill('lb-streak',sSnap,d=>(d.best_win_streak||0)+' 🔥');
   // Uses cached car_count field on profile docs (kept in sync on buy/sell) instead of
   // reading the entire player_cars collection — avoids unbounded reads as the game grows
-  document.getElementById('lb-garage').innerHTML=gSnap.docs.length?gSnap.docs.map((d,i)=>row({...d.data(),id:d.id},i,(d.data().car_count||0)+' cars')).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:10px">No data yet</td></tr>';
+  fill('lb-garage',gSnap,d=>(d.car_count||0)+' cars');
 }
 
 // ═══ PROFILE — fixed: no continuous load ═══
