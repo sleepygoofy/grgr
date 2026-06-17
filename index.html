@@ -27,6 +27,7 @@
   --glow-cyan:0 0 18px rgba(0,229,255,.4);
 }
 body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;}
+.openmoji-img{height:1.18em;width:1.18em;vertical-align:-0.22em;display:inline-block;object-fit:contain;}
 button{font-family:var(--body);cursor:pointer;}
 input,select,textarea{font-family:var(--body);}
 ::-webkit-scrollbar{width:4px;height:4px;}
@@ -399,6 +400,15 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .toast.t-success{border-color:rgba(37,128,53,.5);color:var(--green2);}
 .toast.t-error{border-color:rgba(255,46,139,.5);color:var(--red2);}
 .toast.t-info{border-color:var(--border2);color:var(--steel2);}
+.broadcast-banner{position:fixed;top:14px;left:50%;transform:translate(-50%,-30px);z-index:9500;display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(12,10,30,.97);border:1px solid var(--border2);border-radius:var(--r2);box-shadow:0 12px 40px rgba(0,0,0,.6);backdrop-filter:blur(14px);max-width:min(560px,calc(100vw - 32px));opacity:0;transition:all .35s cubic-bezier(.2,.7,.3,1);font-family:var(--body);font-size:13px;}
+.broadcast-banner.show{transform:translate(-50%,0);opacity:1;}
+.broadcast-banner.t-success{border-color:rgba(37,128,53,.5);}
+.broadcast-banner.t-error{border-color:rgba(255,46,139,.55);}
+.broadcast-ico{font-size:16px;flex-shrink:0;}
+.broadcast-text{font-weight:600;color:var(--text);}
+.broadcast-from{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
+.broadcast-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 0 0 4px;flex-shrink:0;}
+.broadcast-close:hover{color:var(--text);}
 .rt-dot{width:6px;height:6px;border-radius:50%;background:var(--red2);display:inline-block;margin-right:5px;animation:rtPulse 2s infinite;}
 @keyframes rtPulse{0%,100%{opacity:1;}50%{opacity:.2;}}
 .xp-pop{position:fixed;top:70px;right:20px;z-index:8000;font-family:var(--disp);font-size:16px;font-weight:700;color:var(--amber2);pointer-events:none;animation:xpFloat 2s ease forwards;text-shadow:var(--glow-amber);}
@@ -897,6 +907,7 @@ auth.onAuthStateChanged(async user=>{
     clearInterval(window._mktTick);clearInterval(window._auctTick);clearInterval(window._cdTick);
     clearInterval(window._npcTick);clearInterval(window._npcSpawn);clearInterval(window._npcChatTick);
     chatUnsub=null;chatOpen=false;chatUnread=0;
+    broadcastUnsub=null;
     document.getElementById('chat-panel')?.classList.remove('open');
   }
 });
@@ -906,12 +917,77 @@ async function initGame(){
   await Promise.all([loadProfile(),ensureMarketSeeded(),loadActiveEvent()]);
   await Promise.all([loadPlayerCars(),loadMarketPrices()]);
   renderHUD();renderRaceEvents();renderPlayerCars();showActiveEventBanner();
-  setupAuctionListener();startMarketTicker();setupChatListener();
+  setupAuctionListener();startMarketTicker();setupChatListener();setupBroadcastListener();
   // Daily bonus - check server-side to prevent exploit
   checkDailyBonus();
   startNPCEngine();startNPCChat();
   checkAchievements();
   logActivity('login',{}).catch(()=>{});
+  startOpenMojiSwap();
+}
+// ═══ OPENMOJI — swaps native OS emoji for OpenMoji (openmoji.org) graphics everywhere in the UI,
+// including content rendered later (toasts, race results, admin tables, chat, NPC messages, etc.) ═══
+const OPENMOJI_CDN='https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/svg/';
+// Matches emoji sequences including variation selectors (️), ZWJ sequences, and two-codepoint flags
+const OPENMOJI_REGEX=/(\p{Regional_Indicator}{2})|(\p{Emoji_Presentation}|\p{Extended_Pictographic})(\uFE0F|\u200D(\p{Emoji_Presentation}|\p{Extended_Pictographic}))*/gu;
+function emojiToCodepoints(str){
+  // OpenMoji filenames are uppercase hex codepoints joined by '-', with the U+FE0F variation
+  // selector stripped (OpenMoji doesn't ship separate text/emoji-presentation variants)
+  const cps=[...str].map(ch=>ch.codePointAt(0)).filter(cp=>cp!==0xFE0F);
+  return cps.map(cp=>cp.toString(16).toUpperCase().padStart(4,'0')).join('-');
+}
+function swapEmojiInTextNode(node){
+  const text=node.nodeValue;
+  if(!OPENMOJI_REGEX.test(text))return;
+  OPENMOJI_REGEX.lastIndex=0;
+  const frag=document.createDocumentFragment();
+  let lastIndex=0,m;
+  while((m=OPENMOJI_REGEX.exec(text))){
+    if(m.index>lastIndex)frag.appendChild(document.createTextNode(text.slice(lastIndex,m.index)));
+    const code=emojiToCodepoints(m[0]);
+    const img=document.createElement('img');
+    img.src=OPENMOJI_CDN+code+'.svg';
+    img.alt=m[0];
+    img.className='openmoji-img';
+    img.loading='lazy';
+    // If a given sequence has no matching OpenMoji asset, fall back to the original character instead of a broken image icon
+    img.onerror=function(){this.replaceWith(document.createTextNode(m[0]));};
+    frag.appendChild(img);
+    lastIndex=OPENMOJI_REGEX.lastIndex;
+  }
+  if(lastIndex<text.length)frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+  node.replaceWith(frag);
+}
+function swapEmojiInSubtree(root){
+  // Skip inputs/textareas/scripts/styles — only convert visible rendered text
+  const SKIP_TAGS=new Set(['SCRIPT','STYLE','TEXTAREA','INPUT']);
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+    acceptNode(n){return SKIP_TAGS.has(n.parentElement?.tagName)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}
+  });
+  const nodes=[];
+  let n;while((n=walker.nextNode()))nodes.push(n);
+  nodes.forEach(swapEmojiInTextNode);
+}
+function startOpenMojiSwap(){
+  const root=document.getElementById('game');
+  if(!root)return;
+  if(window._openmojiObserver)window._openmojiObserver.disconnect();
+  swapEmojiInSubtree(root);
+  // Watch for all future re-renders (toasts, race results, admin panels, chat, NPC messages, etc.)
+  // and convert any newly-added emoji automatically, without needing to touch every render function.
+  const observer=new MutationObserver(mutations=>{
+    mutations.forEach(mut=>{
+      mut.addedNodes.forEach(added=>{
+        if(added.nodeType===Node.TEXT_NODE){
+          if(added.parentElement&&!['SCRIPT','STYLE','TEXTAREA','INPUT'].includes(added.parentElement.tagName))swapEmojiInTextNode(added);
+        }else if(added.nodeType===Node.ELEMENT_NODE){
+          swapEmojiInSubtree(added);
+        }
+      });
+    });
+  });
+  observer.observe(root,{childList:true,subtree:true});
+  window._openmojiObserver=observer;
 }
 async function loadActiveEvent(){
   try{
@@ -1768,6 +1844,7 @@ function evadeInput(dir){
   evadeCurrentDir=null;
   evadeAdvance(hit);
 }
+function setArenaBadge(type,text){const el=document.getElementById('arena-badge');if(el){el.textContent=text;el.className='arena-badge '+type;}}
 function resetArena(){document.getElementById('race-arena').style.display='none';document.getElementById('race-result').style.display='none';document.getElementById('scoreboard').style.display='none';document.getElementById('launch-gauge').style.display='none';document.getElementById('mash-meter').style.display='none';}
 // Stubs for the HTML onclick attributes — actual handling is wired dynamically per-race via btn.onclick inside runLaunchPhase/runMashPhase
 function hitLaunchGas(){}
@@ -1877,17 +1954,26 @@ async function renderProfile(){
   raceHistLoaded=true;
   document.getElementById('race-hist').innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
   try{
-    const rSnap=await db.collection('races').where('player_id','==',currentUser.uid).orderBy('created_at','desc').limit(10).get();
-    document.getElementById('race-hist').innerHTML=rSnap.empty?'<div class="empty">No races yet!</div>':rSnap.docs.map(d=>{
-      const r=d.data(),w=r.result==='win';
+    // Avoid combining where()+orderBy() on different fields — that needs a Firestore composite
+    // index which may not exist yet. Fetch by player_id only and sort client-side instead.
+    const rSnap=await db.collection('races').where('player_id','==',currentUser.uid).limit(50).get();
+    const races=rSnap.docs.map(d=>d.data()).sort((a,b)=>{
+      const ta=a.created_at?.toDate?.()?.getTime()||0,tb=b.created_at?.toDate?.()?.getTime()||0;
+      return tb-ta;
+    }).slice(0,10);
+    document.getElementById('race-hist').innerHTML=races.length?races.map(r=>{
+      const w=r.result==='win';
       return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);align-items:center">
         <div><div style="font-weight:700;font-family:var(--disp);letter-spacing:.5px;font-size:13px">${r.race_type||'?'} <span style="font-size:10px;color:var(--text3);font-weight:400">· ${r.difficulty||''}</span></div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">${r.car_name||''}</div></div>
         <div style="text-align:right"><div style="color:${w?'var(--green2)':'var(--red2)'};font-weight:700;font-family:var(--disp);font-size:13px">${w?'WIN':'LOSS'}</div>
         ${w?`<div style="font-family:var(--mono);font-size:10px;color:var(--amber2)">+$${fmtCash(r.reward)}</div>`:''}</div>
       </div>`;
-    }).join('');
-  }catch(e){document.getElementById('race-hist').innerHTML='<div class="empty">Error loading races.</div>';}
+    }).join(''):'<div class="empty">No races yet!</div>';
+  }catch(e){
+    console.error('Race history failed:',e.message);
+    document.getElementById('race-hist').innerHTML=`<div class="empty">⚠ Couldn't load race history — ${e.message}</div>`;
+  }
 }
 
 // ═══ NPC ENGINE — throttled to stay within Firestore free-tier quota ═══
@@ -2081,6 +2167,32 @@ function setupChatListener(){
     }
   },err=>console.warn('Chat listener:',err.message));
   auctUnsubs.push(chatUnsub);
+}
+// ═══ BROADCAST — real-time delivery so every connected player actually sees admin announcements ═══
+let broadcastUnsub=null,broadcastSeenAt=Date.now();
+function setupBroadcastListener(){
+  if(broadcastUnsub)broadcastUnsub();
+  broadcastSeenAt=Date.now(); // only toast broadcasts sent AFTER this client connects, not old history
+  broadcastUnsub=db.collection('broadcasts').orderBy('created_at','desc').limit(5).onSnapshot(snap=>{
+    snap.docs.forEach(d=>{
+      const b=d.data();
+      const t=b.created_at?.toDate?.()?.getTime();
+      if(!t||t<=broadcastSeenAt)return; // skip anything from before this session started, or already shown
+      broadcastSeenAt=t;
+      showBroadcastBanner(b.message,b.type||'t-info',b.sender);
+    });
+  },err=>console.warn('Broadcast listener:',err.message));
+  auctUnsubs.push(broadcastUnsub);
+}
+function showBroadcastBanner(msg,type,sender){
+  // A toast alone is easy to miss — broadcasts get a bigger, dismissable banner plus the toast
+  const wrap=document.createElement('div');
+  wrap.className='broadcast-banner '+(type||'t-info');
+  wrap.innerHTML=`<span class="broadcast-ico">📢</span><span class="broadcast-text">${escapeHtml(msg)}</span><span class="broadcast-from">— ${escapeHtml(sender||'Admin')}</span><button class="broadcast-close" onclick="this.parentElement.remove()">✕</button>`;
+  document.body.appendChild(wrap);
+  requestAnimationFrame(()=>wrap.classList.add('show'));
+  setTimeout(()=>{wrap.classList.remove('show');setTimeout(()=>wrap.remove(),400);},9000);
+  toast(msg,type);
 }
 async function sendChatMsg(){
   const input=document.getElementById('chat-input');
@@ -2575,7 +2687,11 @@ async function sendBroadcast(){
   const msg=document.getElementById('bc-msg').value.trim(),type=document.getElementById('bc-type').value;
   if(!msg){toast('Enter a message','t-error');return;}
   await db.collection('broadcasts').add({message:msg,type,sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  toast(msg,type);logActivity('broadcast',{message:msg}).catch(()=>{});toast('Broadcast sent!','t-success');loadAdminSec('broadcast');
+  // The real-time listener (setupBroadcastListener) will pop the banner for every connected player,
+  // including this admin — no need to toast it manually here, that would double it up.
+  logActivity('broadcast',{message:msg}).catch(()=>{});
+  document.getElementById('bc-msg').value='';
+  loadAdminSec('broadcast');
 }
 async function adminSettings(el){
   const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
