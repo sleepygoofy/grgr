@@ -482,6 +482,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <button class="side-tab" id="admin-nav-tab" style="display:none" onclick="showTab('admin',this)"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></button>
       </nav>
       <div class="sidebar-foot">
+        <a href="#" id="discord-link" target="_blank" rel="noopener" class="side-tab" style="text-decoration:none;display:none"><span class="side-ico">💬</span><span class="side-label">Discord</span></a>
         <button class="side-tab" onclick="doLogout()" style="color:#ff7a9e"><span class="side-ico">⏻</span><span class="side-label">Sign Out</span></button>
       </div>
     </aside>
@@ -651,6 +652,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
           <div class="admin-nav-item" onclick="adminSec('auctions',this)">🔨 Auctions</div>
           <div class="admin-nav-item" onclick="adminSec('economy',this)">💰 Economy</div>
           <div class="admin-nav-item" onclick="adminSec('races',this)">🏁 Races</div>
+          <div class="admin-nav-item" onclick="adminSec('heat',this)">🚨 Heat Control</div>
           <div class="admin-nav-item" onclick="adminSec('events',this)">🎉 Events</div>
           <div class="admin-nav-item" onclick="adminSec('broadcast',this)">📢 Broadcast</div>
           <div class="admin-nav-item" onclick="adminSec('settings',this)">⚙ Settings</div>
@@ -686,6 +688,19 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <div class="modal-overlay" id="modal-car"><div class="modal"><button class="modal-close" onclick="closeModal('modal-car')">✕</button><div id="modal-car-body"></div></div></div>
 <div class="modal-overlay" id="modal-user"><div class="modal"><button class="modal-close" onclick="closeModal('modal-user')">✕</button><div class="modal-title" id="modal-user-title">Player</div><div id="modal-user-body"></div></div></div>
 <div class="modal-overlay" id="modal-heat"><div class="modal"><button class="modal-close" onclick="closeModal('modal-heat')">✕</button><div class="modal-title">🚨 Police Heat</div><div id="modal-heat-body"></div></div></div>
+<div class="modal-overlay" id="modal-evade"><div class="modal" style="text-align:center">
+  <div class="modal-title" style="color:var(--red2)">🚨 COPS ARE ON YOU!</div>
+  <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:18px">Tap the matching direction FAST to dodge — or eat the full hit.</div>
+  <div id="evade-round-display" style="font-size:56px;margin:10px 0;min-height:70px"></div>
+  <div id="evade-timer-bar" style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;border:1px solid var(--border2);margin-bottom:18px"><div id="evade-timer-fill" style="height:100%;width:100%;background:linear-gradient(90deg,var(--green2),var(--amber2),var(--red2));transition:width linear"></div></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+    <button class="btn-gas-mash" style="padding:14px 0;font-size:22px" onclick="evadeInput('left')">⬅️</button>
+    <button class="btn-gas-mash" style="padding:14px 0;font-size:22px" onclick="evadeInput('up')">⬆️</button>
+    <button class="btn-gas-mash" style="padding:14px 0;font-size:22px" onclick="evadeInput('down')">⬇️</button>
+    <button class="btn-gas-mash" style="padding:14px 0;font-size:22px" onclick="evadeInput('right')">➡️</button>
+  </div>
+  <div id="evade-progress" style="font-family:var(--mono);font-size:12px;color:var(--text2);letter-spacing:2px"></div>
+</div></div>
 <div class="toast" id="toast"></div>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDAPdNjRs8TkDymnNyYIdc3YpgtVbthvMc",authDomain:"redline-b4422.firebaseapp.com",projectId:"redline-b4422",storageBucket:"redline-b4422.firebasestorage.app",messagingSenderId:"725052073743",appId:"1:725052073743:web:c8ebd165a59f2fd9bbc07a"});
@@ -697,6 +712,7 @@ let selectedPCar=null,isRacing=false,raceHistLoaded=false,currentMktFilter='all'
 let currentBidAuction=null,currentSellPCar=null,currentUpgCat='engine',adminCurSec='overview';
 let auctUnsubs=[],npcAccounts=[];
 let activeEvent=null; // {type, multiplier, expires_at, label} loaded from settings/game
+let bustThreshold=70,bustMultiplier=1; // admin-tunable, cached from settings/game on login
 // Interactive racing state
 let launchActive=false,launchHit=false,launchQuality=0,launchAnimFrame=null;
 let mashActive=false,mashCount=0,mashTimerEnd=0;
@@ -818,7 +834,7 @@ function statsHTML(power,speed,accel,handling,braking,weight){
   .map(([l,w,c,v])=>`<div class="stat-row"><div class="stat-lbl">${l}</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${w}%;background:${c}"></div></div><div class="stat-val">${v}</div></div>`).join('');
 }
 document.addEventListener('click',e=>{
-  document.querySelectorAll('.modal-overlay.open').forEach(m=>{if(e.target===m)m.classList.remove('open');});
+  document.querySelectorAll('.modal-overlay.open').forEach(m=>{if(e.target===m&&m.id!=='modal-evade')m.classList.remove('open');});
   const ab=document.getElementById('avatar-btn');
   if(ab&&!ab.contains(e.target))document.getElementById('hud-menu')?.classList.remove('open');
 });
@@ -900,12 +916,19 @@ async function initGame(){
 async function loadActiveEvent(){
   try{
     const doc=await db.collection('settings').doc('game').get();
-    const ev=doc.exists?doc.data().active_event:null;
+    const data=doc.exists?doc.data():{};
+    const ev=data.active_event;
+    activeEvent=null;
     if(ev&&ev.expires_at){
       const exp=ev.expires_at?.toDate?.();
-      if(exp&&exp>new Date()){activeEvent=ev;return;}
+      if(exp&&exp>new Date())activeEvent=ev;
     }
-    activeEvent=null;
+    // Wire up Discord link if set by admin
+    const dEl=document.getElementById('discord-link');
+    if(dEl){if(data.discord_url){dEl.href=data.discord_url;dEl.style.display='';}else dEl.style.display='none';}
+    // Cache admin-tunable bust settings — avoids a per-race Firestore read
+    bustThreshold=typeof data.bust_threshold==='number'?data.bust_threshold:70;
+    bustMultiplier=typeof data.bust_multiplier==='number'?data.bust_multiplier:1;
   }catch(e){activeEvent=null;}
 }
 function showActiveEventBanner(){
@@ -1569,14 +1592,18 @@ async function startRace(rid){
   // ═══ HEAT SYSTEM — every street race draws police attention; harder races draw more ═══
   const heatGain={easy:4,medium:8,hard:14,elite:22}[r.diff]||6;
   let newHeat=Math.min(100,(profile.heat||0)+heatGain);
-  let bustOccurred=false,bustLoss=0;
+  let bustOccurred=false,bustLoss=0,evadeRes=null;
   // At high heat, there's a chance of getting busted right after the race — lose a cut of cash
-  if(newHeat>=70){
-    const bustChance=(newHeat-65)/100; // scales from ~5% at 70 heat up to 35% at 100 heat
+  if(newHeat>=bustThreshold){
+    const bustChance=Math.min(0.9,((newHeat-bustThreshold+5)/100)*bustMultiplier); // admin-tunable via Heat Control panel
     if(Math.random()<bustChance){
       bustOccurred=true;
-      bustLoss=Math.round((profile.cash+cashGain)*(0.08+Math.random()*0.12));
+      const rawLoss=Math.round((profile.cash+cashGain)*(0.08+Math.random()*0.12));
       newHeat=Math.max(30,newHeat-40); // getting busted also cools you off some
+      // Give the player a shot at evading — a quick reaction minigame that reduces the hit
+      evadeRes=await runEvadeMinigame();
+      bustLoss=Math.round(rawLoss*(1-evadeRes.reduction));
+      if(evadeRes.reduction>=0.99)newHeat=Math.max(20,newHeat-15); // a clean evade cools you off a bit more
     }
   }
   // Only update wins/stats and add prize if won (fee already deducted)
@@ -1592,7 +1619,7 @@ async function startRace(rid){
   await sleep(400);
   const rb=document.getElementById('race-result');rb.style.display='block';rb.className='result-box '+(won?'result-win':'result-lose');
   const perfLine=`<div class="result-detail" style="margin-top:6px">🎯 Launch: ${launchRes.label} · ⚡ Mash: ${mashRes.count} taps (${Math.round(mashRes.factor*100)}%)</div>`;
-  const heatLine=`<div class="result-detail" style="margin-top:4px">🚨 Heat: ${newHeat}/100${bustOccurred?` · <span style="color:var(--red2);font-weight:700">BUSTED — lost $${fmtCash(bustLoss)}!</span>`:''}</div>`;
+  const heatLine=`<div class="result-detail" style="margin-top:4px">🚨 Heat: ${newHeat}/100${bustOccurred?` · <span style="color:var(--red2);font-weight:700">BUSTED${evadeRes&&evadeRes.reduction>0?` — evaded ${Math.round(evadeRes.reduction*100)}% of the hit!`:''} — lost $${fmtCash(bustLoss)}!</span>`:''}</div>`;
   rb.innerHTML=won?`<div style="font-size:52px;margin-bottom:10px">🏆</div><div class="result-title">VICTORY${close?' (CLOSE)':''}</div>
     <div class="result-rewards">
       <div class="result-rew-item"><div class="result-rew-val" style="color:var(--green2)">+$${fmtCash(r.reward)}</div><div class="result-rew-lbl">Prize</div></div>
@@ -1688,7 +1715,59 @@ function runMashPhase(){
   });
 }
 
-function setArenaBadge(type,text){const el=document.getElementById('arena-badge');if(el){el.textContent=text;el.className='arena-badge '+type;}}
+// ═══ EVADE MINIGAME — triggered on a bust; quick reaction sequence reduces the cash hit ═══
+const EVADE_ARROWS={left:'⬅️',up:'⬆️',down:'⬇️',right:'➡️'};
+let evadeActive=false,evadeHits=0,evadeCurrentDir=null,evadeAdvance=null;
+function runEvadeMinigame(){
+  return new Promise(resolve=>{
+    const ROUNDS=4,ROUND_MS=950;
+    let roundIdx=0;
+    evadeActive=true;evadeHits=0;
+    const disp=document.getElementById('evade-round-display'),fill=document.getElementById('evade-timer-fill'),prog=document.getElementById('evade-progress');
+    openModal('modal-evade');
+    function finish(){
+      evadeActive=false;evadeAdvance=null;
+      closeModal('modal-evade');
+      // Reduction scales with hits: 0 hits = 0%, all 4 hits = 80% reduction (never fully free — still a street race)
+      const reduction=Math.min(0.8,(evadeHits/ROUNDS)*0.8);
+      resolve({reduction,hits:evadeHits,rounds:ROUNDS});
+    }
+    function nextRound(){
+      if(roundIdx>=ROUNDS){finish();return;}
+      const dirs=Object.keys(EVADE_ARROWS);
+      evadeCurrentDir=dirs[Math.floor(Math.random()*dirs.length)];
+      disp.textContent=EVADE_ARROWS[evadeCurrentDir];
+      disp.style.color='var(--text)';
+      prog.textContent='ROUND '+(roundIdx+1)+' / '+ROUNDS+'  ·  HITS: '+evadeHits;
+      fill.style.transition='none';fill.style.width='100%';
+      void fill.offsetWidth;
+      fill.style.transition=`width ${ROUND_MS}ms linear`;
+      fill.style.width='0%';
+      clearTimeout(window._evadeTimeout);
+      window._evadeTimeout=setTimeout(()=>{
+        if(!evadeActive)return;
+        disp.style.color='var(--red2)';
+        roundIdx++;
+        setTimeout(nextRound,260);
+      },ROUND_MS);
+    }
+    // evadeAdvance lets evadeInput() trigger the next round from outside this closure
+    evadeAdvance=(hit)=>{
+      clearTimeout(window._evadeTimeout);
+      if(hit)evadeHits++;
+      disp.style.color=hit?'var(--green2)':'var(--red2)';
+      roundIdx++;
+      setTimeout(nextRound,220);
+    };
+    nextRound();
+  });
+}
+function evadeInput(dir){
+  if(!evadeActive||!evadeCurrentDir||!evadeAdvance)return;
+  const hit=dir===evadeCurrentDir;
+  evadeCurrentDir=null;
+  evadeAdvance(hit);
+}
 function resetArena(){document.getElementById('race-arena').style.display='none';document.getElementById('race-result').style.display='none';document.getElementById('scoreboard').style.display='none';document.getElementById('launch-gauge').style.display='none';document.getElementById('mash-meter').style.display='none';}
 // Stubs for the HTML onclick attributes — actual handling is wired dynamically per-race via btn.onclick inside runLaunchPhase/runMashPhase
 function hitLaunchGas(){}
@@ -2042,7 +2121,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,events:adminEvents,broadcast:adminBroadcast,settings:adminSettings};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,settings:adminSettings};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -2181,6 +2260,7 @@ async function resetUser(uid,name){if(!confirm(`Reset ${name}'s stats? Cash kept
 async function viewUserDetail(uid,name){
   const [profDoc,carsSnap]=await Promise.all([db.collection('profiles').doc(uid).get(),db.collection('player_cars').where('player_id','==',uid).get()]);
   const u={...profDoc.data(),id:uid};
+  const isOwner=profile.role==='owner';
   document.getElementById('modal-user-title').textContent=u.username||name;
   document.getElementById('modal-user-body').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
@@ -2189,15 +2269,45 @@ async function viewUserDetail(uid,name){
       <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">W / L</div><div style="font-family:var(--disp);font-size:18px;color:var(--green2)">${u.wins||0}/<span style="color:var(--red2)">${u.losses||0}</span></div></div>
       <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">Cars</div><div style="font-family:var(--disp);font-size:18px;color:var(--amber2)">${carsSnap.size}</div></div>
     </div>
-    <div style="margin-bottom:12px">Role: ${roleBadge(u.role)} · Rep: ${u.reputation||0} · Streak: ${u.win_streak||0} · Daily: ${u.daily_streak||0} days</div>
+    <div style="margin-bottom:12px">Role: ${roleBadge(u.role)} · Rep: ${u.reputation||0} · Streak: ${u.win_streak||0} · Daily: ${u.daily_streak||0} days · Heat: <span style="color:${(u.heat||0)>=70?'var(--red2)':(u.heat||0)>=35?'var(--amber2)':'var(--green2)'}">${u.heat||0}/100</span></div>
     <div style="margin-bottom:12px"><strong style="font-family:var(--disp);font-size:12px;letter-spacing:1px;color:var(--steel2)">GARAGE</strong>
     <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${carsSnap.docs.map(d=>`<span style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:4px 8px;font-family:var(--mono);font-size:10px">${d.data().car_emoji||'🚗'} ${d.data().car_name}</span>`).join('')||'<span style="color:var(--text3);font-family:var(--mono);font-size:11px">No cars</span>'}</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:${isOwner?'14px':'0'}">
       <button class="btn btn-gold btn-sm" onclick="giveCash('${uid}','${u.username}')">+$ Cash</button>
       <button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(255,46,139,.2)" onclick="closeModal('modal-user');banUser('${uid}','${u.username}')">Ban</button>
       <button class="btn btn-sm btn-ghost" onclick="resetUser('${uid}','${u.username}')">Reset Stats</button>
-    </div>`;
+      ${(u.heat||0)>0?`<button class="btn btn-sm btn-ghost" onclick="resetPlayerHeat('${uid}','${u.username}');closeModal('modal-user')">Clear Heat</button>`:''}
+    </div>
+    ${isOwner?`
+    <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+      <strong style="font-family:var(--disp);font-size:12px;letter-spacing:1px;color:var(--purple2)">👑 DIRECT DATABASE EDIT (OWNER ONLY)</strong>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <div><label class="form-label">Cash</label><input class="admin-search" type="number" id="dbe-cash" value="${u.cash||0}"></div>
+        <div><label class="form-label">Level</label><input class="admin-search" type="number" id="dbe-level" value="${u.level||1}"></div>
+        <div><label class="form-label">XP</label><input class="admin-search" type="number" id="dbe-xp" value="${u.xp||0}"></div>
+        <div><label class="form-label">Heat</label><input class="admin-search" type="number" id="dbe-heat" value="${u.heat||0}" min="0" max="100"></div>
+        <div><label class="form-label">Wins</label><input class="admin-search" type="number" id="dbe-wins" value="${u.wins||0}"></div>
+        <div><label class="form-label">Losses</label><input class="admin-search" type="number" id="dbe-losses" value="${u.losses||0}"></div>
+      </div>
+      <button class="btn btn-purple btn-sm" style="width:100%;margin-top:10px" onclick="saveDirectEdit('${uid}','${u.username}')">💾 Save All Fields</button>
+    </div>`:''}`;
   openModal('modal-user');
+}
+async function saveDirectEdit(uid,name){
+  const fields={
+    cash:parseInt(document.getElementById('dbe-cash').value),
+    level:parseInt(document.getElementById('dbe-level').value),
+    xp:parseInt(document.getElementById('dbe-xp').value),
+    heat:Math.max(0,Math.min(100,parseInt(document.getElementById('dbe-heat').value)||0)),
+    wins:parseInt(document.getElementById('dbe-wins').value),
+    losses:parseInt(document.getElementById('dbe-losses').value),
+  };
+  for(const[k,v]of Object.entries(fields)){if(isNaN(v)){toast(`Invalid value for ${k}`,'t-error');return;}}
+  fields.heat_updated_at=firebase.firestore.Timestamp.now();
+  await db.collection('profiles').doc(uid).update(fields);
+  toast(`${name}'s data updated directly`,'t-success');
+  logActivity('owner_direct_edit',{target:name,fields}).catch(()=>{});
+  closeModal('modal-user');
 }
 async function adminNPCs(el){
   const snap=await db.collection('profiles').where('is_npc','==',true).get();
@@ -2321,6 +2431,135 @@ async function adminRaces(el){
     <table class="admin-table"><thead><tr><th>Player</th><th>Event</th><th>Result</th><th>Reward</th><th>Time</th></tr></thead>
     <tbody>${recent.map(d=>{const r=d.data(),w=r.result==='win';return `<tr><td><strong>${r.player_username||'?'}</strong></td><td>${r.race_type||'?'} <span style="color:var(--text3);font-size:10px">· ${r.difficulty}</span></td><td><span class="badge ${w?'badge-green':'badge-red'}">${r.result||'?'}</span></td><td style="font-family:var(--mono);color:var(--amber2)">${r.reward>0?'$'+fmtCash(r.reward):'—'}</td><td style="font-family:var(--mono);font-size:9px;color:var(--text3)">${timeAgo(r.created_at?.toDate?.())}</td></tr>`;}).join('')}</tbody></table>`;
 }
+async function adminHeat(el){
+  const snap=await db.collection('profiles').orderBy('heat','desc').limit(50).get().catch(()=>({docs:[]}));
+  const players=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>!u.is_npc);
+  const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
+  const sett=settDoc?.exists?settDoc.data():{};
+  const hot=players.filter(p=>(p.heat||0)>=70).length;
+  el.innerHTML=`
+    <div class="admin-stat-grid" style="margin-bottom:14px">
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2)">${hot}</div><div class="admin-stat-lbl">Players Wanted (70+)</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--steel2)">${players.length}</div><div class="admin-stat-lbl">With Any Heat</div></div>
+    </div>
+    <div class="panel" style="margin-bottom:14px">
+      <h3>⚙ Bust Formula Tuning</h3>
+      <div style="font-size:11px;color:var(--text2);margin:6px 0 14px">Controls when busts can start happening and how aggressive they scale. Changes apply to all players on their next login.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div><label class="form-label">Bust Threshold (heat needed)</label><input class="admin-search" type="number" id="set-bust-threshold" value="${sett.bust_threshold??70}" min="10" max="100"></div>
+        <div><label class="form-label">Bust Multiplier</label><input class="admin-search" type="number" id="set-bust-mult" value="${sett.bust_multiplier??1}" min="0" max="5" step="0.1"></div>
+      </div>
+      <button class="btn btn-gold" onclick="saveBustTuning()">Save Tuning</button>
+    </div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0">🚨 Players by Heat</h3>
+        <button class="btn btn-sm btn-ghost" onclick="resetAllHeat()">Reset All Heat</button>
+      </div>
+      <table class="admin-table"><thead><tr><th>Player</th><th>Heat</th><th>Status</th><th></th></tr></thead>
+      <tbody>${players.length?players.map(p=>{
+        const h=p.heat||0,color=h>=70?'var(--red2)':h>=35?'var(--amber2)':'var(--green2)';
+        return `<tr><td><strong>${p.username||'?'}</strong></td>
+          <td style="font-family:var(--mono);color:${color}">${h}/100</td>
+          <td><span class="badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${h>=70?'WANTED':h>=35?'ON RADAR':'CLEAN'}</span></td>
+          <td>${h>0?`<button class="btn btn-sm btn-ghost" onclick="resetPlayerHeat('${p.id}','${p.username}')">Clear</button>`:'—'}</td>
+        </tr>`;
+      }).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;padding:14px">No players with heat right now</td></tr>'}</tbody></table>
+    </div>`;
+}
+async function saveBustTuning(){
+  const threshold=parseInt(document.getElementById('set-bust-threshold').value);
+  const mult=parseFloat(document.getElementById('set-bust-mult').value);
+  if(isNaN(threshold)||isNaN(mult)){toast('Invalid values','t-error');return;}
+  await db.collection('settings').doc('game').set({bust_threshold:threshold,bust_multiplier:mult},{merge:true});
+  bustThreshold=threshold;bustMultiplier=mult; // apply immediately for this session too
+  toast('Bust tuning saved','t-success');
+  logActivity('admin_bust_tuning',{threshold,mult}).catch(()=>{});
+}
+async function resetPlayerHeat(uid,name){
+  await db.collection('profiles').doc(uid).update({heat:0,heat_updated_at:firebase.firestore.Timestamp.now()});
+  toast(`Cleared heat for ${name}`,'t-success');
+  logActivity('admin_clear_heat',{target:name}).catch(()=>{});
+  loadAdminSec('heat');
+}
+async function resetAllHeat(){
+  if(!confirm('Clear heat for every player?'))return;
+  const snap=await db.collection('profiles').where('heat','>',0).get();
+  const batch=db.batch();
+  snap.docs.forEach(d=>batch.update(d.ref,{heat:0,heat_updated_at:firebase.firestore.Timestamp.now()}));
+  await batch.commit().catch(()=>{});
+  toast(`Cleared heat for ${snap.size} players`,'t-success');
+  logActivity('admin_clear_all_heat',{count:snap.size}).catch(()=>{});
+  loadAdminSec('heat');
+}
+async function adminEvents(el){
+  const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
+  const sett=settDoc?.exists?settDoc.data():{};
+  const ev=sett.active_event;
+  const expTime=ev?.expires_at?.toDate?.();
+  const isLive=ev&&expTime&&expTime>new Date();
+  el.innerHTML=`
+    ${isLive?`
+    <div class="panel" style="margin-bottom:14px;border-color:rgba(255,46,139,.4)">
+      <h3 style="color:var(--red2)">🎉 Live Event</h3>
+      <div style="font-family:var(--disp);font-size:16px;font-weight:700;margin:8px 0">${ev.label}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Expires ${expTime.toLocaleString()}</div>
+      <button class="btn btn-sm" style="background:var(--red3);color:var(--red2);border:1px solid rgba(255,46,139,.2);margin-top:10px" onclick="endActiveEvent()">End Event Now</button>
+    </div>`:`<div class="panel" style="margin-bottom:14px"><div style="font-family:var(--mono);font-size:11px;color:var(--text3)">No event currently running.</div></div>`}
+    <div class="panel" style="margin-bottom:14px">
+      <h3>🎉 Launch a Scheduled Event</h3>
+      <div style="font-size:11px;color:var(--text2);margin:6px 0 14px">Applies instantly to every player on their next race or market tick. Pick a type, set duration, launch.</div>
+      <div style="margin-bottom:12px;"><label class="form-label">Event Type</label>
+        <select class="form-input" id="evt-type">
+          <option value="double_xp">⭐ Double XP</option>
+          <option value="reduced_fees">💸 Half Race Entry Fees</option>
+          <option value="demand_spike">📈 Market Demand Spike</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px;"><label class="form-label">Duration (hours)</label>
+        <input class="form-input" type="number" id="evt-hours" value="6" min="1" max="72">
+      </div>
+      <div style="margin-bottom:12px;"><label class="form-label">Banner Label (shown to players)</label>
+        <input class="form-input" id="evt-label" placeholder="e.g. Double XP Weekend!" value="Double XP Weekend!">
+      </div>
+      <button class="btn btn-gold btn-lg" style="width:100%" onclick="launchEvent()">🚀 Launch Event</button>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r);border:1px solid var(--border)">⚡ double_xp and reduced_fees apply a 2x / 0.5x multiplier automatically. Players pick up the event on their next login or tab refresh.</div>
+  `;
+  document.getElementById('evt-type').onchange=function(){
+    const labels={double_xp:'Double XP Weekend!',reduced_fees:'Half Price Race Fees!',demand_spike:'Market Demand Spike!'};
+    document.getElementById('evt-label').value=labels[this.value]||'';
+  };
+}
+async function launchEvent(){
+  const type=document.getElementById('evt-type').value;
+  const hours=parseInt(document.getElementById('evt-hours').value)||6;
+  const label=document.getElementById('evt-label').value.trim()||'Event active!';
+  const multiplier=type==='double_xp'?2:type==='reduced_fees'?0.5:1.3;
+  const expiresAt=firebase.firestore.Timestamp.fromDate(new Date(Date.now()+hours*3600000));
+  const eventData={type,multiplier,label,expires_at:expiresAt};
+  await db.collection('settings').doc('game').set({active_event:eventData},{merge:true});
+  // If it's a demand spike, also nudge market prices up immediately for visible impact
+  if(type==='demand_spike'){
+    const batch=db.batch();
+    Object.values(marketPrices).slice(0,20).forEach(mp=>{
+      if(mp.id)batch.update(db.collection('market_prices').doc(mp.id),{demand_score:Math.min(100,(mp.demand_score||50)+25)});
+    });
+    await batch.commit().catch(()=>{});
+  }
+  activeEvent=eventData;showActiveEventBanner();
+  toast(`Event launched: ${label}`,'t-success');
+  logActivity('launch_event',{type,hours,label}).catch(()=>{});
+  loadAdminSec('events');
+}
+async function endActiveEvent(){
+  if(!confirm('End the current event now?'))return;
+  await db.collection('settings').doc('game').update({active_event:firebase.firestore.FieldValue.delete()});
+  activeEvent=null;showActiveEventBanner();
+  toast('Event ended','t-success');
+  logActivity('end_event',{}).catch(()=>{});
+  loadAdminSec('events');
+}
 async function adminBroadcast(el){
   el.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
     <div><label class="form-label">Message</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Announcement..." style="resize:vertical;font-family:var(--body)"></textarea></div>
@@ -2363,6 +2602,11 @@ async function adminSettings(el){
       <button class="btn btn-steel" onclick="backfillCarCounts()">🔧 Run Sync</button>
     </div>
     <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
+      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">💬 Discord Invite Link</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Shows a Discord icon in every player's sidebar once set. Leave blank to hide it.</div>
+      <div style="display:flex;gap:8px"><input class="admin-search" id="set-discord-url" value="${sett.discord_url||''}" placeholder="https://discord.gg/..." style="flex:1"><button class="btn btn-gold" onclick="adminSaveSetting('discord_url',document.getElementById('set-discord-url').value.trim())">Save</button></div>
+    </div>
+    <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
       <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Promote Yourself to Owner</div>
       <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Grant yourself full control of the game.</div>
       <button class="btn btn-purple" onclick="promoteSelfOwner()">👑 Set as Owner</button>
@@ -2381,7 +2625,14 @@ async function backfillCarCounts(){
   toast(`Synced car_count for ${n} players`,'t-success');
   logActivity('backfill_car_counts',{count:n}).catch(()=>{});
 }
-async function adminSaveSetting(key,val){if(isNaN(val)){toast('Invalid value','t-error');return;}await db.collection('settings').doc('game').set({[key]:val},{merge:true});toast(`${key} → ${val}`,'t-success');logActivity('admin_setting',{key,val}).catch(()=>{});loadAdminSec('settings');}
+async function adminSaveSetting(key,val){
+  if(typeof val==='number'&&isNaN(val)){toast('Invalid value','t-error');return;}
+  await db.collection('settings').doc('game').set({[key]:val},{merge:true});
+  toast(`${key} → ${val||'(cleared)'}`,'t-success');
+  logActivity('admin_setting',{key,val}).catch(()=>{});
+  loadAdminSec('settings');
+  if(key==='discord_url')loadActiveEvent(); // refresh sidebar link immediately
+}
 function applyNPCInterval(){const secs=parseInt(document.getElementById('set-npc-int').value)||180;clearInterval(window._npcTick);window._npcTick=setInterval(()=>runNPCBatch().catch(()=>{}),secs*1000);toast(`NPC interval set to ${secs}s`,'t-success');}
 async function promoteSelfOwner(){if(!confirm('Promote yourself to Owner?'))return;await db.collection('profiles').doc(currentUser.uid).update({role:'owner'});profile.role='owner';renderHUD();toast('You are now the Owner! 👑','t-success');logActivity('self_promote_owner',{}).catch(()=>{});loadAdminSec('settings');}
 
