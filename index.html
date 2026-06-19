@@ -447,6 +447,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .stage-sub{color:var(--text2);font-size:12px;margin-top:3px;line-height:1.4;}
 .stage-req{font-family:var(--mono);font-size:11px;margin-top:5px;}
 .stage-line{position:absolute;left:40px;top:-12px;width:2px;height:12px;background:var(--border2);}
+</style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -690,6 +691,11 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <div class="panel"><h3>🔥 Longest Streaks</h3><table class="lb-table" id="lb-streak"></table></div>
         <div class="panel"><h3>🚗 Most Cars</h3><table class="lb-table" id="lb-garage"></table></div>
       </div>
+    </div>
+    <!-- CREW -->
+    <div class="section" id="tab-crew">
+      <div class="sec-head"><div><div class="sec-title">Crew</div><div class="sec-sub">Run together. Climb the crew board.</div></div></div>
+      <div id="crew-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
     <!-- PROFILE -->
     <div class="section" id="tab-profile">
@@ -1335,11 +1341,151 @@ function showTab(t,el){
   if(t==='market'){loadMarketPrices().then(renderMarket);runMarketTick();}
   if(t==='auction')renderAuctions();
   if(t==='leaderboard')loadLeaderboard();
+  if(t==='crew')loadCrew();
   if(t==='profile'){raceHistLoaded=false;renderProfile();}
   if(t==='admin')loadAdminPanel();
   if(t==='challenges')renderChallenges();
 }
 function toggleHudMenu(){document.getElementById('hud-menu')?.classList.toggle('open');}
+
+// ═══ CREW SYSTEM ═══
+async function loadCrew(){
+  const el=document.getElementById('crew-content');
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  try{
+    if(profile.crew_id){
+      const cd=await db.collection('crews').doc(profile.crew_id).get();
+      if(!cd.exists){
+        // Crew was deleted — clear stale reference
+        await db.collection('profiles').doc(currentUser.uid).update({crew_id:firebase.firestore.FieldValue.delete(),crew_name:firebase.firestore.FieldValue.delete()});
+        profile.crew_id=null;profile.crew_name=null;
+        return loadCrew();
+      }
+      const crew={id:cd.id,...cd.data()};
+      const memberIds=(crew.member_ids||[]).slice(0,30);
+      // Fetch members (capped) to show roster + tally wins
+      const memberDocs=await Promise.all(memberIds.map(id=>db.collection('profiles').doc(id).get().catch(()=>null)));
+      const members=memberDocs.filter(d=>d&&d.exists).map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.wins||0)-(a.wins||0));
+      const totalWins=members.reduce((s,m)=>s+(m.wins||0),0);
+      const isOwner=crew.owner_id===currentUser.uid;
+      el.innerHTML=`
+        <div class="panel" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <div style="width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,var(--red),var(--purple));display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:20px;font-weight:900;flex-shrink:0">${escapeHtml(crew.tag||'??')}</div>
+            <div style="flex:1;min-width:160px">
+              <div class="sec-title" style="font-size:20px">${escapeHtml(crew.name)}</div>
+              <div class="sec-sub">[${escapeHtml(crew.tag)}] · ${members.length} member${members.length!==1?'s':''} · ${totalWins} total wins</div>
+            </div>
+            <button class="btn ${isOwner?'btn-ghost':'btn-ghost'}" onclick="leaveCrew()">${isOwner?'Disband':'Leave'} Crew</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>👥 Roster</h3>
+          <table class="lb-table">${members.map((m,i)=>`<tr>
+            <td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td>
+            <td><strong>${escapeHtml(m.username||'?')}</strong>${m.id===crew.owner_id?' <span style="font-size:9px;color:var(--amber2)">★ LEADER</span>':''}${m.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td>
+            <td class="lb-val">${m.wins||0} W</td>
+          </tr>`).join('')}</table>
+        </div>
+        <div style="margin-top:16px"><h3 style="margin-bottom:10px">🏆 Crew Leaderboard</h3><div id="crew-board"></div></div>`;
+      loadCrewBoard();
+    }else{
+      el.innerHTML=`
+        <div class="grid-2">
+          <div class="panel">
+            <h3>➕ Start a Crew</h3>
+            <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Found your own crew and recruit drivers. Costs $25,000.</p>
+            <div style="margin-bottom:10px"><label class="form-label">Crew Name</label><input class="form-input" id="crew-name-in" maxlength="24" placeholder="Midnight Outlaws"></div>
+            <div style="margin-bottom:14px"><label class="form-label">Tag (2-4 chars)</label><input class="form-input" id="crew-tag-in" maxlength="4" placeholder="MNO" style="text-transform:uppercase"></div>
+            <button class="btn btn-gold btn-lg" onclick="createCrew()">Found Crew — $25K</button>
+          </div>
+          <div class="panel">
+            <h3>🤝 Join a Crew</h3>
+            <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Browse active crews and join one.</p>
+            <div id="crew-join-list"><div class="loading-screen"><div class="spinner"></div></div></div>
+          </div>
+        </div>`;
+      loadJoinableCrews();
+    }
+  }catch(e){
+    console.warn('loadCrew error',e);
+    el.innerHTML=`<div class="empty">⚠ Couldn't load crews — ${e.message}</div>`;
+  }
+}
+async function loadJoinableCrews(){
+  const wrap=document.getElementById('crew-join-list');if(!wrap)return;
+  const snap=await db.collection('crews').orderBy('total_wins','desc').limit(15).get().catch(()=>({docs:[]}));
+  if(!snap.docs.length){wrap.innerHTML='<div class="empty" style="font-size:12px">No crews yet — be the first!</div>';return;}
+  wrap.innerHTML=snap.docs.map(d=>{
+    const c=d.data();const count=(c.member_ids||[]).length;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div style="width:34px;height:34px;border-radius:8px;background:var(--panel3);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:11px;font-weight:700;flex-shrink:0">${escapeHtml(c.tag||'??')}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">${escapeHtml(c.name)}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${count} members · ${c.total_wins||0} wins</div></div>
+      <button class="btn btn-sm btn-steel" onclick="joinCrew('${d.id}')">Join</button>
+    </div>`;
+  }).join('');
+}
+async function loadCrewBoard(){
+  const wrap=document.getElementById('crew-board');if(!wrap)return;
+  const snap=await db.collection('crews').orderBy('total_wins','desc').limit(10).get().catch(()=>({docs:[]}));
+  wrap.innerHTML='<table class="lb-table">'+snap.docs.map((d,i)=>{
+    const c=d.data();const mine=d.id===profile.crew_id;
+    return `<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${escapeHtml(c.name)}</strong> <span style="font-size:9px;color:var(--text3)">[${escapeHtml(c.tag)}]</span>${mine?' <span style="font-size:9px;color:var(--red2)">(yours)</span>':''}</td><td class="lb-val">${c.total_wins||0} W</td></tr>`;
+  }).join('')+'</table>';
+}
+async function createCrew(){
+  const name=document.getElementById('crew-name-in').value.trim();
+  const tag=document.getElementById('crew-tag-in').value.trim().toUpperCase();
+  if(name.length<3){toast('Crew name too short','t-error');return;}
+  if(tag.length<2||tag.length>4){toast('Tag must be 2-4 characters','t-error');return;}
+  if((profile.cash||0)<25000){toast('Need $25,000 to found a crew','t-error');return;}
+  try{
+    const ref=db.collection('crews').doc();
+    await ref.set({name,tag,owner_id:currentUser.uid,owner_username:profile.username,member_ids:[currentUser.uid],total_wins:profile.wins||0,created_at:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-25000),crew_id:ref.id,crew_name:name});
+    profile.cash-=25000;profile.crew_id=ref.id;profile.crew_name=name;
+    renderHUD();toast(`Crew "${name}" founded! 🤝`,'t-success');
+    logActivity('crew_create',{name,tag}).catch(()=>{});
+    loadCrew();
+  }catch(e){toast('Failed to create crew','t-error');console.warn(e);}
+}
+async function joinCrew(crewId){
+  if(profile.crew_id){toast('Leave your current crew first','t-error');return;}
+  try{
+    const cd=await db.collection('crews').doc(crewId).get();
+    if(!cd.exists){toast('Crew no longer exists','t-error');loadCrew();return;}
+    const members=cd.data().member_ids||[];
+    if(members.length>=30){toast('That crew is full (30 max)','t-error');return;}
+    await db.collection('crews').doc(crewId).update({member_ids:firebase.firestore.FieldValue.arrayUnion(currentUser.uid),total_wins:firebase.firestore.FieldValue.increment(profile.wins||0)});
+    await db.collection('profiles').doc(currentUser.uid).update({crew_id:crewId,crew_name:cd.data().name});
+    profile.crew_id=crewId;profile.crew_name=cd.data().name;
+    toast(`Joined ${cd.data().name}! 🤝`,'t-success');
+    logActivity('crew_join',{crew:cd.data().name}).catch(()=>{});
+    loadCrew();
+  }catch(e){toast('Failed to join','t-error');console.warn(e);}
+}
+async function leaveCrew(){
+  if(!profile.crew_id)return;
+  const cd=await db.collection('crews').doc(profile.crew_id).get().catch(()=>null);
+  const isOwner=cd&&cd.exists&&cd.data().owner_id===currentUser.uid;
+  if(!confirm(isOwner?'Disband this crew for everyone?':'Leave this crew?'))return;
+  try{
+    if(isOwner&&cd.exists){
+      // Disband: clear crew_id from all members, then delete the crew doc
+      const memberIds=cd.data().member_ids||[];
+      await Promise.all(memberIds.map(id=>db.collection('profiles').doc(id).update({crew_id:firebase.firestore.FieldValue.delete(),crew_name:firebase.firestore.FieldValue.delete()}).catch(()=>{})));
+      await db.collection('crews').doc(profile.crew_id).delete().catch(()=>{});
+      toast('Crew disbanded','t-info');
+    }else{
+      await db.collection('crews').doc(profile.crew_id).update({member_ids:firebase.firestore.FieldValue.arrayRemove(currentUser.uid),total_wins:firebase.firestore.FieldValue.increment(-(profile.wins||0))}).catch(()=>{});
+      await db.collection('profiles').doc(currentUser.uid).update({crew_id:firebase.firestore.FieldValue.delete(),crew_name:firebase.firestore.FieldValue.delete()});
+      toast('Left the crew','t-info');
+    }
+    profile.crew_id=null;profile.crew_name=null;
+    logActivity('crew_leave',{}).catch(()=>{});
+    loadCrew();
+  }catch(e){toast('Failed','t-error');console.warn(e);}
+}
 
 // ═══ GARAGE ═══
 function renderPlayerCars(){
@@ -1830,6 +1976,8 @@ async function startRace(rid){
   if(cashDelta!==0)updateData.cash=firebase.firestore.FieldValue.increment(cashDelta);
   await db.collection('profiles').doc(currentUser.uid).update(updateData);
   profile.cash+=cashDelta;
+  // Keep crew win tally in sync
+  if(won&&profile.crew_id)db.collection('crews').doc(profile.crew_id).update({total_wins:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});
   profile={...profile,wins:newWins,losses:newLosses,win_streak:newStreak,best_win_streak:newBestStreak,xp:newXp,level:newLevel,reputation:newRep,heat:newHeat};
   db.collection('races').add({player_id:currentUser.uid,player_username:profile.username,car_name:pc.car_name,race_type:r.id,difficulty:r.diff,result:won?'win':'loss',player_score:Math.round(myScore),opp_score:Math.round(oppScore),fee:actualFee,reward:cashGain,net:netResult,xp:xpGained,launch_quality:Math.round(launchRes.quality*100),mash_count:mashRes.count,busted:bustOccurred,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
   logActivity('race',{race:r.name,result:won?'win':'loss',fee:actualFee,reward:cashGain,net:netResult,heat:newHeat,busted:bustOccurred}).catch(()=>{});
