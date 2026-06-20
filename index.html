@@ -1,6 +1,3 @@
-
-# 11.22.63
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -370,6 +367,8 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .role-DK{background:linear-gradient(135deg,rgba(0,229,255,.25),rgba(138,43,232,.3));color:#fff;border:1px solid rgba(0,229,255,.45);box-shadow:0 0 10px rgba(0,229,255,.3);}
 .role-admin{background:var(--red3);color:var(--red2);border:1px solid rgba(255,46,139,.3);}
 .role-moderator{background:var(--amber3);color:var(--amber2);border:1px solid rgba(255,122,61,.3);}
+.role-vip{background:linear-gradient(135deg,rgba(255,176,32,.25),rgba(255,46,139,.2));color:#ffd98a;border:1px solid rgba(255,176,32,.45);}
+.role-veteran{background:rgba(70,255,156,.12);color:var(--green2);border:1px solid rgba(0,230,118,.35);}
 .role-player{background:var(--panel3);color:var(--text3);border:1px solid var(--border);}
 .role-npc{background:rgba(30,32,55,.5);color:var(--text3);border:1px solid var(--border);}
 .admin-layout{display:grid;grid-template-columns:190px 1fr;gap:0;min-height:620px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
@@ -1122,7 +1121,18 @@ function toast(msg,cls='t-info'){const el=document.getElementById('toast');if(!e
 function showXpPop(txt){const el=document.createElement('div');el.className='xp-pop';el.textContent=txt;document.body.appendChild(el);setTimeout(()=>el.remove(),2100);}
 function openModal(id){document.getElementById(id)?.classList.add('open');}
 function closeModal(id){document.getElementById(id)?.classList.remove('open');}
-function roleBadge(role){const L={owner:'👑 Owner',admin:'🛡️ Admin',moderator:'⚔️ Mod',DK:'🏯 Drift King',player:'🏎️ Player',npc:'🤖 NPC'};return `<span class="role-badge role-${role||'player'}">${L[role]||'Player'}</span>`;}
+const ROLE_LABELS={owner:'👑 Owner',admin:'🛡️ Admin',moderator:'⚔️ Mod',DK:'🏯 Drift King',vip:'💎 VIP',veteran:'🎖️ Veteran',player:'🏎️ Player',npc:'🤖 NPC'};
+function getRoles(p){
+  // Supports the new multi-role array while staying backward-compatible with single `role`
+  if(p&&Array.isArray(p.roles)&&p.roles.length)return p.roles;
+  return [p&&p.role?p.role:'player'];
+}
+function roleBadge(roleOrProfile){
+  let roles;
+  if(roleOrProfile&&typeof roleOrProfile==='object')roles=getRoles(roleOrProfile);
+  else roles=[roleOrProfile||'player'];
+  return roles.map(r=>`<span class="role-badge role-${r}">${ROLE_LABELS[r]||'Player'}</span>`).join(' ');
+}
 function statsHTML(power,speed,accel,handling,braking,weight){
   return[['POWER',Math.min(100,power/20),'var(--red2)',power+'hp'],['TOP SPEED',Math.min(100,speed/2.5),'var(--amber2)',speed+'mph'],['ACCEL',accel,'var(--steel)',accel+'/100'],['HANDLING',handling,'var(--green2)',handling+'/100'],['BRAKING',braking,'var(--purple2)',braking+'/100'],['WEIGHT',Math.min(100,100-weight/80),'var(--blue2)',weight.toLocaleString()+'lb']]
   .map(([l,w,c,v])=>`<div class="stat-row"><div class="stat-lbl">${l}</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${w}%;background:${c}"></div></div><div class="stat-val">${v}</div></div>`).join('');
@@ -1213,14 +1223,17 @@ async function initGame(){
 }
 // ═══ OPENMOJI — swaps native OS emoji for OpenMoji (openmoji.org) graphics everywhere in the UI,
 // including content rendered later (toasts, race results, admin tables, chat, NPC messages, etc.) ═══
-const OPENMOJI_CDN='https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji/color/svg/';
+const OPENMOJI_CDN='https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/';
 // Matches emoji sequences including variation selectors (️), ZWJ sequences, and two-codepoint flags
 const OPENMOJI_REGEX=/(\p{Regional_Indicator}{2})|(\p{Emoji_Presentation}|\p{Extended_Pictographic})(\uFE0F|\u200D(\p{Emoji_Presentation}|\p{Extended_Pictographic}))*/gu;
 function emojiToCodepoints(str){
-  // OpenMoji filenames are uppercase hex codepoints joined by '-', with the U+FE0F variation
-  // selector stripped (OpenMoji doesn't ship separate text/emoji-presentation variants)
-  const cps=[...str].map(ch=>ch.codePointAt(0)).filter(cp=>cp!==0xFE0F);
-  return cps.map(cp=>cp.toString(16).toUpperCase().padStart(4,'0')).join('-');
+  // Twemoji filenames are LOWERCASE hex codepoints joined by '-', with the U+FE0F variation
+  // selector stripped for single emoji (kept inside ZWJ sequences though).
+  let cps=[...str].map(ch=>ch.codePointAt(0));
+  // Twemoji strips a trailing/standalone FE0F but keeps it within multi-codepoint ZWJ sequences
+  if(cps.length>1 && cps.filter(c=>c!==0xFE0F).length===1) cps=cps.filter(c=>c!==0xFE0F);
+  else if(!cps.includes(0x200D)) cps=cps.filter(c=>c!==0xFE0F);
+  return cps.map(cp=>cp.toString(16).toLowerCase()).join('-');
 }
 function swapEmojiInTextNode(node){
   const text=node.nodeValue;
@@ -1439,7 +1452,7 @@ function renderHUD(){
   document.getElementById('avatar-init').textContent=init;
   document.getElementById('prof-av').textContent=init;
   document.getElementById('menu-username').textContent=profile.username||'Driver';
-  document.getElementById('menu-role').innerHTML=roleBadge(profile.role);
+  document.getElementById('menu-role').innerHTML=roleBadge(profile);
   const active=playerCars.find(p=>p.is_active);
   if(active){
     document.getElementById('hud-car-pill').style.display='';
@@ -2495,7 +2508,7 @@ async function renderProfile(){
   document.getElementById('xp-next').textContent=xpNext;
   document.getElementById('xp-bar').style.width=Math.min(100,((profile.xp||0)/xpNext)*100)+'%';
   document.getElementById('prof-av').textContent=(profile.username||'R')[0].toUpperCase();
-  document.getElementById('prof-role').innerHTML=roleBadge(profile.role);
+  document.getElementById('prof-role').innerHTML=roleBadge(profile);
   const wr=profile.wins+profile.losses>0?Math.round((profile.wins/(profile.wins+profile.losses))*100):0;
   document.getElementById('prof-stats-detail').innerHTML=`
     <div class="stat-row"><div class="stat-lbl">Win Rate</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${wr}%;background:var(--green2)"></div></div><div class="stat-val">${wr}%</div></div>
@@ -2919,7 +2932,7 @@ function userTable(users){
   return `<table class="admin-table"><thead><tr><th>Username</th><th>Role</th><th>Lvl</th><th>Cash</th><th>W/L</th><th>Status</th><th>Actions</th></tr></thead>
   <tbody>${users.map(u=>`<tr style="${u.is_banned?'opacity:.4':''}">
     <td><strong>${u.username||'?'}</strong>${u.id===currentUser.uid?' <span style="font-size:9px;color:var(--text3)">(you)</span>':''}</td>
-    <td>${roleBadge(u.role)}</td>
+    <td>${roleBadge(u)}</td>
     <td style="font-family:var(--mono)">${u.level||1}</td>
     <td style="font-family:var(--mono);color:var(--amber2)">$${fmtCash(u.cash)}</td>
     <td style="font-family:var(--mono);font-size:10px">${u.wins||0}W/${u.losses||0}L</td>
@@ -2969,7 +2982,7 @@ async function viewUserDetail(uid,name){
       <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">W / L</div><div style="font-family:var(--disp);font-size:18px;color:var(--green2)">${u.wins||0}/<span style="color:var(--red2)">${u.losses||0}</span></div></div>
       <div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">Cars</div><div style="font-family:var(--disp);font-size:18px;color:var(--amber2)">${carsSnap.size}</div></div>
     </div>
-    <div style="margin-bottom:12px">Role: ${roleBadge(u.role)} · Rep: ${u.reputation||0} · Streak: ${u.win_streak||0} · Daily: ${u.daily_streak||0} days · Heat: <span style="color:${(u.heat||0)>=70?'var(--red2)':(u.heat||0)>=35?'var(--amber2)':'var(--green2)'}">${u.heat||0}/100</span></div>
+    <div style="margin-bottom:12px">Role: ${roleBadge(u)} · Rep: ${u.reputation||0} · Streak: ${u.win_streak||0} · Daily: ${u.daily_streak||0} days · Heat: <span style="color:${(u.heat||0)>=70?'var(--red2)':(u.heat||0)>=35?'var(--amber2)':'var(--green2)'}">${u.heat||0}/100</span></div>
     <div style="margin-bottom:12px"><strong style="font-family:var(--disp);font-size:12px;letter-spacing:1px;color:var(--steel2)">GARAGE</strong>
     <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${carsSnap.docs.map(d=>`<span style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:4px 8px;font-family:var(--mono);font-size:10px">${d.data().car_emoji||'🚗'} ${d.data().car_name}</span>`).join('')||'<span style="color:var(--text3);font-family:var(--mono);font-size:11px">No cars</span>'}</div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:${isOwner?'14px':'0'}">
@@ -3360,9 +3373,15 @@ async function adminSettings(el){
       <div style="display:flex;gap:8px"><input class="admin-search" id="set-discord-url" value="${sett.discord_url||''}" placeholder="https://discord.gg/..." style="flex:1"><button class="btn btn-gold" onclick="adminSaveSetting('discord_url',document.getElementById('set-discord-url').value.trim())">Save</button></div>
     </div>
     <div style="padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r)">
-      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">Promote Yourself to Owner</div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Grant yourself full control of the game.</div>
-      <button class="btn btn-purple" onclick="promoteSelfOwner()">👑 Set as Owner</button>
+      <div style="font-weight:700;font-family:var(--disp);font-size:13px;margin-bottom:4px">👑 My Roles</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Toggle any roles for yourself. You can hold several at once — all show on your badge. (Owner only.)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="self-role-toggles">
+        ${['owner','admin','moderator','DK','vip','veteran'].map(r=>{
+          const has=getRoles(profile).includes(r);
+          return `<button class="btn btn-sm ${has?'btn-purple':'btn-ghost'}" onclick="toggleSelfRole('${r}')">${ROLE_LABELS[r]}${has?' ✓':''}</button>`;
+        }).join('')}
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Current: ${roleBadge(profile)}</div>
     </div>
   </div>`;
 }
@@ -3387,7 +3406,26 @@ async function adminSaveSetting(key,val){
   if(key==='discord_url')loadActiveEvent(); // refresh sidebar link immediately
 }
 function applyNPCInterval(){const secs=parseInt(document.getElementById('set-npc-int').value)||180;clearInterval(window._npcTick);window._npcTick=setInterval(()=>runNPCBatch().catch(()=>{}),secs*1000);toast(`NPC interval set to ${secs}s`,'t-success');}
-async function promoteSelfOwner(){if(!confirm('Promote yourself to Owner?'))return;await db.collection('profiles').doc(currentUser.uid).update({role:'owner'});profile.role='owner';renderHUD();toast('You are now the Owner! 👑','t-success');logActivity('self_promote_owner',{}).catch(()=>{});loadAdminSec('settings');}
+async function toggleSelfRole(role){
+  if(profile.role!=='owner'&&!(profile.roles||[]).includes('owner')){toast('Owner only','t-error');return;}
+  let roles=getRoles(profile).slice();
+  // never let 'player' duplicate alongside others; treat it as the empty fallback
+  roles=roles.filter(r=>r!=='player');
+  if(roles.includes(role))roles=roles.filter(r=>r!==role);
+  else roles.push(role);
+  if(role==='owner'&&!roles.includes('owner')){
+    if(!confirm('Remove your own Owner role? You may lose access to this panel.'))return;
+  }
+  if(!roles.length)roles=['player'];
+  // primary role = highest-priority one present, kept in `role` for existing permission checks
+  const priority=['owner','admin','moderator','DK','vip','veteran','player'];
+  const primary=priority.find(r=>roles.includes(r))||'player';
+  await db.collection('profiles').doc(currentUser.uid).update({roles,role:primary});
+  profile.roles=roles;profile.role=primary;
+  renderHUD();toast('Roles updated 👑','t-success');
+  logActivity('self_role_change',{roles}).catch(()=>{});
+  loadAdminSec('settings');
+}
 
 async function logActivity(action,details){
   if(!currentUser||!profile)return;
