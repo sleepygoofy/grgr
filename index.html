@@ -386,9 +386,10 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .adm-row label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;min-width:90px;}
 .adm-row input,.adm-row select{flex:1;min-width:120px;}
 .admin-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
-.admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
-.admin-stat-val{font-family:var(--disp);font-size:26px;font-weight:700;}
-.admin-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.admin-stat-ico{font-size:20px;line-height:1;flex-shrink:0;}
+.admin-stat-val{font-family:var(--disp);font-size:18px;font-weight:700;line-height:1.1;}
+.admin-stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
 .admin-table{width:100%;border-collapse:collapse;font-size:12px;}
 .admin-table th{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
 .admin-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
@@ -883,6 +884,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
           <button class="admin-tab" onclick="adminSec('chatmod',this)">💬 Chat Mod</button>
           <span class="admin-tab-sep"></span>
           <button class="admin-tab" onclick="adminSec('logs',this)">📋 Logs</button>
+          <button class="admin-tab" onclick="adminSec('suspects',this)">🔍 Suspects</button>
+          <button class="admin-tab" onclick="adminSec('panic',this)" style="color:var(--red2)">🚨 Panic</button>
+          <button class="admin-tab" onclick="adminSec('beta',this)" style="color:var(--amber2)">🧪 Beta Mode</button>
           <button class="admin-tab" onclick="adminSec('backup',this)">💾 Backup</button>
           <button class="admin-tab" onclick="adminSec('settings',this)">⚙ Settings</button>
         </div>
@@ -3041,7 +3045,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects,beta:adminBeta};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -3059,12 +3063,12 @@ async function adminOverview(el){
   const carsLabel=pcSnap.size>=300?'300+':String(pcSnap.size);
   el.innerHTML=`
     <div class="admin-stat-grid">
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--steel2)">${real.length}</div><div class="admin-stat-lbl">Real Players</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--text3)">${npcs.length}</div><div class="admin-stat-lbl">NPCs (No Cap)</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--amber2)">${aSnap.size}</div><div class="admin-stat-lbl">Live Auctions</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--red2)">${racesLabel}</div><div class="admin-stat-lbl">Recent Races</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--green2);font-size:18px">$${fmtCash(totalCash)}</div><div class="admin-stat-lbl">Economy Size</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-val" style="color:var(--blue2)">${carsLabel}</div><div class="admin-stat-lbl">Cars (sampled)</div></div>
+      <div class="admin-stat-card"><div class="admin-stat-ico">👥</div><div><div class="admin-stat-val" style="color:var(--steel2)">${real.length}</div><div class="admin-stat-lbl">Real Players</div></div></div>
+      <div class="admin-stat-card"><div class="admin-stat-ico">🤖</div><div><div class="admin-stat-val" style="color:var(--text3)">${npcs.length}</div><div class="admin-stat-lbl">NPCs</div></div></div>
+      <div class="admin-stat-card"><div class="admin-stat-ico">📦</div><div><div class="admin-stat-val" style="color:var(--amber2)">${aSnap.size}</div><div class="admin-stat-lbl">Live Auctions</div></div></div>
+      <div class="admin-stat-card"><div class="admin-stat-ico">🏁</div><div><div class="admin-stat-val" style="color:var(--red2)">${racesLabel}</div><div class="admin-stat-lbl">Recent Races</div></div></div>
+      <div class="admin-stat-card"><div class="admin-stat-ico">💵</div><div><div class="admin-stat-val" style="color:var(--green2)">$${fmtCash(totalCash)}</div><div class="admin-stat-lbl">Economy</div></div></div>
+      <div class="admin-stat-card"><div class="admin-stat-ico">🚗</div><div><div class="admin-stat-val" style="color:var(--blue2)">${carsLabel}</div><div class="admin-stat-lbl">Cars Tracked</div></div></div>
     </div>
     <div class="live-activity">${lSnap.docs.map(d=>{const l=d.data();return `<div class="live-row"><span class="live-time">${timeAgo(l.created_at?.toDate())}</span><span><strong style="color:var(--steel2)">${l.username||'?'}</strong> <span class="log-action">${l.action}</span></span></div>`;}).join('')||'<div style="color:var(--text3);font-family:var(--mono);font-size:11px">No activity yet</div>'}</div>`;
 }
@@ -3835,6 +3839,134 @@ async function runBackup(){
   const out=document.getElementById('bk-out');out.style.display='block';out.textContent=json.slice(0,4000)+(json.length>4000?'\n\n…(truncated in preview · full file downloaded)':'');
   logActivity('admin_backup',{counts:{profiles:snapshot.profiles.length,crews:snapshot.crews.length}}).catch(()=>{});
 }
+
+async function adminPanic(el){
+  el.innerHTML=`<div class="panel" style="border-color:var(--red);box-shadow:0 0 24px rgba(230,0,35,.25)">
+    <h3 style="color:var(--red2)">🚨 Emergency Mode</h3>
+    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Pressing the panic button:<br>• Locks the market (no buys/sells)<br>• Freezes all live auctions<br>• Blocks new races<br>• Posts an emergency banner to every connected player</p>
+    <div style="text-align:center;padding:20px 0">
+      <button id="panic-btn" class="btn btn-red btn-lg" style="font-size:18px;padding:18px 40px;letter-spacing:3px" onclick="firePanic()">⚠ EMERGENCY MODE</button>
+    </div>
+    <div id="panic-status" style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text2);text-align:center"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="liftPanic()">↺ Lift Emergency</button>
+    </div>
+  </div>`;
+  const doc=await db.collection('settings').doc('game').get().catch(()=>null);
+  if(doc?.data()?.panic){document.getElementById('panic-status').innerHTML='<span style="color:var(--red2)">⚠ Emergency mode currently ACTIVE</span>';}
+}
+async function firePanic(){
+  if(!confirm('Activate emergency mode? Market, auctions and races will lock for everyone.'))return;
+  await db.collection('settings').doc('game').set({panic:true,panic_at:firebase.firestore.FieldValue.serverTimestamp(),panic_by:profile.username},{merge:true});
+  await db.collection('broadcasts').add({message:'⚠ EMERGENCY MODE — services locked',type:'t-error',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
+  logActivity('admin_panic',{}).catch(()=>{});
+  document.getElementById('panic-status').innerHTML='<span style="color:var(--red2)">⚠ Emergency mode ACTIVE</span>';
+  toast('Emergency mode activated','t-error');
+}
+async function liftPanic(){
+  await db.collection('settings').doc('game').set({panic:false},{merge:true});
+  await db.collection('broadcasts').add({message:'✓ Services restored',type:'t-success',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
+  logActivity('admin_panic_lift',{}).catch(()=>{});
+  document.getElementById('panic-status').innerHTML='<span style="color:var(--green2)">✓ Emergency lifted</span>';
+  toast('Emergency lifted','t-success');
+}
+async function adminSuspects(el){
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  const snap=await db.collection('profiles').limit(300).get();
+  const players=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.is_npc!==true);
+  const now=Date.now();
+  const ranked=players.map(p=>{
+    const created=p.created_at?.toDate?.()?.getTime()||now;
+    const ageHrs=Math.max(1,(now-created)/3600000);
+    const cashPerHr=Math.round((p.cash||0)/ageHrs);
+    let flag='🟢',score=0;
+    if(cashPerHr>2000000){flag='🔴';score=3;}
+    else if(cashPerHr>500000){flag='🟠';score=2;}
+    else if(cashPerHr>200000){flag='🟡';score=1;}
+    if((p.wins||0)>0&&(p.losses||0)===0&&(p.wins||0)>20){flag='🔴';score=Math.max(score,3);}
+    return {...p,cashPerHr,ageHrs,flag,score};
+  }).sort((a,b)=>b.score-a.score||b.cashPerHr-a.cashPerHr).slice(0,30);
+  el.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">Top 30 by suspicious activity · 🔴 high · 🟠 elevated · 🟡 watch · 🟢 normal</div>
+  <table class="admin-table"><thead><tr><th></th><th>Player</th><th>Cash/hr</th><th>W/L</th><th>Age</th><th></th></tr></thead><tbody>
+  ${ranked.map(p=>`<tr>
+    <td style="font-size:14px">${p.flag}</td>
+    <td><strong>${escapeHtml(p.username||'?')}</strong></td>
+    <td style="font-family:var(--mono);color:${p.cashPerHr>500000?'var(--red2)':'var(--text)'}">$${fmtCash(p.cashPerHr)}</td>
+    <td>${p.wins||0} / ${p.losses||0}</td>
+    <td style="color:var(--text3);font-family:var(--mono);font-size:10px">${p.ageHrs<24?Math.round(p.ageHrs)+'h':Math.round(p.ageHrs/24)+'d'}</td>
+    <td><button class="btn btn-sm btn-ghost" onclick="viewUserDetail('${p.id}')">Inspect</button></td>
+  </tr>`).join('')}</tbody></table>
+  <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--text3)">Heuristic: flags accounts with high cash-per-hour or undefeated long streaks. Manual review recommended before action.</div>`;
+}
+async function adminBeta(el){
+  const gameUrl=window.location.href.split('#')[0];
+  el.innerHTML=`<div class="panel">
+    <h3 style="color:var(--amber2)">🧪 Beta Mode</h3>
+    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">A separate workspace to test new features or risky changes without breaking the live game.</p>
+    <div class="admin-grid-2">
+      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">📋 Clone Current Build</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Download the live game HTML as <code>redline_beta.html</code>. Drop it into a separate hosting spot (Vercel, Netlify, GitHub Pages, or just open locally) and you've got a beta instance.</div>
+        <button class="btn btn-red" onclick="exportBetaBuild()">⬇ Download Beta Copy</button>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">🔀 Switch Firebase Project</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Point the beta at a separate Firebase project so test data never touches live. Paste a beta config below; saved to localStorage for this browser only.</div>
+        <textarea id="beta-fbcfg" class="form-input" rows="6" style="font-family:var(--mono);font-size:10px;width:100%" placeholder='{"apiKey":"...","authDomain":"...","projectId":"redline-beta",...}'></textarea>
+        <button class="btn btn-ghost" style="margin-top:6px" onclick="saveBetaConfig()">Save Config</button>
+        <button class="btn btn-ghost" style="margin-top:6px" onclick="clearBetaConfig()">Clear</button>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">🚀 Open Online Sandbox</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Pop the current build into an online code editor for quick edits with live preview.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="btn btn-ghost" href="https://codesandbox.io/" target="_blank" rel="noopener">CodeSandbox →</a>
+          <a class="btn btn-ghost" href="https://stackblitz.com/" target="_blank" rel="noopener">StackBlitz →</a>
+          <a class="btn btn-ghost" href="https://glitch.com/" target="_blank" rel="noopener">Glitch →</a>
+        </div>
+      </div>
+      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">🚩 Beta Feature Flags</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Toggle in-progress features for testing without redeploying. Saved per-browser.</div>
+        <div id="beta-flags"></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:var(--bg3);border-left:3px solid var(--amber);border-radius:var(--r);font-size:11px;color:var(--text2);font-family:var(--mono)">
+      ⚠ Heads-up: a beta copy hitting the same Firebase project as live will share data. Use a separate Firebase project for true isolation.
+    </div>
+  </div>`;
+  document.getElementById('beta-fbcfg').value=localStorage.getItem('beta_fb_config')||'';
+  renderBetaFlags();
+}
+function exportBetaBuild(){
+  const html=document.documentElement.outerHTML;
+  const blob=new Blob(['<!DOCTYPE html>\n'+html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`redline_beta_${Date.now()}.html`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  toast('Beta copy downloaded','t-success');
+}
+function saveBetaConfig(){
+  const v=document.getElementById('beta-fbcfg').value.trim();
+  try{if(v)JSON.parse(v);localStorage.setItem('beta_fb_config',v);toast('Beta config saved (this browser)','t-success');}
+  catch(e){toast('Invalid JSON: '+e.message,'t-error');}
+}
+function clearBetaConfig(){localStorage.removeItem('beta_fb_config');document.getElementById('beta-fbcfg').value='';toast('Cleared','t-info');}
+const BETA_FLAGS=['new_race_camera','experimental_drift_scoring','crew_perks','seasonal_events','dm_system'];
+function renderBetaFlags(){
+  const el=document.getElementById('beta-flags');if(!el)return;
+  const enabled=JSON.parse(localStorage.getItem('beta_flags')||'{}');
+  el.innerHTML=BETA_FLAGS.map(f=>`<label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;font-family:var(--mono)">
+    <input type="checkbox" ${enabled[f]?'checked':''} onchange="toggleBetaFlag('${f}',this.checked)"> ${f.replace(/_/g,' ')}
+  </label>`).join('');
+}
+function toggleBetaFlag(name,on){
+  const flags=JSON.parse(localStorage.getItem('beta_flags')||'{}');
+  if(on)flags[name]=true;else delete flags[name];
+  localStorage.setItem('beta_flags',JSON.stringify(flags));
+  window.BETA=flags;
+}
+window.BETA=JSON.parse(localStorage.getItem('beta_flags')||'{}');
 
 async function adminSettings(el){
   const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
