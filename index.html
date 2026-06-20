@@ -493,11 +493,18 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .mode-card.story .mode-go{color:var(--purple2);}
 .stage-row{display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px;transition:.2s;position:relative;}
 .stage-row.done{border-color:var(--green);}
-.stage-row.active{border-color:var(--purple2);box-shadow:0 0 18px rgba(138,43,232,.3);}
+.stage-row.active{border-color:var(--red);box-shadow:0 0 22px rgba(230,0,35,.35);}
 .stage-row.locked{opacity:.45;}
+.stage-chapter{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--red2);font-weight:700;margin-bottom:2px;}
 .stage-node{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--panel3);border:2px solid var(--border2);}
 .stage-row.done .stage-node{background:var(--green3);border-color:var(--green);}
-.stage-row.active .stage-node{background:var(--purple3);border-color:var(--purple2);}
+.stage-row.active .stage-node{background:var(--red3);border-color:var(--red);}
+.story-dialog-chapter{font-family:var(--mono);font-size:11px;letter-spacing:4px;color:var(--red2);font-weight:700;margin-bottom:6px;}
+.story-dialog-title{font-family:var(--disp);font-size:24px;letter-spacing:2px;color:var(--text);margin-bottom:4px;}
+.story-dialog-sub{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:1px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.story-dialog-text{color:var(--text2);font-size:14px;line-height:1.7;max-height:48vh;overflow-y:auto;}
+.story-dialog-text p{margin:0 0 12px;}
+.story-dialog-text p:last-child{margin-bottom:0;}
 .stage-info{flex:1;min-width:0;}
 .stage-name{font-family:var(--disp);font-size:15px;letter-spacing:1px;}
 .stage-sub{color:var(--text2);font-size:12px;margin-top:3px;line-height:1.4;}
@@ -913,6 +920,10 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
   <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:16px">Buy an eligible drift car for this stage — straight from Story Mode.</div>
   <div id="story-shop-list"></div>
 </div></div>
+<div class="modal-overlay" id="modal-story-dialog"><div class="modal" style="max-width:560px">
+  <button class="modal-close" onclick="closeModal('modal-story-dialog')">✕</button>
+  <div id="modal-story-dialog-body"></div>
+</div></div>
 <div class="toast" id="toast"></div>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDAPdNjRs8TkDymnNyYIdc3YpgtVbthvMc",authDomain:"redline-b4422.firebaseapp.com",projectId:"redline-b4422",storageBucket:"redline-b4422.firebasestorage.app",messagingSenderId:"725052073743",appId:"1:725052073743:web:c8ebd165a59f2fd9bbc07a"});
@@ -944,14 +955,41 @@ function genHumanName(){
 }
 
 const STORY_STAGES=[
-  {id:0,name:'Backstreet Initiation',rival:'Local Tuner',loc:'Miami Docks',reqCars:['Mazda MX-5','Nissan 370Z','Honda Civic Type R'],reqLabel:'any starter drift car (MX-5, 370Z, Civic Type R)',oppMult:0.85,reward:25000,xp:300},
-  {id:1,name:'Harbor Touge',rival:'Nadia Vega',loc:'Coastal Pass',reqCars:['Nissan Silvia S15','Subaru WRX STI','Mitsubishi Evo X'],reqLabel:'a tuner drift car (Silvia S15, WRX STI, Evo X)',oppMult:1.0,reward:55000,xp:500},
-  {id:2,name:'Neon District Showdown',rival:'Kenji Tanaka',loc:'Downtown',reqCars:['Mazda RX-7 FD','Toyota Supra MK4'],reqLabel:'a legend chassis (RX-7 FD or Supra MK4)',oppMult:1.2,reward:120000,xp:800},
-  {id:3,name:'Mountain Gauntlet',rival:'Rico Santos',loc:'Cliffside',reqCars:['Nissan GT-R Nismo','Porsche 911 GT3 RS','Toyota Supra MK5'],reqLabel:'a pro-grade chassis (GT-R Nismo, GT3 RS, Supra MK5)',oppMult:1.4,reward:240000,xp:1200},
-  {id:4,name:'Wangan Midnight',rival:'Yuki Mori',loc:'Bayfront Expressway',reqCars:['Honda NSX Type R','Nissan GT-R Nismo','Porsche 911 Turbo S'],reqLabel:'a top-tier machine (NSX Type R, GT-R Nismo, 911 Turbo S)',oppMult:1.65,reward:450000,xp:1800},
-  {id:5,name:'Mt. Akina — The DK',rival:'The DriftKing',loc:'Tokyo · Final',reqCars:['Honda NSX Type R','McLaren 720S','Ferrari SF90 Stradale','Lamborghini Huracan STO'],reqLabel:'an elite drift weapon (NSX Type R or a Hypercar)',oppMult:2.0,reward:1000000,xp:5000,final:true}
+  {id:0,chapter:'I',name:'The Newcomer',rival:'Diego "Doc" Reyes',loc:'Miami Docks · 2 AM',type:'race',
+    intro:`Three months out of work and one month behind on rent, you roll into the Miami docks where the underground meets every night. A weathered man in an old Civic flags you down.\n\n"Name's Doc. You drive that thing or just polish it?" He nods at your car. "Beat me and I'll put you on the board. Lose and you walk home."`,
+    outro:`Doc grins and tosses you a faded business card. "Kid's got hands. Show up tomorrow night — I'll teach you how to actually race."`,
+    reqCars:['Mazda MX-5','Nissan 370Z','Honda Civic Type R'],reqLabel:'any starter chassis',oppMult:0.85,reward:25000,xp:300},
+  {id:1,chapter:'II',name:'Doc\'s Lesson',rival:'Nadia "Switch" Vega',loc:'Coastal Pass',type:'race',
+    intro:`Doc's been teaching you for weeks. Tonight he sets you against his star pupil — Nadia "Switch" Vega, undefeated on the coastal touge.\n\n"She'll bait you into braking early," Doc warns. "Don't fall for it. Trust the line I taught you."`,
+    outro:`Switch slaps your roof through the open window. "Doc was right about you. Welcome to the crew." She hesitates. "Just... watch yourself. The boss has been asking about new talent."`,
+    reqCars:['Nissan Silvia S15','Subaru WRX STI','Mitsubishi Evo X'],reqLabel:'a tuner build',oppMult:1.0,reward:55000,xp:500},
+  {id:2,chapter:'III',name:'The Invitation',rival:'Marcus "Bishop" Cole',loc:'Neon District',type:'race',
+    intro:`A black Maybach pulls up to Doc's garage. The window rolls down and Bishop — the syndicate's right hand — gives you a look that isn't quite a smile.\n\n"Mister Volkov enjoys what you've been doing on his streets. He'd like to invite you to a race. Refusing would be... inconvenient for Doc."`,
+    outro:`Bishop nods once and drives off. Doc spits on the pavement. "I was hoping they'd never notice you. Whatever they offer next — don't take it."`,
+    reqCars:['Mazda RX-7 FD','Toyota Supra MK4'],reqLabel:'a legend chassis',oppMult:1.2,reward:120000,xp:800},
+  {id:3,chapter:'IV',name:'The Setup',rival:'Police Pursuit',loc:'Bayfront Expressway',type:'escape',
+    intro:`Volkov's "job" was a trap. The package in your trunk was bait, and the cops were waiting at the bridge. Doc's voice crackles over the radio.\n\n"They burned you, kid. Run. Don't stop until you're past the marina — I'll handle the rest."`,
+    outro:`You lose the chopper in the warehouse district. Your phone lights up. It's Switch. "Doc's hurt. Bishop did it. Get to St. Mary's. Now."`,
+    reqCars:['Nissan GT-R Nismo','Porsche 911 GT3 RS','Toyota Supra MK5'],reqLabel:'a pro-grade chassis',oppMult:1.4,reward:240000,xp:1200},
+  {id:4,chapter:'V',name:'A Promise',rival:'Bishop\'s Enforcers',loc:'St. Mary\'s Hospital → Overpass',type:'race',
+    intro:`Doc didn't make it through the night.\n\nHe held your hand for the last hour and made you promise one thing: don't burn the city down for him. Win the way he taught you.\n\nThen Switch calls. Bishop's enforcers are already at the funeral home. They want the route Doc memorized.`,
+    outro:`You outrun them, but only barely. Switch is waiting at the safe house. "Volkov's running the Wangan race in two weeks. Winner takes his territory. He doesn't know we know."`,
+    reqCars:['Honda NSX Type R','Nissan GT-R Nismo','Porsche 911 Turbo S'],reqLabel:'a top-tier machine',oppMult:1.65,reward:450000,xp:1800},
+  {id:5,chapter:'VI',name:'The Long Game',rival:'Yuki "Phantom" Mori',loc:'Wangan Midnight',type:'race',
+    intro:`The Wangan run. Twelve miles of empty expressway at 3 AM, the best drivers in the city watching from the overpasses.\n\nYuki Mori is Volkov's favorite. Nobody's beaten her on this stretch in two years. Switch checks your harness one more time.\n\n"For Doc."`,
+    outro:`Phantom pulls alongside at the finish and rolls her window down. She doesn't look angry — she looks relieved. "I've been waiting for someone to finally take it from me. Volkov's at the airfield. Go end this."`,
+    reqCars:['Honda NSX Type R','Nissan GT-R Nismo','Porsche 911 Turbo S','McLaren 720S'],reqLabel:'a top-tier machine',oppMult:1.85,reward:650000,xp:2500},
+  {id:6,chapter:'VII',name:'Switch',rival:'Nadia "Switch" Vega',loc:'Abandoned Airfield',type:'race',
+    intro:`Switch is sitting on her car at the airfield. Alone. No Volkov.\n\n"I'm sorry," she says, and she actually means it. "He has my brother. He said if I beat you here tonight, he lets him go. I didn't want it to be like this."\n\nShe pulls her helmet on. "Doc would understand. I hope you do too."`,
+    outro:`You let her win the first lap. Then you take the second. She knew you would — it's the only way Volkov walks into a final race thinking he's won. She mouths "thank you" through the visor and peels off into the dark.`,
+    reqCars:['Honda NSX Type R','Nissan GT-R Nismo','Porsche 911 Turbo S','McLaren 720S','Ferrari SF90 Stradale'],reqLabel:'an elite weapon',oppMult:2.0,reward:850000,xp:3500},
+  {id:7,chapter:'VIII',name:'The Drift King',rival:'Viktor "The DK" Volkov',loc:'Mt. Akina · Tokyo',type:'race',final:true,
+    intro:`Tokyo. Mt. Akina at dawn. Volkov chose the venue himself — the mountain where he earned the name Drift King two decades ago.\n\nHe steps out of his car wearing a smile that's been waiting for you since the docks. "Doc was a friend of mine once. Did he tell you that? Before he picked the wrong side."\n\nHe extends a hand. You don't take it.\n\n"Then let's race, kid. One run. Loser leaves the sport forever."`,
+    outro:`At the final hairpin you remember what Doc taught you on the coastal pass — trust the line. You take it clean. Volkov takes it desperate. He doesn't make the corner.\n\nDawn breaks over Tokyo. Switch is waiting at the top with her brother. Phantom's there. Even Bishop, hands in his pockets, gives a small nod before walking away.\n\nThe title is yours. The DK is yours. But that's not what Doc would have wanted you to remember.\n\nDrive the way he taught you.`,
+    reqCars:['Honda NSX Type R','McLaren 720S','Ferrari SF90 Stradale','Lamborghini Huracan STO','Bugatti Chiron'],reqLabel:'an elite weapon',oppMult:2.2,reward:1500000,xp:7500}
 ];
 let activeMode=null;
+let storyDialogIdx=null;
 
 function ownsAnyCar(names){return playerCars.some(pc=>names.includes(pc.car_name));}
 
@@ -964,8 +1002,8 @@ function showModeSelect(){
   const done=profile?.story?.completed;
   const lbl=document.getElementById('story-progress-label');
   if(done)lbl.textContent='COMPLETED ✓ · REPLAY →';
-  else if(st>0)lbl.textContent=`CONTINUE · STAGE ${st+1}/6 →`;
-  else lbl.textContent='START JOURNEY →';
+  else if(st>0)lbl.textContent=`CONTINUE · CHAPTER ${Math.min(st+1,8)}/8 →`;
+  else lbl.textContent='BEGIN THE STORY →';
 }
 function backToModeSelect(){showModeSelect();}
 function enterMode(mode){
@@ -979,37 +1017,68 @@ function renderStoryMap(){
   const completed=profile?.story?.completed;
   const el=document.getElementById('story-stages');
   el.innerHTML=STORY_STAGES.map((s,i)=>{
-    const isDone=i<st||(completed&&i<=5);
+    const isDone=i<st||(completed&&i<=7);
     const isActive=i===st&&!completed;
     const isLocked=i>st&&!completed;
     const owns=ownsAnyCar(s.reqCars);
     const cls=isDone?'done':isActive?'active':isLocked?'locked':'';
     const reqColor=owns?'var(--green2)':'var(--red2)';
+    const typeIcon={race:'🏁',escape:'🚨'}[s.type]||'🏁';
     let action='';
     if(isActive){
       action=owns
-        ? `<button class="btn btn-purple btn-sm" style="margin-top:8px" onclick="startStoryRace(${i})">🏁 Race ${s.rival}</button>`
-        : `<button class="btn btn-gold btn-sm" style="margin-top:8px" onclick="openStoryShop(${i})">🏪 Get a Drift Car</button>`;
+        ? `<button class="btn btn-red btn-sm" style="margin-top:10px" onclick="openStoryDialog(${i})">▶ Begin Chapter ${s.chapter}</button>`
+        : `<button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="openStoryShop(${i})">🏪 Get the Right Car</button>`;
     }
     return `<div class="stage-row ${cls}">
       ${i>0?'<div class="stage-line"></div>':''}
-      <div class="stage-node">${isDone?'✓':s.final?'🏯':isLocked?'🔒':'🏁'}</div>
+      <div class="stage-node">${isDone?'✓':s.final?'👑':isLocked?'🔒':typeIcon}</div>
       <div class="stage-info">
+        <div class="stage-chapter">CHAPTER ${s.chapter}${s.type==='escape'?' · ESCAPE':''}</div>
         <div class="stage-name">${s.name}</div>
         <div class="stage-sub">${s.loc} · vs ${s.rival}</div>
-        ${!isDone?`<div class="stage-req" style="color:${reqColor}">${owns?'✓ Ready':'Need: '+s.reqLabel}</div>`:'<div class="stage-req" style="color:var(--green2)">Cleared</div>'}
+        ${!isDone?`<div class="stage-req" style="color:${reqColor}">${owns?'✓ Car ready':'Need: '+s.reqLabel}</div>`:'<div class="stage-req" style="color:var(--green2)">Cleared</div>'}
         ${action}
       </div>
       <div style="text-align:right;flex-shrink:0;font-family:var(--mono);font-size:11px;color:var(--amber2)">+$${fmtCash(s.reward)}<br><span style="color:var(--text3)">+${s.xp}xp</span></div>
     </div>`;
   }).join('');
   if(completed){
-    el.innerHTML+=`<div style="text-align:center;margin-top:20px;padding:20px;background:var(--purple3);border:1px solid var(--purple2);border-radius:12px;">
-      <div style="font-size:38px;">👑</div>
-      <div class="logo" style="font-size:22px;color:var(--purple2);">DRIFT KING</div>
-      <div style="color:var(--text2);font-size:13px;margin-top:6px;">You conquered the Road to Tokyo. The DK title is yours.</div>
+    el.innerHTML+=`<div style="text-align:center;margin-top:24px;padding:24px;background:linear-gradient(180deg,rgba(230,0,35,.16),transparent);border:1px solid var(--red);border-radius:12px;">
+      <div style="font-size:42px;">👑</div>
+      <div style="font-family:var(--disp);font-size:24px;color:var(--red2);letter-spacing:3px;margin-top:4px">THE DRIFT KING</div>
+      <div style="color:var(--text2);font-size:13px;margin-top:10px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">You finished what Doc started. The title, the territory, the legend — all yours. Drive the way he taught you.</div>
     </div>`;
   }
+}
+function openStoryDialog(stageIdx){
+  storyDialogIdx=stageIdx;
+  const s=STORY_STAGES[stageIdx];if(!s)return;
+  const body=document.getElementById('modal-story-dialog-body');
+  body.innerHTML=`
+    <div class="story-dialog-chapter">CHAPTER ${s.chapter}</div>
+    <div class="story-dialog-title">${s.name}</div>
+    <div class="story-dialog-sub">${s.loc} · vs ${s.rival}</div>
+    <div class="story-dialog-text">${escapeHtml(s.intro).replace(/\n\n/g,'</p><p>').replace(/^/,'<p>')+'</p>'}</div>
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="closeModal('modal-story-dialog')">Not yet</button>
+      <button class="btn btn-red btn-lg" style="flex:1;min-width:160px" onclick="closeModal('modal-story-dialog');startStoryRace(${stageIdx})">${s.type==='escape'?'🚨 Run':'🏁 Race '+s.rival.split(' ')[0]}</button>
+    </div>`;
+  openModal('modal-story-dialog');
+}
+function showStoryOutro(stageIdx){
+  const s=STORY_STAGES[stageIdx];if(!s||!s.outro)return;
+  const body=document.getElementById('modal-story-dialog-body');
+  const isFinal=s.final;
+  const nextAction=isFinal?"showModeSelect()":"enterMode('story')";
+  body.innerHTML=`
+    <div class="story-dialog-chapter" style="color:var(--green2)">CHAPTER ${s.chapter} · CLEARED</div>
+    <div class="story-dialog-title">${s.name}</div>
+    <div class="story-dialog-text">${escapeHtml(s.outro).replace(/\n\n/g,'</p><p>').replace(/^/,'<p>')+'</p>'}</div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-red btn-lg" style="flex:1" onclick="closeModal('modal-story-dialog');${nextAction}">${isFinal?'👑 View the Throne':'Continue →'}</button>
+    </div>`;
+  openModal('modal-story-dialog');
 }
 let storyShopStage=null;
 function openStoryShop(stageIdx){
@@ -2395,10 +2464,10 @@ async function startStoryRace(stageIdx){
     profile.level=Math.floor((profile.xp||0)/1000)+1;
     renderHUD();
     rb.innerHTML=`<div style="font-size:46px;">${isFinal?'👑':'🏆'}</div>
-      <div class="result-title">${isFinal?'YOU ARE THE DRIFT KING':'STAGE CLEARED'}</div>
+      <div class="result-title">${isFinal?'YOU ARE THE DRIFT KING':'CHAPTER '+stage.chapter+' CLEARED'}</div>
       <div class="result-sub">Beat ${stage.rival} at ${stage.loc}</div>
       <div style="margin:14px 0;font-family:var(--mono);color:var(--green2);">+$${fmtCash(stage.reward)} · +${stage.xp} XP${isFinal?' · DK ROLE UNLOCKED':''}</div>
-      <button class="btn btn-purple btn-lg" onclick="resetArena();enterMode('story')">${isFinal?'👑 View Throne':'Continue Journey →'}</button>`;
+      <button class="btn btn-red btn-lg" onclick="resetArena();showStoryOutro(${stageIdx})">Read what happens next →</button>`;
     showXpPop(`+${stage.xp} XP`);
     toast(isFinal?'👑 DRIFT KING! Story complete!':'Stage cleared!','t-success');
     logActivity('story_win',{stage:stageIdx,rival:stage.rival,final:isFinal}).catch(()=>{});
@@ -2586,11 +2655,12 @@ async function loadLeaderboard(){
     try{return await q.get();}
     catch(e){console.error('Leaderboard query failed ['+label+']:',e.message);return {docs:[],_error:e.message};}
   };
+  const base=db.collection('profiles').where('is_npc','==',false);
   const [wSnap,cSnap,sSnap,gSnap]=await Promise.all([
-    safeGet(db.collection('profiles').orderBy('wins','desc').limit(10),'wins'),
-    safeGet(db.collection('profiles').orderBy('cash','desc').limit(10),'cash'),
-    safeGet(db.collection('profiles').orderBy('best_win_streak','desc').limit(10),'streak'),
-    safeGet(db.collection('profiles').orderBy('car_count','desc').limit(10),'cars')
+    safeGet(base.orderBy('wins','desc').limit(10),'wins'),
+    safeGet(base.orderBy('cash','desc').limit(10),'cash'),
+    safeGet(base.orderBy('best_win_streak','desc').limit(10),'streak'),
+    safeGet(base.orderBy('car_count','desc').limit(10),'cars')
   ]);
   const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${currentUser&&d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
   const emptyRow=msg=>`<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:14px">${msg}</td></tr>`;
