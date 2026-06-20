@@ -156,6 +156,23 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .btn-sm{padding:4px 9px;font-size:10px;}
 .btn:disabled{opacity:.3;cursor:not-allowed;}
 .stat-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px;}
+.stat-card-mini{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;text-align:center;}
+.scm-v{font-family:var(--disp);font-size:20px;font-weight:700;line-height:1.1;}
+.scm-l{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
+.stat-line{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;}
+.sl-lbl{color:var(--text2);font-size:11px;}
+.sl-val{font-family:var(--mono);color:var(--text);font-size:12px;font-weight:600;}
+.tut-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9994;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+.tut-card{background:var(--panel);border:1px solid var(--red);border-radius:var(--r2);padding:28px;max-width:480px;width:100%;box-shadow:0 0 40px rgba(230,0,35,.35),0 20px 60px rgba(0,0,0,.7);position:relative;}
+.tut-step{font-family:var(--mono);font-size:10px;color:var(--red2);letter-spacing:3px;margin-bottom:8px;}
+.tut-title{font-family:var(--disp);font-size:22px;letter-spacing:2px;color:var(--text);margin-bottom:14px;}
+.tut-body{color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:20px;}
+.tut-body strong{color:var(--text);}
+.tut-actions{display:flex;gap:10px;align-items:center;}
+.tut-dots{display:flex;gap:6px;flex:1;}
+.tut-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+.tut-dot.active{background:var(--red);box-shadow:0 0 8px var(--red);}
 .stat-row:last-child{border-bottom:none;}
 .stat-lbl{width:80px;font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0;text-transform:uppercase;letter-spacing:1px;}
 .stat-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
@@ -465,15 +482,21 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .toast.t-success{border-color:rgba(37,128,53,.5);color:var(--green2);}
 .toast.t-error{border-color:rgba(255,46,139,.5);color:var(--red2);}
 .toast.t-info{border-color:var(--border2);color:var(--steel2);}
-.broadcast-banner{position:fixed;top:14px;left:50%;transform:translate(-50%,-30px);z-index:9500;display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(12,10,30,.97);border:1px solid var(--border2);border-radius:var(--r2);box-shadow:0 12px 40px rgba(0,0,0,.6);backdrop-filter:blur(14px);max-width:min(560px,calc(100vw - 32px));opacity:0;transition:all .35s cubic-bezier(.2,.7,.3,1);font-family:var(--body);font-size:13px;}
-.broadcast-banner.show{transform:translate(-50%,0);opacity:1;}
-.broadcast-banner.t-success{border-color:rgba(37,128,53,.5);}
-.broadcast-banner.t-error{border-color:rgba(255,46,139,.55);}
-.broadcast-ico{font-size:16px;flex-shrink:0;}
-.broadcast-text{font-weight:600;color:var(--text);}
-.broadcast-from{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
-.broadcast-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0 0 0 4px;flex-shrink:0;}
-.broadcast-close:hover{color:var(--text);}
+#broadcast-stack{position:fixed;top:0;left:0;right:0;z-index:9500;pointer-events:none;display:flex;flex-direction:column;}
+.broadcast-bar{pointer-events:auto;display:flex;align-items:center;gap:14px;padding:14px 22px;background:linear-gradient(90deg,var(--panel) 0%,var(--panel2) 100%);border-bottom:1px solid var(--border2);font-family:var(--body);font-size:14px;color:var(--text);transform:translateY(-100%);transition:transform .4s cubic-bezier(.2,.8,.3,1),opacity .3s;opacity:0;position:relative;overflow:hidden;}
+.broadcast-bar.show{transform:translateY(0);opacity:1;}
+.broadcast-bar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--text2);}
+.broadcast-bar.t-info::before{background:var(--blue2);}
+.broadcast-bar.t-success::before{background:var(--green2);}
+.broadcast-bar.t-error::before{background:var(--red);box-shadow:0 0 18px var(--red);}
+.broadcast-bar.t-error{background:linear-gradient(90deg,rgba(230,0,35,.18),var(--panel2));animation:bbPulse 2s ease-in-out infinite;}
+@keyframes bbPulse{0%,100%{box-shadow:inset 0 0 0 0 rgba(230,0,35,0);}50%{box-shadow:inset 0 0 40px 0 rgba(230,0,35,.18);}}
+.broadcast-ico{font-size:22px;flex-shrink:0;line-height:1;}
+.broadcast-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.broadcast-text{font-weight:600;color:var(--text);line-height:1.3;}
+.broadcast-from{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+.broadcast-close{background:transparent;border:1px solid var(--border2);color:var(--text2);cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:14px;flex-shrink:0;transition:.15s;display:flex;align-items:center;justify-content:center;}
+.broadcast-close:hover{color:var(--text);border-color:var(--text2);background:var(--panel3);}
 .rt-dot{width:6px;height:6px;border-radius:50%;background:var(--red2);display:inline-block;margin-right:5px;animation:rtPulse 2s infinite;}
 @keyframes rtPulse{0%,100%{opacity:1;}50%{opacity:.2;}}
 .xp-pop{position:fixed;top:70px;right:20px;z-index:8000;font-family:var(--disp);font-size:16px;font-weight:700;color:var(--amber2);pointer-events:none;animation:xpFloat 2s ease forwards;text-shadow:var(--glow-amber);}
@@ -555,6 +578,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+<div id="broadcast-stack"></div>
 <div id="crt-overlay"></div>
 <canvas id="bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
 
@@ -673,6 +697,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
               <div class="hud-menu-top"><div style="font-size:13px;font-weight:700;font-family:var(--disp);letter-spacing:1px;color:var(--steel)" id="menu-username">Driver</div><div id="menu-role" style="margin-top:5px"></div></div>
               <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
               <div class="hud-menu-item" onclick="dailySpin()">🎰 Daily Spin</div>
+              <div class="hud-menu-item" onclick="replayTutorial()">❓ Replay Tutorial</div>
               <div class="hud-menu-divider"></div>
               <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
             </div>
@@ -886,7 +911,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
           <button class="admin-tab" onclick="adminSec('logs',this)">📋 Logs</button>
           <button class="admin-tab" onclick="adminSec('suspects',this)">🔍 Suspects</button>
           <button class="admin-tab" onclick="adminSec('panic',this)" style="color:var(--red2)">🚨 Panic</button>
-          <button class="admin-tab" onclick="adminSec('beta',this)" style="color:var(--amber2)">🧪 Beta Mode</button>
           <button class="admin-tab" onclick="adminSec('backup',this)">💾 Backup</button>
           <button class="admin-tab" onclick="adminSec('settings',this)">⚙ Settings</button>
         </div>
@@ -1347,7 +1371,44 @@ async function initGame(){
   checkAchievements();
   logActivity('login',{}).catch(()=>{});
   startOpenMojiSwap();
+  maybeShowTutorial();
 }
+
+const TUTORIAL_STEPS=[
+  {title:'Welcome to REDLINE',body:'You just landed in Vice City with a starter ride and $50K in your pocket. The streets pay if you can drive — let me show you how to make money fast.'},
+  {title:'Step 1 — Race for Cash',body:'Head to the <strong>🏁 Race</strong> tab. Pick an event from the left rail — start with <strong>Easy</strong> ones, they have the lowest entry fees. Win and you keep the prize, lose and you lose the fee. Simple.'},
+  {title:'Step 2 — Buy Better Cars',body:'The <strong>🏪 Market</strong> tab is where you spend winnings. Try a <strong>pack</strong> for a gacha pull, or buy a specific car directly. Better stats = more wins. Your active car shows in the garage.'},
+  {title:'Step 3 — Watch Your Heat',body:'Every race raises your <strong>Heat</strong>. Too high and the cops bust you mid-race. Use <strong>Lay Low</strong> when heat gets red, or you\'ll lose cash to a bust.'},
+  {title:'Step 4 — Story & Crews',body:'When you\'re ready for more: <strong>📜 Story Mode</strong> has an 8-chapter narrative ending in a final showdown. Join a <strong>🤝 Crew</strong> to climb the team leaderboard. Daily Spin in the menu = free cash.'},
+  {title:'You\'re Set',body:'That\'s it. Win races, build a garage, climb the boards. Good luck out there.'}
+];
+let tutStep=0;
+function maybeShowTutorial(){
+  if(localStorage.getItem('redline_tutorial_done')==='1')return;
+  if((profile.wins||0)+(profile.losses||0)>2){localStorage.setItem('redline_tutorial_done','1');return;}
+  tutStep=0;showTutorial();
+}
+function showTutorial(){
+  const s=TUTORIAL_STEPS[tutStep];if(!s){closeTutorial(true);return;}
+  let wrap=document.getElementById('tut-wrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='tut-wrap';wrap.className='tut-overlay';document.body.appendChild(wrap);}
+  wrap.innerHTML=`<div class="tut-card">
+    <div class="tut-step">STEP ${tutStep+1} / ${TUTORIAL_STEPS.length}</div>
+    <div class="tut-title">${s.title}</div>
+    <div class="tut-body">${s.body}</div>
+    <div class="tut-actions">
+      <div class="tut-dots">${TUTORIAL_STEPS.map((_,i)=>`<div class="tut-dot${i===tutStep?' active':''}"></div>`).join('')}</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeTutorial(false)">Skip</button>
+      <button class="btn btn-red" onclick="nextTutorial()">${tutStep===TUTORIAL_STEPS.length-1?'Finish ✓':'Next →'}</button>
+    </div>
+  </div>`;
+}
+function nextTutorial(){tutStep++;if(tutStep>=TUTORIAL_STEPS.length){closeTutorial(true);return;}showTutorial();}
+function closeTutorial(completed){
+  const wrap=document.getElementById('tut-wrap');if(wrap)wrap.remove();
+  if(completed)localStorage.setItem('redline_tutorial_done','1');
+}
+function replayTutorial(){localStorage.removeItem('redline_tutorial_done');tutStep=0;showTutorial();}
 
 const OPENMOJI_CDN='https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/';
 
@@ -2405,7 +2466,7 @@ async function startStoryRace(stageIdx){
   const stage=STORY_STAGES[stageIdx];if(!stage)return;
   const pc=playerCars.find(p=>p.is_active&&stage.reqCars.includes(p.car_name))
         ||playerCars.find(p=>stage.reqCars.includes(p.car_name));
-  if(!pc){toast('You need the right drift car for this stage!','t-error');enterMode('free');return;}
+  if(!pc){toast('You need the right drift car — buy one here!','t-error');openStoryShop(stageIdx);return;}
 
   document.getElementById('story-screen').style.display='none';
   document.getElementById('game').style.display='block';
@@ -2502,8 +2563,8 @@ async function startStoryRace(stageIdx){
       <div class="result-sub">Your line wasn't clean enough. Upgrade your drift car and try again.</div>
       <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
         <button class="btn btn-purple" onclick="resetArena();startStoryRace(${stageIdx})">↺ Rematch</button>
-        <button class="btn btn-ghost" onclick="resetArena();showTab('garage')">🔧 Upgrade</button>
-        <button class="btn btn-ghost" onclick="resetArena();enterMode('story')">Map</button>
+        <button class="btn btn-ghost" onclick="resetArena();openStoryShop(${stageIdx})">🔧 Upgrade Car</button>
+        <button class="btn btn-ghost" onclick="resetArena();enterMode('story')">← Story Map</button>
       </div>`;
     toast(`Lost to ${stage.rival}. Try again!`,'t-error');
   }
@@ -2725,13 +2786,31 @@ async function renderProfile(){
   document.getElementById('xp-bar').style.width=Math.min(100,((profile.xp||0)/xpNext)*100)+'%';
   document.getElementById('prof-av').textContent=(profile.username||'R')[0].toUpperCase();
   document.getElementById('prof-role').innerHTML=roleBadge(profile);
-  const wr=profile.wins+profile.losses>0?Math.round((profile.wins/(profile.wins+profile.losses))*100):0;
+  const totalRaces=(profile.wins||0)+(profile.losses||0);
+  const wr=totalRaces>0?Math.round((profile.wins/totalRaces)*100):0;
+  const kd=profile.losses>0?(profile.wins/profile.losses).toFixed(2):(profile.wins||0).toFixed(2);
+  const garageValue=playerCars.reduce((s,pc)=>{const c=CAR_DATA.find(x=>x.name===pc.car_name);return s+(c?.base_price||0);},0);
+  const rarestCar=playerCars.map(pc=>CAR_DATA.find(c=>c.name===pc.car_name)).filter(Boolean).sort((a,b)=>{const o={Common:1,Uncommon:2,Rare:3,Epic:4,Legendary:5,Mythic:6};return (o[b.rarity]||0)-(o[a.rarity]||0);})[0];
+  const activeCar=playerCars.find(pc=>pc.is_active);
   document.getElementById('prof-stats-detail').innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-card-mini"><div class="scm-v" style="color:var(--green2)">${wr}%</div><div class="scm-l">Win Rate</div></div>
+      <div class="stat-card-mini"><div class="scm-v" style="color:var(--blue2)">${kd}</div><div class="scm-l">K/D Ratio</div></div>
+      <div class="stat-card-mini"><div class="scm-v" style="color:var(--amber2)">${totalRaces}</div><div class="scm-l">Total Races</div></div>
+      <div class="stat-card-mini"><div class="scm-v" style="color:var(--red2)">${profile.best_win_streak||0}</div><div class="scm-l">Best Streak</div></div>
+    </div>
     <div class="stat-row"><div class="stat-lbl">Win Rate</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${wr}%;background:var(--green2)"></div></div><div class="stat-val">${wr}%</div></div>
-    <div class="stat-row"><div class="stat-lbl">Races</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.wins+profile.losses)/2)}%;background:var(--blue2)"></div></div><div class="stat-val">${(profile.wins||0)+(profile.losses||0)}</div></div>
-    <div class="stat-row"><div class="stat-lbl">Cars</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,playerCars.length*10)}%;background:var(--amber2)"></div></div><div class="stat-val">${playerCars.length}</div></div>
-    <div class="stat-row"><div class="stat-lbl">Rep</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.reputation||0)/10)}%;background:var(--purple2)"></div></div><div class="stat-val">${profile.reputation||0}</div></div>
-    <div class="stat-row"><div class="stat-lbl">Daily</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.daily_streak||0)*14)}%;background:var(--red2)"></div></div><div class="stat-val">${profile.daily_streak||0} days</div></div>`;
+    <div class="stat-row"><div class="stat-lbl">Reputation</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.reputation||0)/20)}%;background:var(--purple2)"></div></div><div class="stat-val">${(profile.reputation||0).toLocaleString()}</div></div>
+    <div class="stat-row"><div class="stat-lbl">Daily Login</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${Math.min(100,(profile.daily_streak||0)*14)}%;background:var(--red2)"></div></div><div class="stat-val">${profile.daily_streak||0} days</div></div>
+    <div class="stat-row"><div class="stat-lbl">Heat Level</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${profile.heat||0}%;background:${(profile.heat||0)>=70?'var(--red2)':(profile.heat||0)>=35?'var(--amber2)':'var(--green2)'}"></div></div><div class="stat-val">${profile.heat||0}/100</div></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div class="stat-line"><span class="sl-lbl">Garage Value</span><span class="sl-val" style="color:var(--green2)">$${fmtCash(garageValue)}</span></div>
+      <div class="stat-line"><span class="sl-lbl">Cars Owned</span><span class="sl-val">${playerCars.length}</span></div>
+      ${activeCar?`<div class="stat-line"><span class="sl-lbl">Active Car</span><span class="sl-val">${activeCar.car_emoji||'🚗'} ${escapeHtml(activeCar.car_name)}</span></div>`:''}
+      ${rarestCar?`<div class="stat-line"><span class="sl-lbl">Rarest Car</span><span class="sl-val" style="color:var(--amber2)">${rarestCar.emoji} ${escapeHtml(rarestCar.name)}</span></div>`:''}
+      ${profile.crew_name?`<div class="stat-line"><span class="sl-lbl">Crew</span><span class="sl-val" style="color:var(--red2)">🤝 ${escapeHtml(profile.crew_name)}</span></div>`:''}
+      ${profile.story?`<div class="stat-line"><span class="sl-lbl">Story</span><span class="sl-val">Chapter ${(profile.story.stage||0)+1}/8${profile.story.completed?' ✓':''}</span></div>`:''}
+    </div>`;
   const last=profile.last_daily?.toDate?.()??null;
   const todayStr=new Date().toDateString();
   document.getElementById('prof-daily-info').innerHTML=`
@@ -2744,13 +2823,29 @@ async function renderProfile(){
   raceHistLoaded=true;
   document.getElementById('race-hist').innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
   try{
-
     const rSnap=await db.collection('races').where('player_id','==',currentUser.uid).limit(50).get();
     const races=rSnap.docs.map(d=>d.data()).sort((a,b)=>{
       const ta=a.created_at?.toDate?.()?.getTime()||0,tb=b.created_at?.toDate?.()?.getTime()||0;
       return tb-ta;
-    }).slice(0,10);
-    document.getElementById('race-hist').innerHTML=races.length?races.map(r=>{
+    });
+    const wins=races.filter(r=>r.result==='win');
+    const totalEarned=wins.reduce((s,r)=>s+(r.reward||0),0);
+    const biggestWin=wins.reduce((m,r)=>Math.max(m,r.reward||0),0);
+    const typeCount={};
+    races.forEach(r=>{typeCount[r.race_type||'?']=(typeCount[r.race_type||'?']||0)+1;});
+    const favType=Object.entries(typeCount).sort((a,b)=>b[1]-a[1])[0];
+    const carCount={};
+    races.forEach(r=>{if(r.car_name)carCount[r.car_name]=(carCount[r.car_name]||0)+1;});
+    const favCar=Object.entries(carCount).sort((a,b)=>b[1]-a[1])[0];
+    document.getElementById('prof-stats-detail').insertAdjacentHTML('beforeend',`
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:8px">LAST ${races.length} RACES</div>
+        <div class="stat-line"><span class="sl-lbl">Earned from Wins</span><span class="sl-val" style="color:var(--green2)">$${fmtCash(totalEarned)}</span></div>
+        <div class="stat-line"><span class="sl-lbl">Biggest Win</span><span class="sl-val" style="color:var(--amber2)">$${fmtCash(biggestWin)}</span></div>
+        ${favType?`<div class="stat-line"><span class="sl-lbl">Favorite Event</span><span class="sl-val">${escapeHtml(favType[0])} <span style="color:var(--text3);font-size:10px">(${favType[1]}×)</span></span></div>`:''}
+        ${favCar?`<div class="stat-line"><span class="sl-lbl">Most-Used Car</span><span class="sl-val">${escapeHtml(favCar[0])} <span style="color:var(--text3);font-size:10px">(${favCar[1]}×)</span></span></div>`:''}
+      </div>`);
+    document.getElementById('race-hist').innerHTML=races.length?races.slice(0,10).map(r=>{
       const w=r.result==='win';
       return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);align-items:center">
         <div><div style="font-weight:700;font-family:var(--disp);letter-spacing:.5px;font-size:13px">${r.race_type||'?'} <span style="font-size:10px;color:var(--text3);font-weight:400">· ${r.difficulty||''}</span></div>
@@ -2989,14 +3084,24 @@ function setupBroadcastListener(){
   auctUnsubs.push(broadcastUnsub);
 }
 function showBroadcastBanner(msg,type,sender){
-
-  const wrap=document.createElement('div');
-  wrap.className='broadcast-banner '+(type||'t-info');
-  wrap.innerHTML=`<span class="broadcast-ico">📢</span><span class="broadcast-text">${escapeHtml(msg)}</span><span class="broadcast-from">— ${escapeHtml(sender||'Admin')}</span><button class="broadcast-close" onclick="this.parentElement.remove()">✕</button>`;
-  document.body.appendChild(wrap);
-  requestAnimationFrame(()=>wrap.classList.add('show'));
-  setTimeout(()=>{wrap.classList.remove('show');setTimeout(()=>wrap.remove(),400);},9000);
-  toast(msg,type);
+  const stack=document.getElementById('broadcast-stack');if(!stack)return;
+  const isError=type==='t-error';
+  const ico=isError?'🚨':type==='t-success'?'✓':'📢';
+  const bar=document.createElement('div');
+  bar.className='broadcast-bar '+(type||'t-info');
+  bar.innerHTML=`<span class="broadcast-ico">${ico}</span>
+    <div class="broadcast-body">
+      <span class="broadcast-text">${escapeHtml(msg)}</span>
+      <span class="broadcast-from">— ${escapeHtml(sender||'Admin')}</span>
+    </div>
+    <button class="broadcast-close" aria-label="Dismiss">✕</button>`;
+  bar.querySelector('.broadcast-close').onclick=()=>{bar.classList.remove('show');setTimeout(()=>bar.remove(),400);};
+  stack.appendChild(bar);
+  requestAnimationFrame(()=>bar.classList.add('show'));
+  // Errors/alerts stay until dismissed. Info/success auto-clear after a few seconds.
+  if(!isError){
+    setTimeout(()=>{if(bar.parentElement){bar.classList.remove('show');setTimeout(()=>bar.remove(),400);}},6000);
+  }
 }
 async function sendChatMsg(){
   const input=document.getElementById('chat-input');
@@ -3045,7 +3150,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects,beta:adminBeta};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -3857,18 +3962,25 @@ async function adminPanic(el){
 }
 async function firePanic(){
   if(!confirm('Activate emergency mode? Market, auctions and races will lock for everyone.'))return;
-  await db.collection('settings').doc('game').set({panic:true,panic_at:firebase.firestore.FieldValue.serverTimestamp(),panic_by:profile.username},{merge:true});
-  await db.collection('broadcasts').add({message:'⚠ EMERGENCY MODE — services locked',type:'t-error',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  logActivity('admin_panic',{}).catch(()=>{});
-  document.getElementById('panic-status').innerHTML='<span style="color:var(--red2)">⚠ Emergency mode ACTIVE</span>';
-  toast('Emergency mode activated','t-error');
+  try{
+    await db.collection('settings').doc('game').set({panic:true,panic_at:firebase.firestore.FieldValue.serverTimestamp(),panic_by:profile.username},{merge:true});
+    await db.collection('broadcasts').add({message:'⚠ EMERGENCY MODE — services locked',type:'t-error',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
+    logActivity('admin_panic',{}).catch(()=>{});
+    const st=document.getElementById('panic-status');if(st)st.innerHTML='<span style="color:var(--red2)">⚠ Emergency mode ACTIVE</span>';
+    showBroadcastBanner('⚠ EMERGENCY MODE — services locked','t-error',profile.username);
+    toast('Emergency mode activated','t-error');
+  }catch(e){toast('Failed: '+e.message,'t-error');console.error(e);}
 }
 async function liftPanic(){
-  await db.collection('settings').doc('game').set({panic:false},{merge:true});
-  await db.collection('broadcasts').add({message:'✓ Services restored',type:'t-success',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  logActivity('admin_panic_lift',{}).catch(()=>{});
-  document.getElementById('panic-status').innerHTML='<span style="color:var(--green2)">✓ Emergency lifted</span>';
-  toast('Emergency lifted','t-success');
+  if(!confirm('Lift emergency mode? Services will be restored.'))return;
+  try{
+    await db.collection('settings').doc('game').set({panic:false,panic_lifted_at:firebase.firestore.FieldValue.serverTimestamp(),panic_lifted_by:profile.username},{merge:true});
+    await db.collection('broadcasts').add({message:'✓ Services restored — emergency lifted',type:'t-success',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
+    logActivity('admin_panic_lift',{}).catch(()=>{});
+    const st=document.getElementById('panic-status');if(st)st.innerHTML='<span style="color:var(--green2)">✓ Emergency lifted</span>';
+    showBroadcastBanner('✓ Services restored — emergency lifted','t-success',profile.username);
+    toast('Emergency lifted','t-success');
+  }catch(e){toast('Failed: '+e.message,'t-error');console.error(e);}
 }
 async function adminSuspects(el){
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
@@ -3898,76 +4010,6 @@ async function adminSuspects(el){
   </tr>`).join('')}</tbody></table>
   <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--text3)">Heuristic: flags accounts with high cash-per-hour or undefeated long streaks. Manual review recommended before action.</div>`;
 }
-async function adminBeta(el){
-  const gameUrl=window.location.href.split('#')[0];
-  el.innerHTML=`<div class="panel">
-    <h3 style="color:var(--amber2)">🧪 Beta Mode</h3>
-    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">A separate workspace to test new features or risky changes without breaking the live game.</p>
-    <div class="admin-grid-2">
-      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">📋 Clone Current Build</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Download the live game HTML as <code>redline_beta.html</code>. Drop it into a separate hosting spot (Vercel, Netlify, GitHub Pages, or just open locally) and you've got a beta instance.</div>
-        <button class="btn btn-red" onclick="exportBetaBuild()">⬇ Download Beta Copy</button>
-      </div>
-      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">🔀 Switch Firebase Project</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Point the beta at a separate Firebase project so test data never touches live. Paste a beta config below; saved to localStorage for this browser only.</div>
-        <textarea id="beta-fbcfg" class="form-input" rows="6" style="font-family:var(--mono);font-size:10px;width:100%" placeholder='{"apiKey":"...","authDomain":"...","projectId":"redline-beta",...}'></textarea>
-        <button class="btn btn-ghost" style="margin-top:6px" onclick="saveBetaConfig()">Save Config</button>
-        <button class="btn btn-ghost" style="margin-top:6px" onclick="clearBetaConfig()">Clear</button>
-      </div>
-      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">🚀 Open Online Sandbox</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Pop the current build into an online code editor for quick edits with live preview.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a class="btn btn-ghost" href="https://codesandbox.io/" target="_blank" rel="noopener">CodeSandbox →</a>
-          <a class="btn btn-ghost" href="https://stackblitz.com/" target="_blank" rel="noopener">StackBlitz →</a>
-          <a class="btn btn-ghost" href="https://glitch.com/" target="_blank" rel="noopener">Glitch →</a>
-        </div>
-      </div>
-      <div style="background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
-        <div style="font-family:var(--disp);font-size:14px;letter-spacing:2px;color:var(--steel);margin-bottom:6px">🚩 Beta Feature Flags</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Toggle in-progress features for testing without redeploying. Saved per-browser.</div>
-        <div id="beta-flags"></div>
-      </div>
-    </div>
-    <div style="margin-top:14px;padding:12px;background:var(--bg3);border-left:3px solid var(--amber);border-radius:var(--r);font-size:11px;color:var(--text2);font-family:var(--mono)">
-      ⚠ Heads-up: a beta copy hitting the same Firebase project as live will share data. Use a separate Firebase project for true isolation.
-    </div>
-  </div>`;
-  document.getElementById('beta-fbcfg').value=localStorage.getItem('beta_fb_config')||'';
-  renderBetaFlags();
-}
-function exportBetaBuild(){
-  const html=document.documentElement.outerHTML;
-  const blob=new Blob(['<!DOCTYPE html>\n'+html],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`redline_beta_${Date.now()}.html`;a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),5000);
-  toast('Beta copy downloaded','t-success');
-}
-function saveBetaConfig(){
-  const v=document.getElementById('beta-fbcfg').value.trim();
-  try{if(v)JSON.parse(v);localStorage.setItem('beta_fb_config',v);toast('Beta config saved (this browser)','t-success');}
-  catch(e){toast('Invalid JSON: '+e.message,'t-error');}
-}
-function clearBetaConfig(){localStorage.removeItem('beta_fb_config');document.getElementById('beta-fbcfg').value='';toast('Cleared','t-info');}
-const BETA_FLAGS=['new_race_camera','experimental_drift_scoring','crew_perks','seasonal_events','dm_system'];
-function renderBetaFlags(){
-  const el=document.getElementById('beta-flags');if(!el)return;
-  const enabled=JSON.parse(localStorage.getItem('beta_flags')||'{}');
-  el.innerHTML=BETA_FLAGS.map(f=>`<label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;font-family:var(--mono)">
-    <input type="checkbox" ${enabled[f]?'checked':''} onchange="toggleBetaFlag('${f}',this.checked)"> ${f.replace(/_/g,' ')}
-  </label>`).join('');
-}
-function toggleBetaFlag(name,on){
-  const flags=JSON.parse(localStorage.getItem('beta_flags')||'{}');
-  if(on)flags[name]=true;else delete flags[name];
-  localStorage.setItem('beta_flags',JSON.stringify(flags));
-  window.BETA=flags;
-}
-window.BETA=JSON.parse(localStorage.getItem('beta_flags')||'{}');
-
 async function adminSettings(el){
   const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
   const sett=settDoc?.exists?settDoc.data():{};
