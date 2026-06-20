@@ -8,23 +8,23 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0a0a1f;--bg2:#0e0d28;--bg3:#15123a;
-  --panel:#120f30;--panel2:#181440;--panel3:#211a52;
-  --border:#2a2260;--border2:#3a2d80;--border3:#4d3aa0;
-  --red:#ff2e8b;--red2:#ff5cad;--red3:rgba(255,46,139,.12);
-  --amber:#ff7a3d;--amber2:#ffa35c;--amber3:rgba(255,122,61,.12);
-  --steel:#bfe8ff;--steel2:#7fd8ff;--steel3:#3a4d80;
-  --green:#00d99a;--green2:#2ef0b8;--green3:rgba(0,217,154,.12);
-  --blue:#00b8e0;--blue2:#00e5ff;--blue3:rgba(0,229,255,.12);
-  --purple:#8a2be8;--purple2:#b160ff;--purple3:rgba(138,43,232,.14);
-  --text:#eef0ff;--text2:#9d96d8;--text3:#534890;--text4:#2a2260;
+  --bg:#05060a;--bg2:#080a12;--bg3:#0d1018;
+  --panel:#0a0d16;--panel2:#10141f;--panel3:#171c2b;
+  --border:#1c2331;--border2:#2a3447;--border3:#3d4a63;
+  --red:#ff1f6b;--red2:#ff5c93;--red3:rgba(255,31,107,.12);
+  --amber:#ffb020;--amber2:#ffc757;--amber3:rgba(255,176,32,.12);
+  --steel:#d4f3ff;--steel2:#8fe3ff;--steel3:#2a4055;
+  --green:#00e676;--green2:#46ff9c;--green3:rgba(0,230,118,.12);
+  --blue:#00d0ff;--blue2:#3ae6ff;--blue3:rgba(0,208,255,.12);
+  --purple:#b026ff;--purple2:#cc6bff;--purple3:rgba(176,38,255,.14);
+  --text:#eaf6ff;--text2:#8ba0b8;--text3:#4a5a72;--text4:#1c2331;
   --mono:'Share Tech Mono',monospace;
   --disp:'Audiowide',sans-serif;
   --body:'Rajdhani',sans-serif;
   --r:5px;--r2:8px;
-  --glow-red:0 0 20px rgba(255,46,139,.45);
-  --glow-amber:0 0 16px rgba(255,122,61,.35);
-  --glow-cyan:0 0 18px rgba(0,229,255,.4);
+  --glow-red:0 0 20px rgba(255,31,107,.5);
+  --glow-amber:0 0 16px rgba(255,176,32,.4);
+  --glow-cyan:0 0 18px rgba(0,208,255,.45);
 }
 body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;}
 .openmoji-img{height:1.18em;width:1.18em;vertical-align:-0.22em;display:inline-block;object-fit:contain;}
@@ -624,6 +624,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
             <div class="hud-menu" id="hud-menu">
               <div class="hud-menu-top"><div style="font-size:13px;font-weight:700;font-family:var(--disp);letter-spacing:1px;color:var(--steel)" id="menu-username">Driver</div><div id="menu-role" style="margin-top:5px"></div></div>
               <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
+              <div class="hud-menu-item" onclick="dailySpin()">🎰 Daily Spin</div>
               <div class="hud-menu-divider"></div>
               <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
             </div>
@@ -818,6 +819,8 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
           <div class="admin-nav-item" onclick="adminSec('heat',this)">🚨 Heat Control</div>
           <div class="admin-nav-item" onclick="adminSec('events',this)">🎉 Events</div>
           <div class="admin-nav-item" onclick="adminSec('broadcast',this)">📢 Broadcast</div>
+          <div class="admin-nav-item" onclick="adminSec('giveaway',this)">🎁 Giveaway</div>
+          <div class="admin-nav-item" onclick="adminSec('serverstats',this)">📡 Server Stats</div>
           <div class="admin-nav-item" onclick="adminSec('settings',this)">⚙ Settings</div>
         </div>
         <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
@@ -1353,6 +1356,24 @@ async function checkDailyBonus(){
   profile.last_daily=fresh.last_daily;
   profile.daily_streak=fresh.daily_streak||0;
   showDailyBonus();
+}
+async function dailySpin(){
+  document.getElementById('hud-menu')?.classList.remove('open');
+  const last=profile.last_spin?.toDate?.()?.getTime()||0;
+  const since=Date.now()-last;
+  if(since<20*3600*1000){
+    const hrs=Math.ceil((20*3600*1000-since)/3600000);
+    toast(`🎰 Next spin in ~${hrs}h`,'t-info');return;
+  }
+  // Weighted reward wheel
+  const prizes=[2000,5000,5000,10000,10000,25000,50000,100000];
+  const win=prizes[Math.floor(Math.random()*prizes.length)];
+  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(win),last_spin:firebase.firestore.Timestamp.now()});
+  profile.cash=(profile.cash||0)+win;profile.last_spin={toDate:()=>new Date()};
+  renderHUD();
+  toast(`🎰 Daily Spin: +$${fmtCash(win)}!`,'t-success');
+  showXpPop(`+$${fmtCash(win)}`);
+  logActivity('daily_spin',{amount:win}).catch(()=>{});
 }
 function showDailyBonus(){
   if(!profile)return;
@@ -2766,7 +2787,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,settings:adminSettings};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -3205,6 +3226,55 @@ async function endActiveEvent(){
   logActivity('end_event',{}).catch(()=>{});
   loadAdminSec('events');
 }
+async function adminGiveaway(el){
+  el.innerHTML=`<div class="panel"><h3>🎁 Cash Giveaway</h3>
+    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Drop cash into every real (non-NPC) player's account at once. Great for events or apologies.</p>
+    <div style="margin-bottom:12px"><label class="form-label">Amount per player</label><input class="form-input" type="number" id="gv-amt" value="50000" min="1"></div>
+    <button class="btn btn-gold btn-lg" onclick="runGiveaway()">🎁 Send to All Players</button>
+    <div id="gv-status" style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+  </div>`;
+}
+async function runGiveaway(){
+  const amt=parseInt(document.getElementById('gv-amt').value);
+  if(isNaN(amt)||amt<1){toast('Invalid amount','t-error');return;}
+  if(!confirm(`Give $${fmtCash(amt)} to every real player?`))return;
+  const st=document.getElementById('gv-status');st.textContent='Sending…';
+  const snap=await db.collection('profiles').where('is_npc','==',false).limit(500).get();
+  const batch=db.batch();let n=0;
+  snap.docs.forEach(d=>{batch.update(d.ref,{cash:firebase.firestore.FieldValue.increment(amt)});n++;});
+  await batch.commit().catch(e=>{st.textContent='Failed: '+e.message;});
+  st.textContent=`✓ Sent $${fmtCash(amt)} to ${n} players.`;
+  // Announce it in-game via the broadcast pipeline
+  db.collection('broadcasts').add({message:`🎁 Giveaway! Everyone received $${fmtCash(amt)}!`,type:'t-success',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  logActivity('giveaway',{amount:amt,count:n}).catch(()=>{});
+  if(profile)profile.cash=(profile.cash||0)+amt;renderHUD();
+}
+async function adminServerStats(el){
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  const [profs,races,crews,aucts]=await Promise.all([
+    db.collection('profiles').limit(1000).get(),
+    db.collection('races').limit(1000).get(),
+    db.collection('crews').limit(200).get(),
+    db.collection('auctions').where('status','==','active').limit(200).get().catch(()=>({size:0,docs:[]})),
+  ]);
+  const real=profs.docs.filter(d=>!d.data().is_npc);
+  const npcs=profs.docs.length-real.length;
+  const totalCash=real.reduce((s,d)=>s+(d.data().cash||0),0);
+  const totalWins=real.reduce((s,d)=>s+(d.data().wins||0),0);
+  const wanted=real.filter(d=>(d.data().heat||0)>=70).length;
+  const card=(v,l,c)=>`<div class="admin-stat-card"><div class="admin-stat-val" style="color:${c}">${v}</div><div class="admin-stat-lbl">${l}</div></div>`;
+  el.innerHTML=`<div class="admin-stat-grid">
+    ${card(real.length,'Real Players','var(--blue2)')}
+    ${card(npcs,'NPCs','var(--text2)')}
+    ${card(races.size,'Races (sampled)','var(--red2)')}
+    ${card(crews.size,'Crews','var(--purple2)')}
+    ${card(aucts.size||0,'Live Auctions','var(--amber2)')}
+    ${card(wanted,'Wanted (70+ heat)','var(--red2)')}
+    ${card('$'+fmtCash(totalCash),'Total Economy','var(--green2)')}
+    ${card(totalWins,'Total Wins','var(--steel)')}
+  </div>
+  <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:10px;text-align:center">Sampled snapshot · refresh tab to update</div>`;
+}
 async function adminBroadcast(el){
   el.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
     <div><label class="form-label">Message</label><textarea class="form-input" id="bc-msg" rows="3" placeholder="Announcement..." style="resize:vertical;font-family:var(--body)"></textarea></div>
@@ -3298,130 +3368,51 @@ async function logActivity(action,details){
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
   let W,H,t=0;
-  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-
-  // Vice City palette: hot pink, cyan, purple, sunset orange/yellow
-  const COLORS=['rgba(255,46,139,','rgba(0,229,255,','rgba(138,43,232,','rgba(255,122,61,'];
-  const stars=Array.from({length:90},()=>({x:Math.random(),y:Math.random()*.45,r:Math.random()*1.2+.2,o:Math.random()*.5+.1,tw:Math.random()*Math.PI*2}));
-
-  // Palm tree silhouettes — varying positions, sizes, sway phase
-  const palms=[
-    {x:.06,y:.74,s:1.15,ph:0},{x:.93,y:.7,s:.95,ph:1.4},
-    {x:.16,y:.82,s:.7,ph:2.6},{x:.82,y:.85,s:.6,ph:.8},
-  ];
-  function drawPalm(p){
-    const px=p.x*W,py=p.y*H,scale=p.s*Math.min(W,H)*0.09;
-    const sway=Math.sin(t*0.4+p.ph)*0.05;
-    ctx.save();ctx.translate(px,py);
-    ctx.fillStyle='rgba(10,8,30,0.85)';
-    // trunk — slightly curved
-    ctx.beginPath();
-    ctx.moveTo(-scale*0.08,0);
-    ctx.quadraticCurveTo(sway*scale*1.5,-scale*1.1,sway*scale*2.2-scale*0.04,-scale*2.2);
-    ctx.lineTo(sway*scale*2.2+scale*0.1,-scale*2.2);
-    ctx.quadraticCurveTo(sway*scale*1.5+scale*0.12,-scale*1.1,scale*0.08,0);
-    ctx.closePath();ctx.fill();
-    // fronds — fan of curved leaves from top of trunk
-    const topX=sway*scale*2.2,topY=-scale*2.2;
-    for(let i=0;i<6;i++){
-      const ang=(i/5)*Math.PI*1.3-Math.PI*1.05+Math.sin(t*0.4+p.ph+i)*0.06;
-      ctx.save();ctx.translate(topX,topY);ctx.rotate(ang);
-      ctx.beginPath();ctx.moveTo(0,0);
-      ctx.quadraticCurveTo(scale*0.9,-scale*0.15,scale*1.7,scale*0.05);
-      ctx.quadraticCurveTo(scale*0.9,scale*0.12,0,0);
-      ctx.closePath();ctx.fill();
-      ctx.restore();
-    }
+  function size(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;}
+  size();addEventListener('resize',size);
+  const stars=[];for(let i=0;i<90;i++)stars.push({x:Math.random(),y:Math.random()*0.55,r:Math.random()*1.4+0.3,tw:Math.random()*6.28});
+  function draw(){
+    t+=0.016;
+    const hy=H*0.62; // horizon
+    // sky gradient
+    let g=ctx.createLinearGradient(0,0,0,hy);
+    g.addColorStop(0,'#090318');g.addColorStop(0.5,'#1b0830');g.addColorStop(1,'#3d0d3a');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,hy);
+    // stars
+    for(const s of stars){const a=0.4+0.6*Math.abs(Math.sin(t+s.tw));ctx.globalAlpha=a;ctx.fillStyle='#cfe8ff';ctx.fillRect(s.x*W,s.y*hy,s.r,s.r);}
+    ctx.globalAlpha=1;
+    // sun
+    const cx=W/2, sr=Math.min(W,H)*0.16, sy=hy-sr*0.55;
+    let sg=ctx.createLinearGradient(cx,sy-sr,cx,sy+sr);
+    sg.addColorStop(0,'#ffe14d');sg.addColorStop(0.5,'#ff5ea8');sg.addColorStop(1,'#ff2e8b');
+    ctx.save();ctx.beginPath();ctx.arc(cx,sy,sr,0,6.2832);ctx.clip();
+    ctx.fillStyle=sg;ctx.fillRect(cx-sr,sy-sr,sr*2,sr*2);
+    // sun scanlines
+    ctx.fillStyle='#1b0830';
+    for(let i=0;i<10;i++){const yy=sy+i*(sr*0.16)-sr*0.1;ctx.fillRect(cx-sr,yy,sr*2,Math.max(1,(i/10)*5));}
     ctx.restore();
-  }
-
-  // Skyline buildings with lit windows
-  const buildings=Array.from({length:14},(_,i)=>({
-    x:i/14,w:1/14*(0.7+Math.random()*0.5),h:0.08+Math.random()*0.22,
-    lit:Array.from({length:18},()=>Math.random()<0.4)
-  }));
-  function drawSkyline(){
-    const baseY=H*0.66;
-    buildings.forEach(b=>{
-      const bx=b.x*W,bw=b.w*W*1.3,bh=b.h*H*1.6,by=baseY-bh;
-      ctx.fillStyle='rgba(8,6,26,0.9)';
-      ctx.fillRect(bx,by,bw,bh);
-      // windows
-      const rows=Math.floor(bh/14),cols=Math.max(1,Math.floor(bw/10));
-      for(let r=0;r<rows;r++){
-        for(let c=0;c<cols;c++){
-          const idx=(r*cols+c)%b.lit.length;
-          if(!b.lit[idx])continue;
-          const flicker=0.5+0.5*Math.sin(t*0.8+r*3+c*7+b.x*50);
-          if(flicker<0.35)continue;
-          ctx.fillStyle=c%2===0?'rgba(255,200,120,0.55)':'rgba(120,220,255,0.4)';
-          ctx.fillRect(bx+4+c*10,by+6+r*14,4,7);
-        }
-      }
-    });
-  }
-
-  // Synthwave horizon grid (pink lines fading toward cyan glow at horizon)
-  function drawGrid(){
-    const vx=W*.5,vy=H*.66;
-    ctx.lineWidth=1;
-    for(let i=0;i<=14;i++){
-      const p=i/14,y=vy+(H-vy)*Math.pow(p,1.7),s=W*0.95*Math.pow(p,1.15);
-      const alpha=0.16+Math.sin(t*0.3+i)*0.03;
-      ctx.strokeStyle=`rgba(255,46,139,${alpha})`;
-      ctx.beginPath();ctx.moveTo(vx-s/2,y);ctx.lineTo(vx+s/2,y);ctx.stroke();
+    ctx.save();ctx.globalAlpha=0.35;ctx.shadowBlur=60;ctx.shadowColor='#ff2e8b';ctx.beginPath();ctx.arc(cx,sy,sr,0,6.2832);ctx.fillStyle='rgba(255,46,139,0.15)';ctx.fill();ctx.restore();
+    // ground
+    ctx.fillStyle='#0a0414';ctx.fillRect(0,hy,W,H-hy);
+    // perspective grid
+    ctx.strokeStyle='rgba(0,229,255,0.45)';ctx.lineWidth=1.5;
+    // horizontal lines moving toward viewer
+    const off=(t*0.55)%1;
+    for(let i=0;i<16;i++){
+      const p=((i+off)/16);const z=p*p; // ease for perspective
+      const y=hy+z*(H-hy);
+      ctx.globalAlpha=0.15+0.55*p;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
     }
-    for(let i=0;i<=16;i++){
-      const p=i/16,bx=vx+(p-.5)*W*0.95;
-      ctx.strokeStyle=`rgba(0,229,255,0.1)`;
-      ctx.beginPath();ctx.moveTo(vx,vy);ctx.lineTo(bx,H);ctx.stroke();
+    ctx.globalAlpha=1;
+    // vertical converging lines
+    ctx.strokeStyle='rgba(255,46,139,0.4)';
+    for(let i=-10;i<=10;i++){
+      ctx.beginPath();ctx.moveTo(cx+i*(W*0.03),hy);ctx.lineTo(cx+i*(W*0.5),H);ctx.stroke();
     }
+    requestAnimationFrame(draw);
   }
-
-  const speedLines=Array.from({length:18},()=>({y:Math.random()*0.6,x:Math.random(),len:Math.random()*.1+.03,spd:Math.random()*.003+.001,alpha:Math.random()*.1+.02,c:COLORS[Math.floor(Math.random()*COLORS.length)]}));
-  const particles=Array.from({length:70},()=>({x:Math.random()*1000,y:Math.random()*800,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.2,r:Math.random()*1.6+.4,c:COLORS[Math.floor(Math.random()*COLORS.length)],a:Math.random()*.45+.1,life:Math.random()*Math.PI*2}));
-
-  function frame(){
-    ctx.clearRect(0,0,W,H);t+=.01;
-    // Sunset sky gradient: deep night purple at top -> magenta/orange band -> dark horizon
-    const bg=ctx.createLinearGradient(0,0,0,H*0.7);
-    bg.addColorStop(0,'#0a0a1f');
-    bg.addColorStop(0.45,'#1a0f3d');
-    bg.addColorStop(0.72,'#4d1a5c');
-    bg.addColorStop(0.92,'#ff5a3d22');
-    bg.addColorStop(1,'#ff7a3d18');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H*0.7);
-    ctx.fillStyle='#0a0820';ctx.fillRect(0,H*0.66,W,H*0.34);
-
-    // Sun disc with scanline bands (vaporwave sun), low on horizon
-    const sunX=W*0.5,sunY=H*0.56,sunR=Math.min(W,H)*0.13;
-    const sg=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,sunR);
-    sg.addColorStop(0,'rgba(255,213,120,0.9)');
-    sg.addColorStop(0.5,'rgba(255,90,140,0.55)');
-    sg.addColorStop(1,'rgba(255,46,139,0)');
-    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(sunX,sunY,sunR,0,Math.PI*2);ctx.fill();
-    ctx.save();
-    ctx.beginPath();ctx.arc(sunX,sunY,sunR*0.78,0,Math.PI*2);ctx.clip();
-    for(let i=0;i<7;i++){
-      const yy=sunY-sunR*0.7+i*(sunR*1.5/7);
-      ctx.fillStyle='rgba(10,8,30,0.5)';
-      ctx.fillRect(sunX-sunR,yy,sunR*2,sunR*0.09);
-    }
-    ctx.restore();
-
-    stars.forEach(s=>{s.tw+=.012;const a=s.o*(0.6+0.4*Math.sin(s.tw));ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(220,225,255,${a})`;ctx.fill();});
-
-    drawSkyline();
-    drawGrid();
-    palms.forEach(drawPalm);
-
-    speedLines.forEach(sl=>{sl.x-=sl.spd;if(sl.x+sl.len<0)sl.x=1+sl.len;const g=ctx.createLinearGradient(sl.x*W,0,(sl.x+sl.len)*W,0);g.addColorStop(0,sl.c+'0)');g.addColorStop(.5,sl.c+sl.alpha+')');g.addColorStop(1,sl.c+'0)');ctx.strokeStyle=g;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sl.x*W,sl.y*H);ctx.lineTo((sl.x+sl.len)*W,sl.y*H);ctx.stroke();});
-    particles.forEach(p=>{p.life+=.02;p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;const a=p.a*(0.5+0.5*Math.sin(p.life));ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c+a+')';ctx.fill();});
-
-    requestAnimationFrame(frame);
-  }
-  frame();
+  draw();
 })();
 </script>
 </body>
