@@ -1,3 +1,5 @@
+# 11.22.63
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1941,6 +1943,7 @@ async function buyoutAuction(aId,price,carName,carEmoji,sellerId){
   profile.cash-=price;
   await loadPlayerCars();renderHUD();renderAuctions();
   toast(`🏆 ${carName} bought! Added to garage.`,'t-success');
+  if(Math.random()<0.4)npcReact('buy',profile.username);
   checkAchievements();
 }
 function openListModal(){
@@ -2117,6 +2120,7 @@ async function startRace(rid){
     const bustChance=Math.min(0.9,((newHeat-bustThreshold+5)/100)*bustMultiplier); // admin-tunable via Heat Control panel
     if(Math.random()<bustChance){
       bustOccurred=true;
+      if(Math.random()<0.6)npcReact('wanted',profile.username);
       const rawLoss=Math.round((profile.cash+cashGain)*(0.08+Math.random()*0.12));
       newHeat=Math.max(30,newHeat-40); // getting busted also cools you off some
       // Give the player a shot at evading — a quick reaction minigame that reduces the hit
@@ -2162,7 +2166,7 @@ async function startRace(rid){
     <div class="result-detail">${Math.round(myScore)} vs ${Math.round(oppScore)}</div>
     <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--text3);padding:8px;background:var(--panel2);border-radius:var(--r)">💡 ${RACE_TIPS[r.id]||'Upgrade your car!'} ${launchRes.quality<0.5?'A clean launch makes a big difference — watch the green zone!':mashRes.factor<1?'Mash the gas harder once the race starts!':''}</div>`;
   rb.innerHTML+=`<div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="btn btn-ghost" onclick="resetArena()">↺ Again</button><button class="btn btn-ghost" onclick="showTab('garage')">🔧 Upgrade</button></div>`;
-  if(won){toast(`Victory! Net: +$${fmtCash(netResult)}`,'t-success');showXpPop(`+${xpGained} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');}
+  if(won){toast(`Victory! Net: +$${fmtCash(netResult)}`,'t-success');showXpPop(`+${xpGained} XP`);if(levUp)showXpPop('⬆️ LEVEL UP!');if(Math.random()<0.5)npcReact(netResult>=50000?'bigwin':'win',profile.username);}
   else toast(`Defeat! Lost entry fee: -$${fmtCash(actualFee)}`,'t-error');
   isRacing=false;checkAchievements();
 }
@@ -2676,6 +2680,26 @@ let chatOpen=false,chatUnsub=null,chatUnread=0,chatLastSeen=0,chatMsgCache=[];
 const NPC_CHAT_LINES=[
   "anyone selling a Supra rn?","just won the midnight run, that fee was worth it 🔥","market's crashing again lol","who's got a hypercar for auction","drift battle is rigged i swear","new car who dis","gg on that race","saving up for a Bugatti, slow grind","anyone else broke after entry fees today","love the new touge pass track","circuit pro keeps wrecking me","bidding war on that GT-R is insane rn","just hit level 10 🎉","canyon run scared me half to death","is the EV bonus worth it?","grinding daily bonus every day, streak's at 7","who's the richest player rn","just bought my first hypercar!!","offroad rally + SUV = free wins ngl","anyone wanna race for fun"
 ];
+// Context-aware reaction pools — NPCs react to things YOU just did
+const NPC_REACT={
+  win:["yo {p} just smoked that race 👀","gg {p}","{p} is on a tear rn","aight {p} pulling up fr","lucky launch {p} lol","ok {p} we get it you're fast"],
+  bigwin:["{p} just won BIG 💰","how much did {p} just bank lmao","{p} buying the whole map after that","save some cash for the rest of us {p}"],
+  buy:["nice pickup {p} 👌","{p} got that new whip","what'd you pay for that {p}?","{p} flexing the garage again"],
+  wanted:["{p} got the cops on em 🚨","run {p} run lmao","{p} too hot to handle rn","stay low {p}"],
+  greet:["yo {p}","sup {p}","{p} 🤝","welcome back {p}"],
+  reply:["fr fr","lol facts","nah you trippin","🤣","real","who asked tho jk","based","idk man the market's rough","same tbh","big if true"]
+};
+let _lastChatReactName=null,_lastPlayerMsgAt=0;
+function npcReact(kind,playerName){
+  if(!npcAccounts.length||!currentUser)return;
+  const pool=NPC_REACT[kind];if(!pool)return;
+  const npc=npcAccounts[Math.floor(Math.random()*npcAccounts.length)];
+  const line=pool[Math.floor(Math.random()*pool.length)].replace('{p}',playerName||profile.username||'racer');
+  const delay=2000+Math.random()*6000; // feels typed, not instant
+  setTimeout(()=>{
+    db.collection('chat_messages').add({sender_id:npc.id,sender_username:npc.username,role:'player',is_npc:true,message:line,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  },delay);
+}
 function toggleChat(){
   chatOpen=!chatOpen;
   document.getElementById('chat-panel').classList.toggle('open',chatOpen);
@@ -2755,6 +2779,10 @@ async function sendChatMsg(){
   if(msg.length>200){toast('Message too long','t-error');return;}
   input.value='';
   await db.collection('chat_messages').add({sender_id:currentUser.uid,sender_username:profile.username,role:profile.role||'player',is_npc:false,message:msg,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{toast('Failed to send','t-error');});
+  // NPCs sometimes reply to you — addressed by name or a quick reaction
+  if(npcAccounts.length&&Math.random()<0.6){
+    npcReact(Math.random()<0.4?'greet':'reply',profile.username);
+  }
 }
 async function npcSendChat(npc){
   if(!currentUser)return;
@@ -2767,7 +2795,12 @@ function startNPCChat(){
     if(!npcAccounts.length)return;
     if(Math.random()<0.55){ // not every tick — keeps it natural
       const npc=npcAccounts[Math.floor(Math.random()*npcAccounts.length)];
-      npcSendChat(npc).catch(()=>{});
+      // sometimes NPCs banter with each other instead of just posting a line
+      if(Math.random()<0.3&&chatMsgCache&&chatMsgCache.length){
+        npcReact('reply',null);
+      }else{
+        npcSendChat(npc).catch(()=>{});
+      }
     }
   },45000+Math.random()*60000);
 }
