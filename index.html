@@ -698,6 +698,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
               <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
               <div class="hud-menu-item" onclick="dailySpin()">🎰 Daily Spin</div>
               <div class="hud-menu-item" onclick="replayTutorial()">❓ Replay Tutorial</div>
+              <div class="hud-menu-item" onclick="openApplyModal()">📝 Submit Application</div>
               <div class="hud-menu-divider"></div>
               <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
             </div>
@@ -909,6 +910,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
           <button class="admin-tab" onclick="adminSec('chatmod',this)">💬 Chat Mod</button>
           <span class="admin-tab-sep"></span>
           <button class="admin-tab" onclick="adminSec('logs',this)">📋 Logs</button>
+          <button class="admin-tab" onclick="adminSec('forms',this)">📝 Forms</button>
           <button class="admin-tab" onclick="adminSec('suspects',this)">🔍 Suspects</button>
           <button class="admin-tab" onclick="adminSec('panic',this)" style="color:var(--red2)">🚨 Panic</button>
           <button class="admin-tab" onclick="adminSec('backup',this)">💾 Backup</button>
@@ -971,6 +973,23 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <div class="modal-overlay" id="modal-story-dialog"><div class="modal" style="max-width:560px">
   <button class="modal-close" onclick="closeModal('modal-story-dialog')">✕</button>
   <div id="modal-story-dialog-body"></div>
+</div></div>
+<div class="modal-overlay" id="modal-apply"><div class="modal" style="max-width:540px">
+  <button class="modal-close" onclick="closeModal('modal-apply')">✕</button>
+  <div class="modal-title">📝 Submit Application</div>
+  <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:14px">Mods will review your submission. You'll see status updates in your application history.</div>
+  <div class="adm-row"><label>Type</label><select class="form-input" id="apply-type">
+    <option value="staff">Staff Application</option>
+    <option value="partner">Partner / Creator</option>
+    <option value="appeal">Ban Appeal</option>
+    <option value="bug">Bug Report</option>
+    <option value="other">Other / Feedback</option>
+  </select></div>
+  <div class="adm-row"><label>Subject</label><input class="form-input" id="apply-subject" maxlength="80" placeholder="Short summary"></div>
+  <div style="margin:10px 0"><label class="form-label">Details</label><textarea class="form-input" id="apply-body" rows="6" maxlength="2000" placeholder="Tell us why, what happened, or what you'd like us to know..." style="resize:vertical;font-family:var(--body);width:100%"></textarea></div>
+  <button class="btn btn-red btn-lg" style="width:100%" onclick="submitApplication()">Send to Staff</button>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:14px">Your past submissions:</div>
+  <div id="apply-history"></div>
 </div></div>
 <div class="toast" id="toast"></div>
 <script>
@@ -1483,6 +1502,7 @@ async function loadActiveEvent(){
       const exp=ev.expires_at?.toDate?.();
       if(exp&&exp>new Date())activeEvent=ev;
     }
+    panicMode=!!data.panic;
 
     const dEl=document.getElementById('discord-link');
     if(dEl){if(data.discord_url){dEl.href=data.discord_url;dEl.style.display='';}else dEl.style.display='none';}
@@ -1490,6 +1510,18 @@ async function loadActiveEvent(){
     bustThreshold=typeof data.bust_threshold==='number'?data.bust_threshold:70;
     bustMultiplier=typeof data.bust_multiplier==='number'?data.bust_multiplier:1;
   }catch(e){activeEvent=null;}
+}
+let panicMode=false;
+function isPanicLocked(){
+  if(!panicMode)return false;
+  if(['owner','admin','moderator'].includes(profile?.role))return false;
+  if(Array.isArray(profile?.roles)&&profile.roles.some(r=>['owner','admin','moderator'].includes(r)))return false;
+  return true;
+}
+function panicBlock(action){
+  if(!isPanicLocked())return false;
+  toast(`🚨 ${action} locked — emergency mode active`,'t-error');
+  return true;
 }
 function showActiveEventBanner(){
   const el=document.getElementById('event-banner');
@@ -2007,6 +2039,7 @@ function openPackInfo(id){
 }
 let _packBusy=false;
 async function buyPack(id){
+  if(panicBlock('Pack opening'))return;
   if(_packBusy)return;
   const p=PACKS.find(x=>x.id===id);if(!p)return;
   if(profile.cash<p.price){toast('Not enough cash for that pack','t-error');return;}
@@ -2049,6 +2082,7 @@ async function buyPack(id){
   _packBusy=false;
 }
 async function buyCar(carName,price){
+  if(panicBlock('Market'))return;
   if(profile.cash<price){toast('Not enough cash!','t-error');return;}
   if(playerCars.find(p=>p.car_name===carName)){toast('You already own this!','t-error');return;}
   const car=CAR_DATA.find(c=>c.name===carName);if(!car)return;
@@ -2308,6 +2342,7 @@ function selectRace(rid){
 const RACE_TIPS={drag:'More HP + Turbo upgrades win drags.',circuit:'Handling + HP = circuit king.',street:'Acceleration upgrades are key.',highway:'Max power and top speed builds.',offroad:'SUV/Truck gets a massive +600 bonus!',drift:'Max handling upgrades dominate drifts.',midnight:'Balance ALL stats for endurance.',ev:'Tesla, Rimac, Lucid get 500pt bonus!',touge:'Handling + braking win mountain passes.',canyon:'Braking precision matters most here.',hypercar:'Hypercar-class cars get a huge +800 bonus.'};
 
 async function startRace(rid){
+  if(panicBlock('Racing'))return;
   if(isRacing)return;
   const r=RACE_EVENTS.find(x=>x.id===rid);if(!r)return;
   const pc=playerCars.find(p=>p.is_active)||playerCars[0];
@@ -2462,6 +2497,7 @@ async function startRace(rid){
 }
 
 async function startStoryRace(stageIdx){
+  if(panicBlock('Racing'))return;
   if(isRacing)return;
   const stage=STORY_STAGES[stageIdx];if(!stage)return;
   const pc=playerCars.find(p=>p.is_active&&stage.reqCars.includes(p.car_name))
@@ -3079,6 +3115,8 @@ function setupBroadcastListener(){
       if(!t||t<=broadcastSeenAt)return;
       broadcastSeenAt=t;
       showBroadcastBanner(b.message,b.type||'t-info',b.sender);
+      // Any broadcast may signal a settings change — re-read panic flag etc.
+      loadActiveEvent().catch(()=>{});
     });
   },err=>console.warn('Broadcast listener:',err.message));
   auctUnsubs.push(broadcastUnsub);
@@ -3150,7 +3188,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects,forms:adminForms};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -3982,6 +4020,114 @@ async function liftPanic(){
     toast('Emergency lifted','t-success');
   }catch(e){toast('Failed: '+e.message,'t-error');console.error(e);}
 }
+const APP_TYPE_LABEL={staff:'🛡️ Staff',partner:'⭐ Partner',appeal:'⚖️ Ban Appeal',bug:'🐛 Bug Report',other:'💬 Other'};
+const APP_STATUS_COLOR={pending:'var(--amber2)',approved:'var(--green2)',rejected:'var(--red2)'};
+async function openApplyModal(){
+  document.getElementById('hud-menu')?.classList.remove('open');
+  document.getElementById('apply-subject').value='';
+  document.getElementById('apply-body').value='';
+  openModal('modal-apply');
+  loadApplyHistory();
+}
+async function loadApplyHistory(){
+  const el=document.getElementById('apply-history');if(!el||!currentUser)return;
+  el.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0">Loading…</div>';
+  try{
+    const snap=await db.collection('applications').where('user_id','==',currentUser.uid).limit(20).get();
+    const apps=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_at?.toDate?.()?.getTime()||0)-(a.created_at?.toDate?.()?.getTime()||0));
+    if(!apps.length){el.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0">No past submissions.</div>';return;}
+    el.innerHTML=apps.slice(0,8).map(a=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600">${APP_TYPE_LABEL[a.type]||a.type} · ${escapeHtml(a.subject||'(no subject)')}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">${timeAgo(a.created_at?.toDate?.())}</div>
+        ${a.response?`<div style="font-size:11px;color:var(--text2);margin-top:4px;padding:6px 8px;background:var(--panel3);border-radius:var(--r)"><strong style="color:var(--text)">Staff:</strong> ${escapeHtml(a.response)}</div>`:''}
+      </div>
+      <span style="font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:${APP_STATUS_COLOR[a.status]||'var(--text3)'};white-space:nowrap">${a.status||'pending'}</span>
+    </div>`).join('');
+  }catch(e){el.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--red2);padding:6px 0">'+escapeHtml(e.message)+'</div>';}
+}
+async function submitApplication(){
+  if(!currentUser||!profile){toast('Sign in first','t-error');return;}
+  const type=document.getElementById('apply-type').value;
+  const subject=document.getElementById('apply-subject').value.trim();
+  const body=document.getElementById('apply-body').value.trim();
+  if(subject.length<3){toast('Subject too short','t-error');return;}
+  if(body.length<10){toast('Tell us more — at least 10 characters','t-error');return;}
+  try{
+    await db.collection('applications').add({
+      user_id:currentUser.uid,
+      username:profile.username,
+      type,subject,body,
+      status:'pending',
+      response:null,
+      reviewed_by:null,
+      reviewed_at:null,
+      created_at:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('Application submitted — staff will review it','t-success');
+    logActivity('apply_submit',{type,subject}).catch(()=>{});
+    document.getElementById('apply-subject').value='';
+    document.getElementById('apply-body').value='';
+    loadApplyHistory();
+  }catch(e){toast('Failed: '+e.message,'t-error');}
+}
+let formsFilter='pending';
+async function adminForms(el){
+  el.innerHTML=`<div class="panel"><h3>📝 Applications</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">Review and respond to player applications. Mods and up can act on these.</p>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    ${['pending','approved','rejected','all'].map(f=>`<button class="btn btn-sm ${formsFilter===f?'btn-red':'btn-ghost'}" onclick="setFormsFilter('${f}')">${f.toUpperCase()}</button>`).join('')}
+  </div>
+  <div id="forms-list"><div class="loading-screen"><div class="spinner"></div></div></div>
+  </div>`;
+  loadFormsList();
+}
+function setFormsFilter(f){formsFilter=f;adminForms(document.getElementById('admin-content'));}
+async function loadFormsList(){
+  const el=document.getElementById('forms-list');if(!el)return;
+  try{
+    const snap=await db.collection('applications').limit(200).get();
+    let apps=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(formsFilter!=='all')apps=apps.filter(a=>(a.status||'pending')===formsFilter);
+    apps.sort((a,b)=>(b.created_at?.toDate?.()?.getTime()||0)-(a.created_at?.toDate?.()?.getTime()||0));
+    if(!apps.length){el.innerHTML='<div class="empty" style="font-size:12px;padding:30px 0">No applications in this view.</div>';return;}
+    el.innerHTML=apps.map(a=>{
+      const status=a.status||'pending';
+      const acted=status!=='pending';
+      return `<div style="background:var(--panel2);border:1px solid var(--border);border-left:3px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);padding:12px 14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-family:var(--disp);font-size:13px;letter-spacing:1px;color:var(--steel)">${APP_TYPE_LABEL[a.type]||a.type} · ${escapeHtml(a.subject||'(no subject)')}</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px">from <strong style="color:var(--text2)">${escapeHtml(a.username||'?')}</strong> · ${timeAgo(a.created_at?.toDate?.())}</div>
+          </div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${APP_STATUS_COLOR[status]};padding:3px 8px;border:1px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);white-space:nowrap">${status}</span>
+        </div>
+        <div style="margin:10px 0;padding:10px;background:var(--bg3);border-radius:var(--r);font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap">${escapeHtml(a.body||'')}</div>
+        ${a.response?`<div style="padding:8px 10px;background:var(--panel3);border-left:2px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);font-size:11px;margin-bottom:8px"><strong style="color:var(--text)">Response from ${escapeHtml(a.reviewed_by||'staff')}:</strong> ${escapeHtml(a.response)}</div>`:''}
+        ${!acted?`<div style="display:flex;gap:6px;flex-wrap:wrap">
+          <input class="form-input" id="rsp-${a.id}" placeholder="Response message (optional)" style="flex:1;min-width:180px;font-size:12px">
+          <button class="btn btn-sm btn-red" onclick="reviewApplication('${a.id}','approved')">✓ Approve</button>
+          <button class="btn btn-sm btn-ghost" onclick="reviewApplication('${a.id}','rejected')">✕ Reject</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML='<div class="empty">⚠ '+escapeHtml(e.message)+'</div>';}
+}
+async function reviewApplication(id,decision){
+  const note=document.getElementById('rsp-'+id)?.value?.trim()||null;
+  try{
+    await db.collection('applications').doc(id).update({
+      status:decision,
+      response:note,
+      reviewed_by:profile.username,
+      reviewed_at:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast(`Marked ${decision}`,'t-success');
+    logActivity('apply_review',{id,decision}).catch(()=>{});
+    loadFormsList();
+  }catch(e){toast('Failed: '+e.message,'t-error');}
+}
+
 async function adminSuspects(el){
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
   const snap=await db.collection('profiles').limit(300).get();
