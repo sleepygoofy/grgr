@@ -372,12 +372,19 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .role-veteran{background:rgba(70,255,156,.12);color:var(--green2);border:1px solid rgba(0,230,118,.35);}
 .role-player{background:var(--panel3);color:var(--text3);border:1px solid var(--border);}
 .role-npc{background:rgba(30,32,55,.5);color:var(--text3);border:1px solid var(--border);}
-.admin-layout{display:grid;grid-template-columns:190px 1fr;gap:0;min-height:620px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
-.admin-sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 0;}
-.admin-nav-item{padding:10px 16px;font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--text3);transition:all .12s;border-left:2px solid transparent;letter-spacing:1px;text-transform:uppercase;}
-.admin-nav-item:hover{background:var(--panel);color:var(--text2);}
-.admin-nav-item.active{background:var(--panel);color:var(--red2);border-left-color:var(--red);}
-.admin-content{background:var(--panel);padding:20px;overflow-y:auto;max-height:85vh;}
+.admin-topbar-wrap{border:1px solid var(--border);border-radius:var(--r2);background:var(--panel);margin-bottom:14px;overflow:hidden;}
+.admin-topbar{display:flex;gap:4px;overflow-x:auto;padding:8px;scrollbar-width:thin;}
+.admin-topbar::-webkit-scrollbar{height:6px;}
+.admin-topbar::-webkit-scrollbar-thumb{background:var(--border3);border-radius:3px;}
+.admin-tab{flex-shrink:0;padding:7px 12px;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid transparent;border-radius:var(--r);color:var(--text2);cursor:pointer;transition:.12s;white-space:nowrap;}
+.admin-tab:hover{background:var(--panel2);color:var(--text);}
+.admin-tab.active{background:var(--red3);color:var(--red2);border-color:var(--red);box-shadow:0 0 12px rgba(230,0,35,.25);}
+.admin-tab-sep{width:1px;background:var(--border2);margin:4px 6px;flex-shrink:0;}
+.admin-content{background:var(--panel);padding:20px;border:1px solid var(--border);border-radius:var(--r2);overflow-y:auto;max-height:78vh;}
+.admin-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;}
+.adm-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.adm-row label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;min-width:90px;}
+.adm-row input,.adm-row select{flex:1;min-width:120px;}
 .admin-stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px;}
 .admin-stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
 .admin-stat-val{font-family:var(--disp);font-size:26px;font-weight:700;}
@@ -393,7 +400,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .live-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start;}
 .live-row:last-child{border-bottom:none;}
 .live-time{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;margin-top:1px;flex-shrink:0;}
-@media(max-width:700px){.admin-layout{grid-template-columns:1fr;}.admin-sidebar{display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);padding:6px;}.admin-nav-item{white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:8px 12px;}.admin-nav-item.active{border-bottom-color:var(--red);border-left-color:transparent;}}
 .feed-container{position:fixed;bottom:24px;left:24px;z-index:400;pointer-events:none;}
 .feed-item{background:rgba(10,11,20,.95);border:1px solid var(--border2);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;font-family:var(--mono);font-size:11px;color:var(--text2);max-width:290px;backdrop-filter:blur(8px);animation:feedSlide .3s ease;transition:opacity .3s;}
 .feed-item.fade{opacity:0;}
@@ -848,26 +854,40 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     <!-- ADMIN -->
     <div class="section" id="tab-admin">
       <div class="sec-head"><div><div class="sec-title" style="color:var(--red2)">⚙ Admin Panel</div><div class="sec-sub">system control · restricted</div></div><span id="admin-role-badge" class="role-badge"></span></div>
-      <div class="admin-layout">
-        <div class="admin-sidebar">
-          <div class="admin-nav-item active" onclick="adminSec('overview',this)">📊 Overview</div>
-          <div class="admin-nav-item" onclick="adminSec('analytics',this)">📈 Analytics</div>
-          <div class="admin-nav-item" onclick="adminSec('users',this)">👥 Players</div>
-          <div class="admin-nav-item" onclick="adminSec('npcs',this)">🤖 NPC Control</div>
-          <div class="admin-nav-item" onclick="adminSec('logs',this)">📋 Activity</div>
-          <div class="admin-nav-item" onclick="adminSec('market',this)">💹 Market</div>
-          <div class="admin-nav-item" onclick="adminSec('auctions',this)">🔨 Auctions</div>
-          <div class="admin-nav-item" onclick="adminSec('economy',this)">💰 Economy</div>
-          <div class="admin-nav-item" onclick="adminSec('races',this)">🏁 Races</div>
-          <div class="admin-nav-item" onclick="adminSec('heat',this)">🚨 Heat Control</div>
-          <div class="admin-nav-item" onclick="adminSec('events',this)">🎉 Events</div>
-          <div class="admin-nav-item" onclick="adminSec('broadcast',this)">📢 Broadcast</div>
-          <div class="admin-nav-item" onclick="adminSec('giveaway',this)">🎁 Giveaway</div>
-          <div class="admin-nav-item" onclick="adminSec('serverstats',this)">📡 Server Stats</div>
-          <div class="admin-nav-item" onclick="adminSec('settings',this)">⚙ Settings</div>
+      <div class="admin-topbar-wrap">
+        <div class="admin-topbar">
+          <button class="admin-tab active" onclick="adminSec('overview',this)">📊 Overview</button>
+          <button class="admin-tab" onclick="adminSec('analytics',this)">📈 Analytics</button>
+          <button class="admin-tab" onclick="adminSec('serverstats',this)">📡 Live Stats</button>
+          <span class="admin-tab-sep"></span>
+          <button class="admin-tab" onclick="adminSec('users',this)">👥 Players</button>
+          <button class="admin-tab" onclick="adminSec('bans',this)">🚫 Bans</button>
+          <button class="admin-tab" onclick="adminSec('mail',this)">📨 Mail</button>
+          <button class="admin-tab" onclick="adminSec('story',this)">📜 Story</button>
+          <button class="admin-tab" onclick="adminSec('crews',this)">🛡️ Crews</button>
+          <button class="admin-tab" onclick="adminSec('npcs',this)">🤖 NPCs</button>
+          <span class="admin-tab-sep"></span>
+          <button class="admin-tab" onclick="adminSec('cars',this)">🏎️ Cars</button>
+          <button class="admin-tab" onclick="adminSec('carsAdd',this)">➕ Add Car</button>
+          <button class="admin-tab" onclick="adminSec('raceedit',this)">🏁 Race Edit</button>
+          <button class="admin-tab" onclick="adminSec('market',this)">💹 Market</button>
+          <button class="admin-tab" onclick="adminSec('auctions',this)">🔨 Auctions</button>
+          <button class="admin-tab" onclick="adminSec('economy',this)">💰 Economy</button>
+          <button class="admin-tab" onclick="adminSec('rng',this)">🎲 RNG</button>
+          <span class="admin-tab-sep"></span>
+          <button class="admin-tab" onclick="adminSec('races',this)">🏁 Races</button>
+          <button class="admin-tab" onclick="adminSec('heat',this)">🚨 Heat</button>
+          <button class="admin-tab" onclick="adminSec('events',this)">🎉 Events</button>
+          <button class="admin-tab" onclick="adminSec('broadcast',this)">📢 Broadcast</button>
+          <button class="admin-tab" onclick="adminSec('giveaway',this)">🎁 Giveaway</button>
+          <button class="admin-tab" onclick="adminSec('chatmod',this)">💬 Chat Mod</button>
+          <span class="admin-tab-sep"></span>
+          <button class="admin-tab" onclick="adminSec('logs',this)">📋 Logs</button>
+          <button class="admin-tab" onclick="adminSec('backup',this)">💾 Backup</button>
+          <button class="admin-tab" onclick="adminSec('settings',this)">⚙ Settings</button>
         </div>
-        <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
       </div>
+      <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
       </main>
     </div>
@@ -2651,38 +2671,38 @@ async function checkAchievements(){
 }
 
 async function loadLeaderboard(){
-  const safeGet=async(q,label)=>{
-    try{return await q.get();}
-    catch(e){console.error('Leaderboard query failed ['+label+']:',e.message);return {docs:[],_error:e.message};}
-  };
-  const base=db.collection('profiles').where('is_npc','==',false);
-  const [wSnap,cSnap,sSnap,gSnap]=await Promise.all([
-    safeGet(base.orderBy('wins','desc').limit(10),'wins'),
-    safeGet(base.orderBy('cash','desc').limit(10),'cash'),
-    safeGet(base.orderBy('best_win_streak','desc').limit(10),'streak'),
-    safeGet(base.orderBy('car_count','desc').limit(10),'cars')
-  ]);
-  const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${currentUser&&d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
-  const emptyRow=msg=>`<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:14px">${msg}</td></tr>`;
-  const fill=(elId,snap,getVal,field)=>{
-    const el=document.getElementById(elId);if(!el)return;
-    if(snap._error){el.innerHTML=emptyRow('⚠ Couldn\'t load — '+snap._error);return;}
-    let rows=snap.docs.map(d=>({...d.data(),id:d.id}));
-
-    if(currentUser&&profile){
-      const mine=rows.find(r=>r.id===currentUser.uid);
-      if(mine){mine.wins=profile.wins;mine.cash=profile.cash;mine.best_win_streak=profile.best_win_streak;mine.car_count=profile.car_count;}
-
-      if(field)rows.sort((a,b)=>(b[field]||0)-(a[field]||0));
+  const setLoading=(id)=>{const el=document.getElementById(id);if(el)el.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:14px">Loading…</td></tr>';};
+  ['lb-wins','lb-cash','lb-streak','lb-garage'].forEach(setLoading);
+  let pool;
+  try{
+    const snap=await db.collection('profiles').limit(200).get();
+    pool=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.is_npc!==true);
+  }catch(e){
+    const err=`<tr><td colspan="3" style="text-align:center;color:var(--red2);font-family:var(--mono);font-size:10px;padding:14px">⚠ ${e.message}</td></tr>`;
+    ['lb-wins','lb-cash','lb-streak','lb-garage'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=err;});
+    return;
+  }
+  if(currentUser&&profile){
+    const mine=pool.find(p=>p.id===currentUser.uid);
+    if(mine){
+      mine.wins=profile.wins||0;
+      mine.cash=profile.cash||0;
+      mine.best_win_streak=profile.best_win_streak||0;
+      mine.car_count=profile.car_count||0;
     }
-    if(!rows.length){el.innerHTML=emptyRow('No data yet');return;}
-    el.innerHTML=rows.map((d,i)=>row(d,i,getVal(d))).join('');
+  }
+  const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${currentUser&&d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
+  const empty=`<tr><td colspan="3" style="text-align:center;color:var(--text3);font-family:var(--mono);font-size:10px;padding:14px">No data yet</td></tr>`;
+  const fill=(elId,field,fmt)=>{
+    const el=document.getElementById(elId);if(!el)return;
+    const sorted=[...pool].sort((a,b)=>(b[field]||0)-(a[field]||0)).slice(0,10);
+    if(!sorted.length){el.innerHTML=empty;return;}
+    el.innerHTML=sorted.map((d,i)=>row(d,i,fmt(d))).join('');
   };
-  fill('lb-wins',wSnap,d=>(d.wins||0)+' W','wins');
-  fill('lb-cash',cSnap,d=>'$'+fmtCash(d.cash),'cash');
-  fill('lb-streak',sSnap,d=>(d.best_win_streak||0)+' 🔥','best_win_streak');
-
-  fill('lb-garage',gSnap,d=>(d.car_count||0)+' cars','car_count');
+  fill('lb-wins','wins',d=>(d.wins||0)+' W');
+  fill('lb-cash','cash',d=>'$'+fmtCash(d.cash));
+  fill('lb-streak','best_win_streak',d=>(d.best_win_streak||0)+' 🔥');
+  fill('lb-garage','car_count',d=>(d.car_count||0)+' cars');
 }
 
 async function renderProfile(){
@@ -3009,7 +3029,7 @@ function startNPCChat(){
 
 function adminSec(sec,el){
   adminCurSec=sec;
-  document.querySelectorAll('.admin-nav-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
   if(el)el.classList.add('active');loadAdminSec(sec);
 }
 async function loadAdminPanel(){
@@ -3021,7 +3041,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -3527,6 +3547,295 @@ async function sendBroadcast(){
   document.getElementById('bc-msg').value='';
   loadAdminSec('broadcast');
 }
+async function adminCars(el){
+  const q=`<div class="adm-row"><label>Search</label><input class="admin-search" id="adm-car-q" placeholder="name or brand..." oninput="adminCars(document.getElementById('admin-content'))"></div>`;
+  const term=document.getElementById('adm-car-q')?.value?.toLowerCase()||'';
+  const list=CAR_DATA.filter(c=>!term||c.name.toLowerCase().includes(term)||c.brand.toLowerCase().includes(term)).slice(0,80);
+  el.innerHTML=q+`<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">${list.length} of ${CAR_DATA.length} cars · edits override base values for this session and push to market_prices</div>
+  <table class="admin-table"><thead><tr><th></th><th>Name</th><th>Class</th><th>Rarity</th><th>Power</th><th>Top</th><th>HDL</th><th>Base $</th><th></th></tr></thead><tbody>
+  ${list.map(c=>`<tr id="cr-${escapeHtml(c.name)}">
+    <td>${c.emoji}</td><td><strong>${escapeHtml(c.name)}</strong><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">${escapeHtml(c.brand)}</div></td>
+    <td>${c.class}</td>
+    <td><select id="cf-rar-${escapeHtml(c.name)}"><option ${c.rarity==='Common'?'selected':''}>Common</option><option ${c.rarity==='Uncommon'?'selected':''}>Uncommon</option><option ${c.rarity==='Rare'?'selected':''}>Rare</option><option ${c.rarity==='Epic'?'selected':''}>Epic</option><option ${c.rarity==='Legendary'?'selected':''}>Legendary</option><option ${c.rarity==='Mythic'?'selected':''}>Mythic</option></select></td>
+    <td><input type="number" id="cf-pw-${escapeHtml(c.name)}" value="${c.power}" style="width:64px"></td>
+    <td><input type="number" id="cf-ts-${escapeHtml(c.name)}" value="${c.top_speed}" style="width:64px"></td>
+    <td><input type="number" id="cf-hd-${escapeHtml(c.name)}" value="${c.handling}" style="width:64px"></td>
+    <td><input type="number" id="cf-bp-${escapeHtml(c.name)}" value="${c.base_price}" style="width:96px"></td>
+    <td><button class="btn btn-sm btn-red" onclick="saveCarEdit('${c.name.replace(/'/g,"\\'")}')">Save</button></td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+async function saveCarEdit(name){
+  const car=CAR_DATA.find(c=>c.name===name);if(!car)return;
+  const get=(p)=>document.getElementById(`cf-${p}-${name}`)?.value;
+  const rarity=get('rar'),power=parseInt(get('pw'))||car.power,ts=parseInt(get('ts'))||car.top_speed,hd=parseInt(get('hd'))||car.handling,bp=parseInt(get('bp'))||car.base_price;
+  car.rarity=rarity;car.power=power;car.top_speed=ts;car.handling=hd;car.base_price=bp;
+  const mp=marketPrices[name];
+  if(mp?.id)await db.collection('market_prices').doc(mp.id).update({base_price:bp,current_price:bp}).catch(()=>{});
+  toast(`Saved ${name}`,'t-success');
+  logActivity('admin_edit_car',{car:name,bp,power,ts,hd,rarity}).catch(()=>{});
+}
+async function adminCarsAdd(el){
+  el.innerHTML=`<div class="panel"><h3>➕ Add New Car</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Adds a car to the live CAR_DATA list for this session. To make it permanent, copy the JSON output and paste into your source.</p>
+  <div class="admin-grid-2">
+    <div class="adm-row"><label>Name</label><input class="form-input" id="nc-name" placeholder="Toyota Celica GT-Four"></div>
+    <div class="adm-row"><label>Brand</label><input class="form-input" id="nc-brand" placeholder="Toyota"></div>
+    <div class="adm-row"><label>Class</label><select class="form-input" id="nc-class"><option>Sports</option><option>Hypercar</option><option>Muscle</option><option>EV</option><option>SUV/Truck</option><option>Drift</option><option>JDM</option></select></div>
+    <div class="adm-row"><label>Rarity</label><select class="form-input" id="nc-rarity"><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option><option>Mythic</option></select></div>
+    <div class="adm-row"><label>Emoji</label><input class="form-input" id="nc-emoji" value="🏎️" style="width:80px"></div>
+    <div class="adm-row"><label>Base $</label><input type="number" class="form-input" id="nc-bp" value="50000"></div>
+    <div class="adm-row"><label>Power</label><input type="number" class="form-input" id="nc-pw" value="400"></div>
+    <div class="adm-row"><label>Top Speed</label><input type="number" class="form-input" id="nc-ts" value="180"></div>
+    <div class="adm-row"><label>Accel</label><input type="number" class="form-input" id="nc-ac" value="80"></div>
+    <div class="adm-row"><label>Handling</label><input type="number" class="form-input" id="nc-hd" value="80"></div>
+    <div class="adm-row"><label>Braking</label><input type="number" class="form-input" id="nc-br" value="80"></div>
+    <div class="adm-row"><label>Weight</label><input type="number" class="form-input" id="nc-wt" value="3200"></div>
+  </div>
+  <div class="adm-row" style="margin-top:8px"><label>Description</label><input class="form-input" id="nc-desc" placeholder="A short blurb."></div>
+  <button class="btn btn-red btn-lg" style="margin-top:12px" onclick="addNewCar()">➕ Create Car</button>
+  <pre id="nc-json" style="margin-top:14px;background:var(--bg3);padding:10px;border-radius:var(--r);font-family:var(--mono);font-size:11px;color:var(--text2);white-space:pre-wrap;display:none"></pre>
+  </div>`;
+}
+async function addNewCar(){
+  const get=(id)=>document.getElementById(id).value;
+  const name=get('nc-name').trim();if(!name){toast('Name required','t-error');return;}
+  if(CAR_DATA.find(c=>c.name===name)){toast('That name already exists','t-error');return;}
+  const car={name,brand:get('nc-brand').trim()||'Unknown',class:get('nc-class'),rarity:get('nc-rarity'),emoji:get('nc-emoji')||'🏎️',base_price:parseInt(get('nc-bp'))||50000,top_speed:parseInt(get('nc-ts'))||180,acceleration:parseInt(get('nc-ac'))||80,handling:parseInt(get('nc-hd'))||80,braking:parseInt(get('nc-br'))||80,power:parseInt(get('nc-pw'))||400,weight:parseInt(get('nc-wt'))||3200,description:get('nc-desc')||'A new contender.'};
+  CAR_DATA.push(car);
+  await db.collection('market_prices').add({car_name:car.name,base_price:car.base_price,current_price:car.base_price,demand_score:50}).catch(()=>{});
+  await loadMarketPrices();
+  toast(`Added ${name}`,'t-success');
+  logActivity('admin_add_car',{car:name}).catch(()=>{});
+  const pre=document.getElementById('nc-json');pre.style.display='block';pre.textContent=JSON.stringify(car,null,2)+'\n\n// Paste into CAR_DATA in source to persist across sessions.';
+}
+async function adminRaceEdit(el){
+  el.innerHTML=`<div class="panel"><h3>🏁 Race Editor</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Tune entry fees, win rewards, XP and opponent strength for each event. Session-local edits — adjust source for permanence.</p>
+  <table class="admin-table"><thead><tr><th>Event</th><th>Diff</th><th>Fee</th><th>Reward</th><th>XP</th><th>Opp</th><th></th></tr></thead><tbody>
+  ${RACE_EVENTS.map(r=>`<tr>
+    <td>${r.emoji} <strong>${escapeHtml(r.name)}</strong></td>
+    <td>${r.diff}</td>
+    <td><input type="number" id="re-fee-${r.id}" value="${r.fee}" style="width:88px"></td>
+    <td><input type="number" id="re-rw-${r.id}" value="${r.reward}" style="width:96px"></td>
+    <td><input type="number" id="re-xp-${r.id}" value="${r.xp}" style="width:64px"></td>
+    <td><input type="number" id="re-op-${r.id}" value="${r.opp}" style="width:72px"></td>
+    <td><button class="btn btn-sm btn-red" onclick="saveRaceEdit('${r.id}')">Save</button></td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function saveRaceEdit(id){
+  const r=RACE_EVENTS.find(x=>x.id===id);if(!r)return;
+  const get=(p)=>parseInt(document.getElementById(`re-${p}-${id}`)?.value);
+  r.fee=get('fee')||r.fee;r.reward=get('rw')||r.reward;r.xp=get('xp')||r.xp;r.opp=get('op')||r.opp;
+  toast(`Saved ${r.name}`,'t-success');
+  if(typeof renderRaceEvents==='function')renderRaceEvents();
+  logActivity('admin_edit_race',{race:id,fee:r.fee,reward:r.reward}).catch(()=>{});
+}
+async function adminMail(el){
+  el.innerHTML=`<div class="panel"><h3>📨 Send Mail</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Send cash or a car directly to a single player.</p>
+  <div class="adm-row"><label>Username</label><input class="form-input" id="mail-user" placeholder="exact username"></div>
+  <div class="adm-row"><label>Gift type</label><select class="form-input" id="mail-type" onchange="document.getElementById('mail-car').style.display=this.value==='car'?'flex':'none';document.getElementById('mail-cash').style.display=this.value==='cash'?'flex':'none'">
+    <option value="cash">Cash</option><option value="car">Car</option>
+  </select></div>
+  <div class="adm-row" id="mail-cash"><label>Amount</label><input type="number" class="form-input" id="mail-amt" value="50000"></div>
+  <div class="adm-row" id="mail-car" style="display:none"><label>Car</label><select class="form-input" id="mail-carsel">${CAR_DATA.map(c=>`<option>${escapeHtml(c.name)}</option>`).join('')}</select></div>
+  <div class="adm-row"><label>Note</label><input class="form-input" id="mail-note" placeholder="optional, shows in their feed"></div>
+  <button class="btn btn-red btn-lg" onclick="sendAdminMail()">📨 Send</button>
+  <div id="mail-status" style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+  </div>`;
+}
+async function sendAdminMail(){
+  const u=document.getElementById('mail-user').value.trim();
+  const type=document.getElementById('mail-type').value;
+  const note=document.getElementById('mail-note').value.trim();
+  const st=document.getElementById('mail-status');
+  if(!u){st.textContent='Need a username';return;}
+  const snap=await db.collection('profiles').where('username','==',u).limit(1).get();
+  if(snap.empty){st.textContent=`No player named "${u}"`;return;}
+  const target=snap.docs[0];
+  if(type==='cash'){
+    const amt=parseInt(document.getElementById('mail-amt').value);
+    if(!amt||amt<1){st.textContent='Invalid amount';return;}
+    await db.collection('profiles').doc(target.id).update({cash:firebase.firestore.FieldValue.increment(amt)});
+    st.textContent=`✓ Sent $${fmtCash(amt)} to ${u}`;
+    logActivity('admin_mail_cash',{to:u,amt,note}).catch(()=>{});
+  }else{
+    const carName=document.getElementById('mail-carsel').value;
+    const car=CAR_DATA.find(c=>c.name===carName);if(!car){st.textContent='Car not found';return;}
+    await db.collection('player_cars').add({player_id:target.id,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:0,is_active:false,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('profiles').doc(target.id).update({car_count:firebase.firestore.FieldValue.increment(1)});
+    st.textContent=`✓ Sent ${carName} to ${u}`;
+    logActivity('admin_mail_car',{to:u,car:carName,note}).catch(()=>{});
+  }
+  if(note)db.collection('broadcasts').add({message:`📨 ${u}: ${note}`,type:'t-info',sender:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  toast('Mail sent','t-success');
+}
+async function adminBans(el){
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  const snap=await db.collection('profiles').where('is_banned','==',true).limit(50).get().catch(()=>({docs:[]}));
+  if(!snap.docs.length){el.innerHTML='<div class="empty">No banned accounts.</div>';return;}
+  el.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">${snap.docs.length} banned accounts</div>
+  <table class="admin-table"><thead><tr><th>Player</th><th>Reason</th><th>Cash</th><th></th></tr></thead><tbody>
+  ${snap.docs.map(d=>{const p=d.data();return `<tr>
+    <td><strong>${escapeHtml(p.username||'?')}</strong></td>
+    <td>${escapeHtml(p.ban_reason||'(none recorded)')}</td>
+    <td>$${fmtCash(p.cash)}</td>
+    <td><button class="btn btn-sm btn-ghost" onclick="unbanPlayer('${d.id}')">Unban</button></td>
+  </tr>`;}).join('')}</tbody></table>`;
+}
+async function unbanPlayer(id){
+  if(!confirm('Unban this account?'))return;
+  await db.collection('profiles').doc(id).update({is_banned:false,ban_reason:null});
+  toast('Unbanned','t-success');
+  logActivity('admin_unban',{uid:id}).catch(()=>{});
+  loadAdminSec('bans');
+}
+async function adminChatMod(el){
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  const snap=await db.collection('chat_messages').orderBy('created_at','desc').limit(50).get();
+  el.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">Last 50 messages · click ✕ to delete</div>
+  ${snap.docs.map(d=>{const m=d.data();return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);min-width:90px">${m.sender_username||'?'}${m.is_npc?' 🤖':''}</span>
+    <span style="flex:1;color:var(--text)">${escapeHtml(m.message||'')}</span>
+    <button class="btn btn-sm btn-ghost" onclick="delChatMsg('${d.id}')">✕</button>
+  </div>`;}).join('')}`;
+}
+async function delChatMsg(id){
+  await db.collection('chat_messages').doc(id).delete().catch(()=>{});
+  toast('Deleted','t-info');
+  loadAdminSec('chatmod');
+}
+async function adminRNG(el){
+  el.innerHTML=`<div class="panel"><h3>🎲 RNG Tools</h3>
+    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Force-refresh randomized game systems for events or testing.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+      <button class="btn btn-ghost" onclick="rngForceTick()">📈 Force Market Tick</button>
+      <button class="btn btn-ghost" onclick="rngResetDemand()">🔄 Reset All Demand to 50</button>
+      <button class="btn btn-ghost" onclick="rngResetSpins()">🎰 Reset All Daily Spins</button>
+      <button class="btn btn-ghost" onclick="rngShufflePrices()">💸 Shuffle Market Prices ±20%</button>
+    </div>
+    <div id="rng-status" style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+  </div>`;
+}
+async function rngForceTick(){if(typeof runMarketTick==='function')await runMarketTick();document.getElementById('rng-status').textContent='✓ Market tick fired';}
+async function rngResetDemand(){
+  const snap=await db.collection('market_prices').limit(300).get();
+  const batch=db.batch();snap.docs.forEach(d=>batch.update(d.ref,{demand_score:50}));
+  await batch.commit().catch(()=>{});
+  await loadMarketPrices();
+  document.getElementById('rng-status').textContent=`✓ Reset demand on ${snap.size} entries`;
+}
+async function rngResetSpins(){
+  const snap=await db.collection('profiles').where('is_npc','==',false).limit(500).get().catch(()=>({docs:[]}));
+  const batch=db.batch();snap.docs.forEach(d=>batch.update(d.ref,{last_spin:null}));
+  await batch.commit().catch(()=>{});
+  document.getElementById('rng-status').textContent=`✓ Daily spin reset for ${snap.docs.length} players`;
+}
+async function rngShufflePrices(){
+  const snap=await db.collection('market_prices').limit(300).get();
+  const batch=db.batch();
+  snap.docs.forEach(d=>{const m=d.data();const factor=0.8+Math.random()*0.4;batch.update(d.ref,{current_price:Math.round((m.base_price||50000)*factor)});});
+  await batch.commit().catch(()=>{});
+  await loadMarketPrices();
+  document.getElementById('rng-status').textContent=`✓ Shuffled ${snap.size} prices ±20%`;
+}
+async function adminStoryCtl(el){
+  el.innerHTML=`<div class="panel"><h3>📜 Story Control</h3>
+    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Jump a player to any chapter, mark complete, or grant the DK role.</p>
+    <div class="adm-row"><label>Username</label><input class="form-input" id="st-user" placeholder="exact username"></div>
+    <div class="adm-row"><label>Set chapter</label><select class="form-input" id="st-chapter">
+      ${STORY_STAGES.map((s,i)=>`<option value="${i}">Chapter ${s.chapter} · ${escapeHtml(s.name)}</option>`).join('')}
+    </select></div>
+    <div class="adm-row"><label>Completed?</label><select class="form-input" id="st-done"><option value="no">No</option><option value="yes">Yes (grants DK)</option></select></div>
+    <button class="btn btn-red btn-lg" onclick="applyStoryCtl()">Apply</button>
+    <div id="st-status" style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+  </div>`;
+}
+async function applyStoryCtl(){
+  const u=document.getElementById('st-user').value.trim();
+  const ch=parseInt(document.getElementById('st-chapter').value);
+  const done=document.getElementById('st-done').value==='yes';
+  const st=document.getElementById('st-status');
+  if(!u){st.textContent='Need a username';return;}
+  const snap=await db.collection('profiles').where('username','==',u).limit(1).get();
+  if(snap.empty){st.textContent='Not found';return;}
+  const update={story:{stage:ch,completed:done}};
+  if(done){
+    const cur=snap.docs[0].data();
+    const roles=Array.isArray(cur.roles)?cur.roles.slice():[cur.role||'player'];
+    if(!roles.includes('DK'))roles.push('DK');
+    update.roles=roles.filter(r=>r!=='player');
+    if(!update.roles.length)update.roles=['DK'];
+  }
+  await db.collection('profiles').doc(snap.docs[0].id).update(update);
+  st.textContent=`✓ Set ${u} to Chapter ${ch+1}${done?' (completed · DK granted)':''}`;
+  logActivity('admin_story',{user:u,chapter:ch,done}).catch(()=>{});
+}
+async function adminCrewsMgr(el){
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  const snap=await db.collection('crews').orderBy('total_wins','desc').limit(40).get().catch(()=>({docs:[]}));
+  if(!snap.docs.length){el.innerHTML='<div class="empty">No crews exist yet.</div>';return;}
+  el.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">${snap.docs.length} crews</div>
+  <table class="admin-table"><thead><tr><th>Tag</th><th>Name</th><th>Owner</th><th>Members</th><th>Wins</th><th></th></tr></thead><tbody>
+  ${snap.docs.map(d=>{const c=d.data();return `<tr>
+    <td><strong style="color:var(--red2)">[${escapeHtml(c.tag||'??')}]</strong></td>
+    <td>${escapeHtml(c.name||'?')}</td>
+    <td>${escapeHtml(c.owner_username||'?')}</td>
+    <td>${(c.member_ids||[]).length}</td>
+    <td>${c.total_wins||0}</td>
+    <td><button class="btn btn-sm btn-ghost" onclick="adminDisbandCrew('${d.id}','${escapeHtml(c.name||'?').replace(/'/g,"\\'")}')">Disband</button></td>
+  </tr>`;}).join('')}</tbody></table>`;
+}
+async function adminDisbandCrew(id,name){
+  if(!confirm(`Disband crew "${name}"? This clears all members and deletes the crew.`))return;
+  const cd=await db.collection('crews').doc(id).get();if(!cd.exists)return;
+  const members=cd.data().member_ids||[];
+  await Promise.all(members.map(m=>db.collection('profiles').doc(m).update({crew_id:firebase.firestore.FieldValue.delete(),crew_name:firebase.firestore.FieldValue.delete()}).catch(()=>{})));
+  await db.collection('crews').doc(id).delete();
+  toast('Crew disbanded','t-info');
+  logActivity('admin_disband_crew',{crew:name}).catch(()=>{});
+  loadAdminSec('crews');
+}
+async function adminBackup(el){
+  el.innerHTML=`<div class="panel"><h3>💾 Backup / Export</h3>
+    <p style="color:var(--text2);font-size:13px;margin:6px 0 14px">Download a JSON snapshot of profiles, crews, market and settings. Use for backups before risky changes.</p>
+    <button class="btn btn-red btn-lg" onclick="runBackup()">⬇ Generate Snapshot</button>
+    <div id="bk-status" style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+    <pre id="bk-out" style="margin-top:10px;background:var(--bg3);padding:10px;border-radius:var(--r);font-family:var(--mono);font-size:10px;color:var(--text2);max-height:300px;overflow:auto;display:none"></pre>
+  </div>`;
+}
+async function runBackup(){
+  const st=document.getElementById('bk-status');st.textContent='Reading collections…';
+  const [profs,crews,market,settings]=await Promise.all([
+    db.collection('profiles').limit(1000).get(),
+    db.collection('crews').limit(200).get(),
+    db.collection('market_prices').limit(500).get(),
+    db.collection('settings').limit(50).get(),
+  ]);
+  const snapshot={
+    generated_at:new Date().toISOString(),
+    generated_by:profile.username,
+    profiles:profs.docs.map(d=>({id:d.id,...d.data()})),
+    crews:crews.docs.map(d=>({id:d.id,...d.data()})),
+    market_prices:market.docs.map(d=>({id:d.id,...d.data()})),
+    settings:settings.docs.map(d=>({id:d.id,...d.data()})),
+  };
+  const json=JSON.stringify(snapshot,(k,v)=>{
+    if(v&&typeof v==='object'&&v._seconds!==undefined)return new Date(v._seconds*1000).toISOString();
+    if(v&&v.toDate)return v.toDate().toISOString();
+    return v;
+  },2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`redline-backup-${Date.now()}.json`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  st.textContent=`✓ Snapshot: ${snapshot.profiles.length} profiles, ${snapshot.crews.length} crews, ${snapshot.market_prices.length} market rows`;
+  const out=document.getElementById('bk-out');out.style.display='block';out.textContent=json.slice(0,4000)+(json.length>4000?'\n\n…(truncated in preview · full file downloaded)':'');
+  logActivity('admin_backup',{counts:{profiles:snapshot.profiles.length,crews:snapshot.crews.length}}).catch(()=>{});
+}
+
 async function adminSettings(el){
   const settDoc=await db.collection('settings').doc('game').get().catch(()=>null);
   const sett=settDoc?.exists?settDoc.data():{};
