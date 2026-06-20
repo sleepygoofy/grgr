@@ -502,6 +502,37 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .stage-sub{color:var(--text2);font-size:12px;margin-top:3px;line-height:1.4;}
 .stage-req{font-family:var(--mono);font-size:11px;margin-top:5px;}
 .stage-line{position:absolute;left:40px;top:-12px;width:2px;height:12px;background:var(--border2);}
+.pack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:8px;}
+.pack-card{position:relative;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--border2);border-radius:12px;padding:20px;cursor:pointer;overflow:hidden;transition:transform .15s,box-shadow .2s,border-color .2s;}
+.pack-card:hover{transform:translateY(-4px);border-color:var(--red);box-shadow:0 8px 28px rgba(0,0,0,.5),var(--glow-red);}
+.pack-card:active{transform:scale(.97);}
+.pack-shine{position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-18deg);transition:left .5s;}
+.pack-card:hover .pack-shine{left:130%;}
+.pack-emoji{font-size:46px;line-height:1;margin-bottom:10px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));}
+.pack-name{font-family:var(--disp);font-size:16px;letter-spacing:1px;color:var(--steel);margin-bottom:6px;}
+.pack-desc{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:14px;min-height:46px;}
+.pack-foot{display:flex;align-items:center;justify-content:space-between;}
+.pack-price{font-family:var(--disp);font-size:18px;color:var(--amber2);}
+.pack-rates{font-family:var(--mono);font-size:10px;color:var(--blue2);cursor:pointer;}
+.pack-rates:hover{text-decoration:underline;}
+.pack-starter{border-top:3px solid var(--text2);}
+.pack-street{border-top:3px solid var(--green2);}
+.pack-exotic{border-top:3px solid var(--purple2);}
+.pack-hyper{border-top:3px solid var(--amber2);}
+.reveal-spin{display:flex;align-items:center;justify-content:center;height:140px;}
+.reveal-spin-emoji{font-size:72px;animation:packShake .25s linear infinite;}
+@keyframes packShake{0%{transform:rotate(-8deg) scale(1);}50%{transform:rotate(8deg) scale(1.08);}100%{transform:rotate(-8deg) scale(1);}}
+.reveal-label{font-family:var(--mono);font-size:12px;color:var(--text2);letter-spacing:2px;margin-top:8px;}
+.reveal-card{animation:revealPop .5s cubic-bezier(.2,1.3,.4,1);padding:10px;border-radius:14px;border:2px solid var(--rc);box-shadow:0 0 30px -4px var(--rc);background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 70%);}
+@keyframes revealPop{0%{transform:scale(.5) rotate(-6deg);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1) rotate(0);opacity:1;}}
+.reveal-rarity{font-family:var(--disp);font-size:14px;letter-spacing:3px;margin-bottom:8px;}
+.reveal-emoji{font-size:84px;line-height:1;margin:6px 0;filter:drop-shadow(0 0 18px var(--rc));animation:revealFloat 2.4s ease-in-out infinite;}
+@keyframes revealFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.reveal-carname{font-family:var(--disp);font-size:20px;color:var(--steel);}
+.reveal-brand{font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:4px;}
+.reveal-new{margin-top:12px;font-family:var(--disp);font-size:16px;color:var(--amber2);letter-spacing:2px;animation:newPulse 1s ease-in-out infinite;}
+@keyframes newPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.12);opacity:.85;}}
+.reveal-dupe{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--green2);}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -659,7 +690,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- MARKET -->
     <div class="section" id="tab-market">
-      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>live demand-driven pricing</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>open packs or buy direct</div></div></div>
+      <div id="pack-grid" class="pack-grid"></div>
+      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" style="font-size:18px">Direct Buy</div><div class="sec-sub">live demand-driven pricing</div></div></div>
       <div class="ticker-bar"><span class="rt-dot"></span><span class="ticker-text" id="ticker-text">Loading...</span></div>
       <div class="filter-bar">
         <input class="filter-search" id="mkt-search" placeholder="Search..." oninput="renderMarket()">
@@ -854,6 +887,10 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <div class="modal-overlay" id="modal-bid"><div class="modal"><button class="modal-close" onclick="closeModal('modal-bid')">✕</button><div class="modal-title">Place Bid</div><div id="bid-car-info" style="margin-bottom:16px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"><div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Current Bid</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--amber2)">$<span id="bid-curr">0</span></div></div><div class="card-mini"><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase">Your Cash</div><div style="font-family:var(--disp);font-size:18px;font-weight:700;color:var(--green2)">$<span id="bid-mycash">0</span></div></div></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Your Bid</label><input class="form-input" type="number" id="bid-input"></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px">Min: $<span id="bid-min">0</span> · Buyout: $<span id="bid-buyout-disp">N/A</span></div><div id="bid-hist-list" style="max-height:140px;overflow-y:auto;margin-bottom:14px"></div><button class="btn btn-red btn-lg" style="width:100%" onclick="submitBid()">⚡ Place Bid</button></div></div>
 <div class="modal-overlay" id="modal-sell"><div class="modal"><button class="modal-close" onclick="closeModal('modal-sell')">✕</button><div class="modal-title">List for Auction</div><div id="sell-car-info" style="margin-bottom:14px"></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Starting Price</label><input class="form-input" type="number" id="sell-start"></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Buyout Price (optional)</label><input class="form-input" type="number" id="sell-buyout" placeholder="Leave blank"></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Duration</label><select class="form-input" id="sell-dur"><option value="1">1 hour</option><option value="3">3 hours</option><option value="6" selected>6 hours</option><option value="12">12 hours</option><option value="24">24 hours</option></select></div><div style="margin-bottom:14px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Event Type</label><select class="form-input" id="sell-evt"><option value="standard">Standard</option><option value="hypercar">🏆 Hypercar Night</option><option value="jdm_night">🎌 JDM Night</option><option value="muscle_madness">💪 Muscle Madness</option></select></div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:14px;padding:8px;background:var(--amber3);border:1px solid rgba(255,122,61,.25);border-radius:var(--r)">⚠ 5% fee deducted from final sale</div><button class="btn btn-gold btn-lg" style="width:100%" onclick="submitAuction()">🔨 List Now</button></div></div>
 <div class="modal-overlay" id="modal-car"><div class="modal"><button class="modal-close" onclick="closeModal('modal-car')">✕</button><div id="modal-car-body"></div></div></div>
+<div class="modal-overlay" id="modal-pack"><div class="modal"><button class="modal-close" onclick="closeModal('modal-pack')">✕</button><div id="modal-pack-body"></div></div></div>
+<div class="modal-overlay" id="modal-reveal"><div class="modal" style="text-align:center;max-width:420px">
+  <div id="reveal-stage"></div>
+</div></div>
 <div class="modal-overlay" id="modal-user"><div class="modal"><button class="modal-close" onclick="closeModal('modal-user')">✕</button><div class="modal-title" id="modal-user-title">Player</div><div id="modal-user-body"></div></div></div>
 <div class="modal-overlay" id="modal-heat"><div class="modal"><button class="modal-close" onclick="closeModal('modal-heat')">✕</button><div class="modal-title">🚨 Police Heat</div><div id="modal-heat-body"></div></div></div>
 <div class="modal-overlay" id="modal-evade"><div class="modal" style="text-align:center">
@@ -1507,7 +1544,7 @@ function showTab(t,el){
   else document.querySelector(`.side-tab[onclick*="showTab('${t}'"]`)?.classList.add('active');
   document.getElementById('hud-menu')?.classList.remove('open');
   if(t==='garage')renderPlayerCars();
-  if(t==='market'){loadMarketPrices().then(renderMarket);runMarketTick();}
+  if(t==='market'){renderPacks();loadMarketPrices().then(renderMarket);runMarketTick();}
   if(t==='auction')renderAuctions();
   if(t==='leaderboard')loadLeaderboard();
   if(t==='crew')loadCrew();
@@ -1728,6 +1765,37 @@ async function buyUpgrade(key,lvl,cost,pb,hb,sb){
 }
 
 // ═══ MARKET ═══
+// ═══ PACK-OPENING SYSTEM — gacha-style car packs with rarity drop tiers ═══
+const PACKS=[
+  {id:'starter',name:'Starter Crate',emoji:'📦',price:8000,desc:'Cheap and cheerful. Mostly commons, a slim shot at something rare.',
+    weights:{Common:62,Uncommon:25,Rare:10,Epic:2.7,Legendary:0.3}},
+  {id:'street',name:'Street Pack',emoji:'🏙️',price:25000,desc:'Solid mid-tier pulls. Where most builds really start.',
+    weights:{Common:35,Uncommon:33,Rare:22,Epic:8,Legendary:2}},
+  {id:'exotic',name:'Exotic Pack',emoji:'💎',price:75000,desc:'No commons. Strong odds at Epic and a real Legendary chance.',
+    weights:{Uncommon:30,Rare:42,Epic:21,Legendary:7}},
+  {id:'hyper',name:'Hypercar Vault',emoji:'🏆',price:200000,desc:'Top-shelf only. Every pull stings the wallet but the floor is high.',
+    weights:{Rare:34,Epic:46,Legendary:20}},
+];
+// Map our rarity labels (some cars use Mythic) onto the pack tiers
+function carTier(c){
+  const r=(c.rarity||'Common');
+  if(r==='Mythic')return 'Legendary';
+  return r;
+}
+function rollPack(pack){
+  // Weighted rarity roll, then a random car of that rarity (fallback to nearest tier with stock)
+  const order=['Legendary','Epic','Rare','Uncommon','Common'];
+  const total=Object.values(pack.weights).reduce((a,b)=>a+b,0);
+  let roll=Math.random()*total,tier=null;
+  for(const[t,w]of Object.entries(pack.weights)){roll-=w;if(roll<=0){tier=t;break;}}
+  if(!tier)tier=Object.keys(pack.weights)[0];
+  let pool=CAR_DATA.filter(c=>carTier(c)===tier);
+  // if that tier has no cars, walk toward more common tiers until we find stock
+  let idx=order.indexOf(tier);
+  while(!pool.length&&idx<order.length-1){idx++;pool=CAR_DATA.filter(c=>carTier(c)===order[idx]);}
+  if(!pool.length)pool=CAR_DATA;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 function renderMarket(){
   const grid=document.getElementById('market-grid');
   const q=(document.getElementById('mkt-search')?.value||'').toLowerCase();
@@ -1764,6 +1832,80 @@ function renderMarket(){
   }).join('');
 }
 function setMktFilter(btn){currentMktFilter=btn.dataset.cls;document.querySelectorAll('[data-cls]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMarket();}
+function renderPacks(){
+  const grid=document.getElementById('pack-grid');if(!grid)return;
+  grid.innerHTML=PACKS.map(p=>{
+    const afford=profile&&profile.cash>=p.price;
+    return `<div class="pack-card pack-${p.id}" onclick="buyPack('${p.id}')" style="${afford?'':'opacity:.55'}">
+      <div class="pack-shine"></div>
+      <div class="pack-emoji">${p.emoji}</div>
+      <div class="pack-name">${p.name}</div>
+      <div class="pack-desc">${p.desc}</div>
+      <div class="pack-foot">
+        <span class="pack-price">$${fmtCash(p.price)}</span>
+        <span class="pack-rates" onclick="event.stopPropagation();openPackInfo('${p.id}')">drop rates ▸</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openPackInfo(id){
+  const p=PACKS.find(x=>x.id===id);if(!p)return;
+  const tierColor={Common:'var(--text2)',Uncommon:'var(--green2)',Rare:'var(--blue2)',Epic:'var(--purple2)',Legendary:'var(--amber2)'};
+  const rows=Object.entries(p.weights).sort((a,b)=>a[1]-b[1]).map(([t,w])=>{
+    const n=CAR_DATA.filter(c=>carTier(c)===t).length;
+    return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:${tierColor[t]||'var(--text)'}">${t} <span style="color:var(--text3);font-size:10px">(${n} cars)</span></span><span style="font-family:var(--mono)">${w}%</span></div>`;
+  }).join('');
+  document.getElementById('modal-pack-body').innerHTML=`
+    <div style="text-align:center;font-size:48px">${p.emoji}</div>
+    <div class="modal-title" style="text-align:center">${p.name}</div>
+    <div style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:14px">${p.desc}</div>
+    <div style="font-family:var(--disp);font-size:12px;letter-spacing:1px;color:var(--steel);margin-bottom:6px">DROP RATES</div>
+    ${rows}
+    <button class="btn btn-gold btn-lg" style="width:100%;margin-top:16px" onclick="closeModal('modal-pack');buyPack('${p.id}')">Open for $${fmtCash(p.price)}</button>`;
+  openModal('modal-pack');
+}
+let _packBusy=false;
+async function buyPack(id){
+  if(_packBusy)return;
+  const p=PACKS.find(x=>x.id===id);if(!p)return;
+  if(profile.cash<p.price){toast('Not enough cash for that pack','t-error');return;}
+  _packBusy=true;
+  // Charge up front
+  await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(-p.price)});
+  profile.cash-=p.price;renderHUD();
+  const car=rollPack(p);
+  const already=playerCars.some(pc=>pc.car_name===car.name);
+  // Reveal animation
+  const stage=document.getElementById('reveal-stage');
+  openModal('modal-reveal');
+  stage.innerHTML=`<div class="reveal-spin"><div class="reveal-spin-emoji">${p.emoji}</div></div><div class="reveal-label">Opening ${p.name}…</div>`;
+  await sleep(1500);
+  const tierColor={Common:'#8ba0b8',Uncommon:'#46ff9c',Rare:'#3ae6ff',Epic:'#cc6bff',Legendary:'#ffc757',Mythic:'#ffc757'};
+  const col=tierColor[car.rarity]||'#8ba0b8';
+  stage.innerHTML=`
+    <div class="reveal-card" style="--rc:${col}">
+      <div class="reveal-rarity" style="color:${col}">${car.rarity.toUpperCase()}</div>
+      <div class="reveal-emoji">${car.emoji}</div>
+      <div class="reveal-carname">${car.name}</div>
+      <div class="reveal-brand">${car.brand} · ${car.class}</div>
+      ${already?'<div class="reveal-dupe">DUPLICATE · +$'+fmtCash(Math.round(car.base_price*0.4))+' refund</div>':'<div class="reveal-new">★ NEW! ★</div>'}
+      <button class="btn btn-gold btn-lg" style="margin-top:16px;width:100%" onclick="closeModal('modal-reveal')">${already?'Collect Refund':'Add to Garage'}</button>
+    </div>`;
+  // Grant or refund
+  if(already){
+    const refund=Math.round(car.base_price*0.4);
+    await db.collection('profiles').doc(currentUser.uid).update({cash:firebase.firestore.FieldValue.increment(refund)});
+    profile.cash+=refund;
+  }else{
+    await db.collection('player_cars').add({player_id:currentUser.uid,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:p.price,is_active:playerCars.length===0,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('profiles').doc(currentUser.uid).update({reputation:firebase.firestore.FieldValue.increment(5),car_count:firebase.firestore.FieldValue.increment(1)});
+    await loadPlayerCars();
+  }
+  renderHUD();renderPacks();
+  logActivity('open_pack',{pack:p.id,car:car.name,rarity:car.rarity,dupe:already}).catch(()=>{});
+  if(!already&&['Legendary','Mythic','Epic'].includes(car.rarity)&&npcAccounts&&npcAccounts.length&&typeof npcReact==='function'){npcReact('bigwin',profile.username);}
+  _packBusy=false;
+}
 async function buyCar(carName,price){
   if(profile.cash<price){toast('Not enough cash!','t-error');return;}
   if(playerCars.find(p=>p.car_name===carName)){toast('You already own this!','t-error');return;}
