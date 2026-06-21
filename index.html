@@ -1568,7 +1568,10 @@ function showMaintenanceScreen(){
       <div class="logo" style="font-size:38px;letter-spacing:4px">UNDER MAINTENANCE</div>
       <div style="color:var(--text2);max-width:440px;margin:20px 0 28px;line-height:1.7;font-size:14px">REDLINE is briefly offline for maintenance. Hang tight — we'll be back shortly. Your progress and cars are safe.</div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:2px">↻ THIS PAGE WILL REFRESH AUTOMATICALLY</div>
-      <button class="btn btn-ghost" style="margin-top:28px" onclick="location.reload()">↻ Refresh now</button>`;
+      <div style="display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;justify-content:center">
+        <button class="btn btn-ghost" onclick="location.reload()">↻ Refresh now</button>
+        <button class="btn btn-ghost" style="color:#ff7a9e" onclick="doLogout()">⏻ Sign Out</button>
+      </div>`;
     document.body.appendChild(m);
     setInterval(()=>{loadActiveEvent().then(()=>{if(!panicMode)location.reload();}).catch(()=>{});},20000);
   }
