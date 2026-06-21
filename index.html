@@ -28,7 +28,8 @@
   --glow-cyan:0 0 18px rgba(255,255,255,.25);
 }
 body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;}
-.openmoji-img{height:1.18em;width:1.18em;vertical-align:-0.22em;display:inline-block;object-fit:contain;}
+.openmoji-img{height:1.18em;width:1.18em;vertical-align:-0.22em;display:inline-block;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(230,0,35,.25)) contrast(1.08) saturate(1.15);transition:filter .2s;}
+.openmoji-img:hover{filter:drop-shadow(0 0 6px rgba(230,0,35,.55)) contrast(1.12) saturate(1.25);}
 button{font-family:var(--body);cursor:pointer;}
 input,select,textarea{font-family:var(--body);}
 ::-webkit-scrollbar{width:4px;height:4px;}
@@ -1388,6 +1389,7 @@ auth.onAuthStateChanged(async user=>{
     currentUser=user;
     document.getElementById('auth-screen').style.display='none';
     await initGame();
+    if(isPanicLocked()){showMaintenanceScreen();return;}
     const status=await checkEntryGate();
     if(status==='approved'){
       hideEntryGateScreen();
@@ -1546,14 +1548,34 @@ async function loadActiveEvent(){
 let panicMode=false;
 function isPanicLocked(){
   if(!panicMode)return false;
-  if(['owner','admin','moderator'].includes(profile?.role))return false;
-  if(Array.isArray(profile?.roles)&&profile.roles.some(r=>['owner','admin','moderator'].includes(r)))return false;
+  if(profile?.role==='owner')return false;
+  if(Array.isArray(profile?.roles)&&profile.roles.includes('owner'))return false;
   return true;
 }
 function panicBlock(action){
   if(!isPanicLocked())return false;
-  toast(`🚨 ${action} locked — emergency mode active`,'t-error');
+  showMaintenanceScreen();
   return true;
+}
+function showMaintenanceScreen(){
+  let m=document.getElementById('maint-screen');
+  if(!m){
+    m=document.createElement('div');
+    m.id='maint-screen';
+    m.style.cssText='position:fixed;inset:0;z-index:9997;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,rgba(230,0,35,.18),transparent 60%),var(--bg);text-align:center;';
+    m.innerHTML=`
+      <div style="font-size:80px;margin-bottom:18px;animation:idleFloat 3s ease-in-out infinite">🔧</div>
+      <div class="logo" style="font-size:38px;letter-spacing:4px">UNDER MAINTENANCE</div>
+      <div style="color:var(--text2);max-width:440px;margin:20px 0 28px;line-height:1.7;font-size:14px">REDLINE is briefly offline for maintenance. Hang tight — we'll be back shortly. Your progress and cars are safe.</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:2px">↻ THIS PAGE WILL REFRESH AUTOMATICALLY</div>
+      <button class="btn btn-ghost" style="margin-top:28px" onclick="location.reload()">↻ Refresh now</button>`;
+    document.body.appendChild(m);
+    setInterval(()=>{loadActiveEvent().then(()=>{if(!panicMode)location.reload();}).catch(()=>{});},20000);
+  }
+  m.style.display='flex';
+}
+function hideMaintenanceScreen(){
+  const m=document.getElementById('maint-screen');if(m)m.remove();
 }
 function showActiveEventBanner(){
   const el=document.getElementById('event-banner');
@@ -3161,8 +3183,10 @@ function setupBroadcastListener(){
       if(!t||t<=broadcastSeenAt)return;
       broadcastSeenAt=t;
       showBroadcastBanner(b.message,b.type||'t-info',b.sender);
-      // Any broadcast may signal a settings change — re-read panic flag etc.
-      loadActiveEvent().catch(()=>{});
+      loadActiveEvent().then(()=>{
+        if(panicMode&&isPanicLocked())showMaintenanceScreen();
+        else if(!panicMode)hideMaintenanceScreen();
+      }).catch(()=>{});
     });
   },err=>console.warn('Broadcast listener:',err.message));
   auctUnsubs.push(broadcastUnsub);
