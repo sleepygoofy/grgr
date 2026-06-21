@@ -389,17 +389,17 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .role-veteran{background:rgba(70,255,156,.12);color:var(--green2);border:1px solid rgba(0,230,118,.35);}
 .role-player{background:var(--panel3);color:var(--text3);border:1px solid var(--border);}
 .role-npc{background:rgba(30,32,55,.5);color:var(--text3);border:1px solid var(--border);}
-.admin-topbar-wrap{border:1px solid var(--border);border-radius:var(--r2);background:var(--panel);margin-bottom:14px;overflow:hidden;}
-.admin-topbar{display:flex;gap:4px;overflow-x:auto;padding:8px;scrollbar-width:thin;}
-.admin-topbar::-webkit-scrollbar{height:6px;}
+.admin-shell{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start;}
+@media(max-width:760px){.admin-shell{grid-template-columns:1fr;}}
+.admin-topbar-wrap{border:1px solid var(--border);background:var(--panel);border-radius:var(--r2);padding:8px;margin-bottom:0;position:sticky;top:14px;max-height:calc(100vh - 100px);overflow-y:auto;}
+.admin-topbar{display:flex;flex-direction:column;gap:1px;padding:0;}
+.admin-topbar::-webkit-scrollbar{width:6px;}
 .admin-topbar::-webkit-scrollbar-thumb{background:var(--border3);border-radius:3px;}
-.admin-topbar-wrap{border:none;border-bottom:1px solid var(--border2);background:transparent;border-radius:0;margin-bottom:18px;padding:0;}
-.admin-topbar{padding:0 2px;gap:2px;}
-.admin-tab{flex-shrink:0;padding:11px 14px 13px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;background:transparent;border:none;border-bottom:2px solid transparent;border-radius:0;color:var(--text3);cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;position:relative;}
-.admin-tab:hover{color:var(--text);background:transparent;}
-.admin-tab.active{background:transparent;color:var(--red2);border-color:var(--red);box-shadow:none;}
-.admin-tab.active::after{content:'';position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--red);box-shadow:0 0 12px var(--red);}
-.admin-tab-sep{width:1px;background:var(--border);margin:8px 4px;flex-shrink:0;}
+.admin-tab{width:100%;text-align:left;flex-shrink:0;padding:9px 12px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;background:transparent;border:none;border-left:3px solid transparent;border-radius:0;color:var(--text3);cursor:pointer;transition:color .15s,background .15s,border-color .15s;white-space:nowrap;position:relative;}
+.admin-tab:hover{color:var(--text);background:var(--panel2);}
+.admin-tab.active{background:var(--red3);color:var(--red2);border-left-color:var(--red);box-shadow:none;}
+.admin-tab.active::after{display:none;}
+.admin-tab-sep{display:block;width:auto;height:1px;background:var(--border);margin:6px 8px;flex-shrink:0;}
 .admin-content{background:var(--panel);padding:20px;border:1px solid var(--border);border-radius:var(--r2);overflow-y:auto;max-height:78vh;}
 .admin-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;}
 .adm-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
@@ -692,6 +692,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <button class="side-tab" onclick="showTab('crew',this)"><span class="side-ico">🤝</span><span class="side-label">Crew</span></button>
         <button class="side-tab" onclick="showTab('profile',this)"><span class="side-ico">👤</span><span class="side-label">Profile</span></button>
         <button class="side-tab" id="admin-nav-tab" style="display:none" onclick="showTab('admin',this)"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></button>
+        <button class="side-tab" id="modforms-nav-tab" style="display:none" onclick="showTab('modforms',this)"><span class="side-ico">📝</span><span class="side-label">Forms</span></button>
       </nav>
       <div class="sidebar-foot">
         <button class="side-tab" onclick="showModeSelect()"><span class="side-ico">🗺️</span><span class="side-label">Modes</span></button>
@@ -894,8 +895,13 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       </div>
     </div>
     <!-- ADMIN -->
+    <div class="section" id="tab-modforms">
+      <div class="sec-head"><div><div class="sec-title" style="color:var(--amber2)">📝 Application Review</div><div class="sec-sub">moderator access · review and act on player applications</div></div></div>
+      <div id="modforms-content"><div class="loading-screen"><div class="spinner"></div></div></div>
+    </div>
     <div class="section" id="tab-admin">
       <div class="sec-head"><div><div class="sec-title" style="color:var(--red2)">⚙ Admin Panel</div><div class="sec-sub">system control · restricted</div></div><span id="admin-role-badge" class="role-badge"></span></div>
+      <div class="admin-shell">
       <div class="admin-topbar-wrap">
         <div class="admin-topbar">
           <button class="admin-tab active" onclick="adminSec('overview',this)">📊 Overview</button>
@@ -933,6 +939,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         </div>
       </div>
       <div class="admin-content" id="admin-content"><div class="loading-screen"><div class="spinner"></div></div></div>
+      </div>
     </div>
       </main>
     </div>
@@ -1701,8 +1708,11 @@ function renderHUD(){
     const ch=document.getElementById('active-car-chip');
     if(ch){ch.style.display='';document.getElementById('active-car-chip-name').textContent=active.car_name||'';}
   }
-  const isAdm=['admin','owner'].includes(profile.role);
+  const roles=Array.isArray(profile.roles)?profile.roles:[profile.role];
+  const isAdm=roles.includes('admin')||roles.includes('owner');
+  const isMod=isAdm||roles.includes('moderator');
   const adminTab=document.getElementById('admin-nav-tab');if(adminTab)adminTab.style.display=isAdm?'':'none';
+  const modFormsTab=document.getElementById('modforms-nav-tab');if(modFormsTab)modFormsTab.style.display=(isMod&&!isAdm)?'':'none';
   const av=document.getElementById('avatar-btn');
   if(profile.role==='owner')av.style.border='2px solid var(--purple2)';
   else if(profile.role==='admin')av.style.border='2px solid var(--red2)';
@@ -1750,6 +1760,7 @@ function showTab(t,el){
   if(t==='auction')renderAuctions();
   if(t==='leaderboard')loadLeaderboard();
   if(t==='crew')loadCrew();
+  if(t==='modforms')loadModForms();
   if(t==='profile'){raceHistLoaded=false;renderProfile();}
   if(t==='admin')loadAdminPanel();
   if(t==='challenges')renderChallenges();
@@ -2808,13 +2819,19 @@ async function loadLeaderboard(){
     ['lb-wins','lb-cash','lb-streak','lb-garage'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=err;});
     return;
   }
+  try{
+    const carsSnap=await db.collection('player_cars').limit(2000).get();
+    const counts={};
+    carsSnap.docs.forEach(d=>{const pid=d.data().player_id;if(pid)counts[pid]=(counts[pid]||0)+1;});
+    pool.forEach(p=>{p.car_count=counts[p.id]||0;});
+  }catch(e){console.warn('car count read failed, falling back to cached field',e);}
   if(currentUser&&profile){
     const mine=pool.find(p=>p.id===currentUser.uid);
     if(mine){
       mine.wins=profile.wins||0;
       mine.cash=profile.cash||0;
       mine.best_win_streak=profile.best_win_streak||0;
-      mine.car_count=profile.car_count||0;
+      mine.car_count=playerCars.length||mine.car_count||0;
     }
   }
   const row=(d,i,val)=>`<tr><td class="lb-rank">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td><td><strong>${d.username||'?'}</strong>${currentUser&&d.id===currentUser.uid?' <span style="font-size:9px;color:var(--red2)">(you)</span>':''}</td><td class="lb-val">${val}</td></tr>`;
@@ -2980,6 +2997,10 @@ async function runSingleNPCAction(npc){
     const refill=15000+Math.floor(Math.random()*25000);
     await db.collection('profiles').doc(npc.id).update({cash:refill}).catch(()=>{});
     npc.cash=refill;
+    return;
+  }
+  if(Math.random()<0.18){
+    await runNPCCrewAction(npc).catch(()=>{});
     return;
   }
   const roll=Math.random();
@@ -4138,6 +4159,66 @@ async function submitApplication(){
 }
 
 let formsFilter='pending';
+const NPC_CREW_NAMES=['Midnight Outlaws','Bayfront Kings','Sunset Drifters','Vice Velocity','Neon Syndicate','Coastal Phantoms','Apex Hunters','Tarmac Saints','Redline Republic','Asphalt Aces','Twin Cam Society','Dawn Patrol','Boost Brigade','Late Night Crew'];
+const NPC_CREW_TAGS=['MNO','BFK','SSD','VVC','NSC','CPH','APX','TKS','RLR','ASA','TCS','DWP','BBR','LNC'];
+
+async function runNPCCrewAction(npc){
+  const fresh=await db.collection('profiles').doc(npc.id).get().catch(()=>null);
+  if(!fresh||!fresh.exists)return;
+  const data=fresh.data();
+  if(data.crew_id){
+    if(Math.random()<0.04){
+      const cd=await db.collection('crews').doc(data.crew_id).get().catch(()=>null);
+      if(cd&&cd.exists){
+        if(cd.data().owner_id===npc.id){
+          const members=cd.data().member_ids||[];
+          await Promise.all(members.map(m=>db.collection('profiles').doc(m).update({crew_id:firebase.firestore.FieldValue.delete(),crew_name:firebase.firestore.FieldValue.delete()}).catch(()=>{})));
+          await db.collection('crews').doc(data.crew_id).delete().catch(()=>{});
+        }else{
+          await db.collection('crews').doc(data.crew_id).update({member_ids:firebase.firestore.FieldValue.arrayRemove(npc.id),total_wins:firebase.firestore.FieldValue.increment(-(data.wins||0))}).catch(()=>{});
+          await db.collection('profiles').doc(npc.id).update({crew_id:firebase.firestore.FieldValue.delete(),crew_name:firebase.firestore.FieldValue.delete()});
+        }
+      }
+    }
+    return;
+  }
+  const crewsSnap=await db.collection('crews').limit(20).get().catch(()=>({docs:[]}));
+  const joinable=crewsSnap.docs.filter(d=>(d.data().member_ids||[]).length<30);
+  if(joinable.length&&Math.random()<0.7){
+    const pick=joinable[Math.floor(Math.random()*joinable.length)];
+    await db.collection('crews').doc(pick.id).update({member_ids:firebase.firestore.FieldValue.arrayUnion(npc.id),total_wins:firebase.firestore.FieldValue.increment(data.wins||0)}).catch(()=>{});
+    await db.collection('profiles').doc(npc.id).update({crew_id:pick.id,crew_name:pick.data().name}).catch(()=>{});
+    showFeed(`🤝 ${data.username} joined ${pick.data().name}`);
+    return;
+  }
+  if((data.cash||0)>=25000&&Math.random()<0.5){
+    const idx=Math.floor(Math.random()*NPC_CREW_NAMES.length);
+    const name=NPC_CREW_NAMES[idx];
+    const tag=NPC_CREW_TAGS[idx];
+    const existing=await db.collection('crews').where('name','==',name).limit(1).get().catch(()=>({empty:true}));
+    if(!existing.empty)return;
+    const ref=db.collection('crews').doc();
+    await ref.set({name,tag,owner_id:npc.id,owner_username:data.username,member_ids:[npc.id],total_wins:data.wins||0,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+    await db.collection('profiles').doc(npc.id).update({cash:firebase.firestore.FieldValue.increment(-25000),crew_id:ref.id,crew_name:name}).catch(()=>{});
+    showFeed(`🆕 ${data.username} founded ${name}`);
+  }
+}
+
+async function loadModForms(){
+  const el=document.getElementById('modforms-content');if(!el)return;
+  el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
+  if(typeof formsFilter==='undefined')window.formsFilter='pending';
+  el.innerHTML=`<div class="panel"><h3>📝 Player Applications</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">Review entry applications and approve or reject them.</p>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    ${['pending','approved','rejected','all'].map(f=>`<button class="btn btn-sm ${formsFilter===f?'btn-red':'btn-ghost'}" onclick="setModFormsFilter('${f}')">${f.toUpperCase()}</button>`).join('')}
+  </div>
+  <div id="forms-list"><div class="loading-screen"><div class="spinner"></div></div></div>
+  </div>`;
+  loadFormsList();
+}
+function setModFormsFilter(f){formsFilter=f;loadModForms();}
+
 async function adminForms(el){
   el.innerHTML=`<div class="panel"><h3>📝 Entry Applications</h3>
   <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">New player gate. Approve to let them in, reject to bounce them.</p>
