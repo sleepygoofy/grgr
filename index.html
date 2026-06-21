@@ -455,7 +455,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .chat-send{width:34px;height:34px;border-radius:50%;background:var(--red);border:none;color:#fff;cursor:pointer;font-size:14px;flex-shrink:0;}
 .chat-send:hover{background:var(--red2);}
 @media(max-width:500px){.chat-panel{width:calc(100vw - 24px);right:12px;bottom:84px;height:55vh;}.chat-fab{bottom:16px;right:16px;}}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;padding-top:38px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8),inset 1px 1px 0 rgba(255,255,255,.05);animation:modalPop .22s cubic-bezier(.2,1.2,.4,1);}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:28px;background:linear-gradient(90deg,var(--panel3),var(--panel2));border-bottom:1px solid var(--border2);border-radius:var(--r2) var(--r2) 0 0;}
