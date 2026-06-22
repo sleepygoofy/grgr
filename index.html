@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>REDLINE: Vice Streets</title>
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -19,9 +19,9 @@
   --blue:#cfcfcf;--blue2:#ffffff;--blue3:rgba(255,255,255,.08);
   --purple:#e60023;--purple2:#ff2b3d;--purple3:rgba(230,0,35,.14);
   --text:#ffffff;--text2:#b0b0b0;--text3:#6b6b6b;--text4:#262626;
-  --mono:'JetBrains Mono',monospace;
+  --mono:'DM Mono',monospace;
   --disp:'Luckiest Guy',cursive;
-  --body:'Space Grotesk',sans-serif;
+  --body:'Fraunces',Georgia,serif;
   --r:4px;--r2:6px;
   --glow-red:none;
   --glow-amber:none;
@@ -346,18 +346,19 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .td-controls{font-family:var(--body);font-size:11px;color:var(--text3);margin-top:8px;letter-spacing:.3px;}
 .td-controls strong{color:var(--text);font-weight:700;}
 .launch-gauge-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--steel2);margin-bottom:12px;text-transform:uppercase;}
-.launch-gauge-track{position:relative;height:22px;background:var(--bg3);border-radius:11px;overflow:hidden;border:1px solid var(--border2);margin-bottom:10px;}
+.launch-gauge-track{position:relative;height:28px;background:var(--bg3);border-radius:4px;overflow:hidden;border:2px solid #000;margin-bottom:14px;box-shadow:3px 3px 0 #000;}
 .launch-zone-red,.launch-zone-yellow,.launch-zone-green{position:absolute;top:0;bottom:0;}
-.launch-zone-red{background:rgba(255,46,139,.18);}
-.launch-zone-yellow{background:rgba(255,122,61,.28);}
-.launch-zone-green{background:rgba(46,240,184,.45);box-shadow:inset 0 0 12px rgba(46,240,184,.5);}
-.launch-needle{position:absolute;top:-3px;bottom:-3px;width:4px;background:#fff;box-shadow:0 0 10px #fff,0 0 18px var(--steel2);border-radius:2px;left:0%;}
-.btn-gas-launch,.btn-gas-mash{font-family:var(--disp);font-size:18px;font-weight:900;letter-spacing:2px;padding:16px 40px;border-radius:50px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--red),var(--purple));color:#fff;box-shadow:0 6px 24px rgba(255,46,139,.4),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .08s;user-select:none;-webkit-tap-highlight-color:transparent;}
-.btn-gas-launch:active,.btn-gas-mash:active{transform:scale(.93);box-shadow:0 2px 12px rgba(255,46,139,.5);}
+.launch-zone-red{background:repeating-linear-gradient(45deg,rgba(230,0,35,.22),rgba(230,0,35,.22) 6px,transparent 6px,transparent 12px);}
+.launch-zone-yellow{background:rgba(255,140,0,.22);}
+.launch-zone-green{background:rgba(30,215,96,.4);}
+.launch-needle{position:absolute;top:-5px;bottom:-5px;width:3px;background:#fff;border-left:1px solid #000;border-right:1px solid #000;left:0%;}
+.btn-gas-launch,.btn-gas-mash{font-family:var(--disp);font-size:22px;letter-spacing:1px;padding:14px 44px;border:3px solid #000;border-radius:8px;cursor:pointer;background:var(--red);color:#fff;box-shadow:5px 5px 0 #000;transition:transform .06s,box-shadow .06s,background .12s;user-select:none;-webkit-tap-highlight-color:transparent;}
+.btn-gas-launch:hover,.btn-gas-mash:hover{background:#ff2b3d;}
+.btn-gas-launch:active,.btn-gas-mash:active{transform:translate(4px,4px);box-shadow:1px 1px 0 #000;}
 .launch-result{margin-top:10px;font-family:var(--disp);font-size:14px;font-weight:700;letter-spacing:1px;min-height:20px;text-transform:uppercase;}
 .mash-meter{padding:12px;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:12px;text-align:center;}
 .mash-bar-track{height:16px;background:var(--bg3);border-radius:8px;overflow:hidden;border:1px solid var(--border2);margin-bottom:10px;}
-.mash-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--green2),var(--amber2));border-radius:8px;transition:width .1s linear;box-shadow:0 0 12px rgba(0,229,255,.5);}
+.mash-bar-fill{height:100%;background:var(--red);border-radius:8px;transition:width .1s linear;}
 .mash-count{margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:1px;}
 .speed-bar-section{margin-bottom:12px;}
 .speed-row{margin-bottom:10px;}
@@ -627,32 +628,46 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <div id="crt-overlay"></div>
 
 <!-- AUTH -->
-<div id="auth-screen" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;">
-  <div style="position:relative;z-index:2;width:100%;max-width:400px;padding:16px;">
-    <div style="background:rgba(10,11,20,.88);border:1px solid rgba(255,46,139,.32);border-radius:var(--r2);padding:34px 32px;backdrop-filter:blur(24px);box-shadow:0 24px 64px rgba(0,0,0,.75);position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:24px;width:120px;height:2px;background:linear-gradient(90deg,var(--red),var(--amber));"></div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
-        <div style="width:48px;height:48px;flex-shrink:0;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;box-shadow:0 0 22px rgba(255,31,107,.5);"></div>
-        <div style="font-family:var(--disp);font-weight:900;font-size:32px;letter-spacing:6px;background:linear-gradient(135deg,#ffffff 0%,#ffffff 45%,#e60023 55%,#e60023 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 14px rgba(230,0,35,.5));">REDLINE</div>
+<div id="auth-screen" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:stretch;justify-content:stretch;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;width:100%;min-height:100%;">
+    <div style="position:relative;background:#0a0a0a;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 36px;border-right:3px solid var(--red);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:38px;height:38px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;"></div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;">EST. 2026 / NIGHT CIRCUIT</div>
       </div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:3px;margin-bottom:24px;text-transform:uppercase;padding-left:54px;">Vice City Street Racing</div>
-      <div style="display:flex;margin-bottom:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r);padding:3px;gap:3px;">
-        <button class="auth-tab active" onclick="switchAuthTab('login',this)" style="flex:1;padding:9px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .18s;border:none;">Sign In</button>
-        <button class="auth-tab" onclick="switchAuthTab('signup',this)" style="flex:1;padding:9px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .18s;border:none;">Register</button>
+      <div>
+        <div style="font-family:var(--disp);font-size:90px;line-height:.85;color:var(--text);margin-bottom:6px;">REDLINE</div>
+        <div style="height:6px;width:140px;background:var(--red);margin:14px 0 18px;"></div>
+        <div style="font-family:var(--body);font-size:18px;color:var(--text2);font-weight:500;max-width:340px;line-height:1.45;">Run the streets after dark. Build the garage everyone talks about. Don&rsquo;t get caught.</div>
       </div>
-      <div id="auth-login">
-        <div style="margin-bottom:10px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Username</label><input class="form-input" id="login-user" placeholder="YourRacerTag" autocomplete="username"></div>
-        <div style="margin-bottom:10px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <button class="btn-auth" onclick="doLogin()">🏁 IGNITE ENGINE</button>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;">
+        <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">300+</span>Cars</div>
+        <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">8</span>Chapters</div>
+        <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">24/7</span>Open Lobby</div>
       </div>
-      <div id="auth-signup" style="display:none">
-        <div style="margin-bottom:10px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Username</label><input class="form-input" id="su-user" placeholder="YourRacerTag" maxlength="20"></div>
-        <div style="margin-bottom:10px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Email</label><input class="form-input" type="email" id="su-email" placeholder="you@redline.gg"></div>
-        <div style="margin-bottom:10px;"><label style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Password</label><input class="form-input" type="password" id="su-pass" placeholder="Min 6 chars" onkeydown="if(event.key==='Enter')doSignup()"></div>
-        <button class="btn-auth" onclick="doSignup()">🚀 JOIN THE GRID</button>
+    </div>
+    <div style="background:#000;display:flex;align-items:center;justify-content:center;padding:40px 36px;position:relative;">
+      <div style="width:100%;max-width:360px;">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--red2);margin-bottom:6px;text-transform:uppercase;">/ Access</div>
+        <div style="font-family:var(--disp);font-size:38px;line-height:1;margin-bottom:24px;color:var(--text);">Hop in.</div>
+        <div style="display:flex;margin-bottom:18px;border-bottom:1px solid var(--border2);">
+          <button class="auth-tab active" onclick="switchAuthTab('login',this)" style="flex:1;padding:10px 0;font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--text);border:none;border-bottom:2px solid var(--red);margin-bottom:-1px;">Sign in</button>
+          <button class="auth-tab" onclick="switchAuthTab('signup',this)" style="flex:1;padding:10px 0;font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;background:none;color:var(--text3);border:none;border-bottom:2px solid transparent;margin-bottom:-1px;">New here</button>
+        </div>
+        <div id="auth-login">
+          <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Username</label><input class="form-input" id="login-user" placeholder="your tag" autocomplete="username"></div>
+          <div style="margin-bottom:18px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+          <button class="btn-auth" onclick="doLogin()">Sign in &rarr;</button>
+        </div>
+        <div id="auth-signup" style="display:none">
+          <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Pick a tag</label><input class="form-input" id="su-user" placeholder="your tag" maxlength="20"></div>
+          <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Email</label><input class="form-input" type="email" id="su-email" placeholder="you@somewhere"></div>
+          <div style="margin-bottom:18px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Password</label><input class="form-input" type="password" id="su-pass" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignup()"></div>
+          <button class="btn-auth" onclick="doSignup()">Create account &rarr;</button>
+        </div>
+        <div class="auth-msg" id="auth-msg"></div>
+        <div style="text-align:center;margin-top:20px;font-family:var(--mono);font-size:9px;color:var(--text4);letter-spacing:2px;">v2.0 / 2026</div>
       </div>
-      <div class="auth-msg" id="auth-msg"></div>
-      <div style="text-align:center;margin-top:14px;font-family:var(--mono);font-size:9px;color:var(--text4);">REDLINE v2.0 · © 2026</div>
     </div>
   </div>
 </div>
@@ -672,7 +687,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <!-- GAME -->
 <!-- MODE SELECT -->
 <div id="mode-screen" style="display:none;position:fixed;inset:0;z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
-  <div style="text-align:center;margin-bottom:8px;"><div class="logo" style="font-size:46px;">REDLINE</div><div class="logo-sub" style="font-size:13px;letter-spacing:6px;">VICE CITY RACING</div></div>
+  <div style="text-align:center;margin-bottom:8px;"><div class="logo" style="font-size:46px;">REDLINE</div><div class="logo-sub" style="font-size:13px;letter-spacing:6px;">STREET RACING</div></div>
   <div style="color:var(--text2);margin:14px 0 30px;font-size:14px;">Choose your road, <span id="mode-username" style="color:var(--red2);font-weight:700;">racer</span></div>
   <div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;max-width:760px;">
     <div class="mode-card" onclick="enterMode('free')">
@@ -708,7 +723,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="sidebar-mark">🏁</div>
-        <div><div class="logo">REDLINE</div><span class="logo-sub">Vice City Racing</span></div>
+        <div><div class="logo">REDLINE</div><span class="logo-sub">Street Racing</span></div>
       </div>
       <nav class="sidebar-nav">
         <button class="side-tab active" onclick="showTab('garage',this)"><span class="side-ico">🏠</span><span class="side-label">Garage</span></button>
@@ -1463,7 +1478,7 @@ async function initGame(){
 }
 
 const TUTORIAL_STEPS=[
-  {title:'Welcome to REDLINE',body:'You just landed in Vice City with a starter ride and $50K in your pocket. The streets pay if you can drive — let me show you how to make money fast.'},
+  {title:'Welcome to REDLINE',body:'You just landed with a starter ride and $50K in your pocket. The streets pay if you can drive — let me show you how to make money fast.'},
   {title:'Step 1 — Race for Cash',body:'Head to the <strong>🏁 Race</strong> tab. Pick an event from the left rail — start with <strong>Easy</strong> ones, they have the lowest entry fees. Win and you keep the prize, lose and you lose the fee. Simple.'},
   {title:'Step 2 — Buy Better Cars',body:'The <strong>🏪 Market</strong> tab is where you spend winnings. Try a <strong>pack</strong> for a gacha pull, or buy a specific car directly. Better stats = more wins. Your active car shows in the garage.'},
   {title:'Step 3 — Watch Your Heat',body:'Every race raises your <strong>Heat</strong>. Too high and the cops bust you mid-race. Use <strong>Lay Low</strong> when heat gets red, or you\'ll lose cash to a bust.'},
@@ -2485,10 +2500,13 @@ async function startRace(rid){
   }
   ph.style.display='none';
 
+  const launchRes=await runLaunchPhase();
+
+  ph.style.display='block';ph.textContent='GO!';ph.className='phase-display phase-go';
+  ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
+  await sleep(500);ph.style.display='none';
   setArenaBadge('racing','RACING');
-  const tdRes=await runTopDownRace(r.oppName,s,r.diff);
-  const launchRes={quality:tdRes.quality,label:tdRes.won?'CLEAN RACE':'TOUGH ONE'};
-  const mashRes={factor:tdRes.quality,count:Math.round(tdRes.time)};
+  const mashRes=await runMashPhase();
 
   const skillMult=Math.max(0.55,launchRes.quality*0.5+mashRes.factor*0.65);
 
@@ -2628,10 +2646,11 @@ async function startStoryRace(stageIdx){
   setArenaBadge('countdown','COUNTDOWN');
   for(const txt of ['3','2','1']){await sleep(650);ph.textContent=txt;ph.className='phase-display phase-cd';ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';}
   ph.style.display='none';
+  const launchRes=await runLaunchPhase();
+  ph.style.display='block';ph.textContent='GO!';ph.className='phase-display phase-go';ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
+  await sleep(500);ph.style.display='none';
   setArenaBadge('racing','DRIFT');
-  const tdRes=await runTopDownRace(stage.rival,s,'hard');
-  const launchRes={quality:tdRes.quality,label:tdRes.won?'CLEAN':'TOUGH'};
-  const mashRes={factor:tdRes.quality,count:Math.round(tdRes.time)};
+  const mashRes=await runMashPhase();
   const skillMult=Math.max(0.55,launchRes.quality*0.5+mashRes.factor*0.65);
 
   const baseScore=s.handling*15+s.braking*5+s.power*0.12;
@@ -3207,7 +3226,7 @@ async function runSingleNPCAction(npc){
     npc.cash=refill;
     return;
   }
-  if(Math.random()<0.18){
+  if(Math.random()<0.35){
     await runNPCCrewAction(npc).catch(()=>{});
     return;
   }
@@ -3236,11 +3255,11 @@ async function runSingleNPCAction(npc){
       const a=d.data(),t=a.ends_at?.toDate?.();
       return t&&t>now&&a.seller_id!==npc.id&&a.highest_bidder_id!==npc.id;
     });
-    if(valid.length&&(npc.cash||0)>5000){
+    if(valid.length&&(npc.cash||0)>30000){
       const aDoc=valid[Math.floor(Math.random()*valid.length)];
       const a=aDoc.data();
       const bidAmt=Math.round(a.current_price*(1.05+Math.random()*0.15));
-      if((npc.cash||0)>=bidAmt){
+      if((npc.cash||0)-bidAmt>=20000){
         if(a.highest_bidder_id&&a.highest_bidder_id!==npc.id)
           db.collection('profiles').doc(a.highest_bidder_id).update({cash:firebase.firestore.FieldValue.increment(a.current_price)}).catch(()=>{});
         await db.collection('auctions').doc(aDoc.id).update({current_price:bidAmt,highest_bidder_id:npc.id,highest_bidder_username:npc.username,bid_count:firebase.firestore.FieldValue.increment(1)});
@@ -3253,8 +3272,8 @@ async function runSingleNPCAction(npc){
     }
   } else if(roll<0.85){
 
-    const affordable=CAR_DATA.filter(c=>{const p=marketPrices[c.name]?.current_price||c.base_price;return p<=(npc.cash||0)*0.6&&p<400000;});
-    if(affordable.length){
+    const affordable=CAR_DATA.filter(c=>{const p=marketPrices[c.name]?.current_price||c.base_price;return p<=((npc.cash||0)-20000)*0.6&&p<400000;});
+    if(affordable.length&&(npc.cash||0)>40000){
       const car=affordable[Math.floor(Math.random()*affordable.length)];
       const price=marketPrices[car.name]?.current_price||car.base_price;
       await db.collection('player_cars').add({player_id:npc.id,car_name:car.name,car_class:car.class,car_emoji:car.emoji,purchase_price:price,is_active:false,is_favorite:false,power_boost:0,handling_boost:0,speed_boost:0,upgrades:{},acquired_at:firebase.firestore.FieldValue.serverTimestamp()});
@@ -4306,7 +4325,7 @@ function showEntryGateScreen(status){
   g.style.display='flex';
   let inner='';
   if(status==='none'){
-    inner=`<div style="text-align:center;margin-bottom:6px"><div class="logo" style="font-size:42px">REDLINE</div><div class="logo-sub" style="font-size:12px;letter-spacing:6px">VICE CITY RACING</div></div>
+    inner=`<div style="text-align:center;margin-bottom:6px"><div class="logo" style="font-size:42px">REDLINE</div><div class="logo-sub" style="font-size:12px;letter-spacing:6px">STREET RACING</div></div>
       <div style="color:var(--text2);max-width:440px;text-align:center;margin:18px 0 24px;line-height:1.6;font-size:14px">This is a closed beta — fill out a quick application and a mod will let you in. Takes a sec.</div>
       <button class="btn btn-red btn-lg" onclick="openApplyModal()">📝 Fill out application</button>
       <button class="btn-ghost-sm" style="margin-top:18px" onclick="doLogout()">Sign out</button>`;
@@ -4394,14 +4413,14 @@ async function runNPCCrewAction(npc){
   }
   const crewsSnap=await db.collection('crews').limit(20).get().catch(()=>({docs:[]}));
   const joinable=crewsSnap.docs.filter(d=>(d.data().member_ids||[]).length<30);
-  if(joinable.length&&Math.random()<0.7){
+  if(joinable.length&&Math.random()<0.4){
     const pick=joinable[Math.floor(Math.random()*joinable.length)];
     await db.collection('crews').doc(pick.id).update({member_ids:firebase.firestore.FieldValue.arrayUnion(npc.id),total_wins:firebase.firestore.FieldValue.increment(data.wins||0)}).catch(()=>{});
     await db.collection('profiles').doc(npc.id).update({crew_id:pick.id,crew_name:pick.data().name}).catch(()=>{});
     showFeed(`🤝 ${data.username} joined ${pick.data().name}`);
     return;
   }
-  if((data.cash||0)>=25000&&Math.random()<0.5){
+  if((data.cash||0)>=25000&&Math.random()<0.85){
     const idx=Math.floor(Math.random()*NPC_CREW_NAMES.length);
     const name=NPC_CREW_NAMES[idx];
     const tag=NPC_CREW_TAGS[idx];
@@ -4608,7 +4627,7 @@ async function logActivity(action,details){
 }
 </script>
 
-<!-- VICE CITY SKYLINE BACKGROUND -->
+<!-- NIGHT CIRCUIT BACKGROUND -->
 <script>
 (function(){
   const canvas=document.getElementById('bg-canvas');
