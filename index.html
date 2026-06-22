@@ -123,11 +123,14 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 }
 .section{display:none;}
 .section.active{display:block;}
-.sec-head{margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;padding:10px 0 10px 18px;}
-.sec-head::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:5px;background:var(--red);border-radius:3px;}
-.sec-title{font-family:var(--disp);font-size:30px;line-height:.95;color:var(--text);text-transform:none;letter-spacing:0;}
-.sec-sub{font-family:var(--body);font-size:13px;color:var(--text2);letter-spacing:0;margin-top:4px;text-transform:none;font-style:italic;font-weight:500;}
-.sec-head .sec-actions{display:flex;gap:8px;flex-shrink:0;}
+.sec-head{margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:0;flex-wrap:wrap;}
+.sec-head::before{display:none;}
+.sec-head > div:first-child{flex:1;min-width:0;}
+.sec-title{font-family:var(--disp);font-size:38px;line-height:.9;color:var(--text);text-transform:none;letter-spacing:1px;margin-top:6px;}
+.sec-title::before{content:'/ ' attr(data-kicker);display:block;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--red2);text-transform:uppercase;margin-bottom:8px;font-weight:500;}
+.sec-sub{font-family:var(--body);font-size:15px;color:var(--text2);letter-spacing:0;margin-top:10px;text-transform:none;font-style:normal;font-weight:500;line-height:1.5;max-width:560px;position:relative;padding-top:14px;}
+.sec-sub::before{content:'';position:absolute;top:0;left:0;width:80px;height:4px;background:var(--red);}
+.sec-head .sec-actions{display:flex;gap:8px;flex-shrink:0;align-items:center;}
 .tag{display:inline-block;font-family:var(--body);font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--panel2);color:var(--text);border:1.5px solid var(--border2);}
 .tag-red{background:var(--red);color:#fff;border-color:var(--red);}
 .tag-amber{background:var(--amber);color:#000;border-color:var(--amber);}
@@ -771,7 +774,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       <main class="main">
         <!-- GARAGE -->
         <div class="section active" id="tab-garage">
-          <div class="sec-head"><div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div class="sec-actions"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
+          <div class="sec-head"><div><div class="sec-title" data-kicker="Your Stable">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div class="sec-actions"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
           <div class="garage-layout">
             <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
             <div id="garage-sidebar" style="display:none">
@@ -791,9 +794,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- MARKET -->
     <div class="section" id="tab-market">
-      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub">Open packs or buy direct</div></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Showroom">Car Market</div><div class="sec-sub">Open packs or buy direct</div></div></div>
       <div id="pack-grid" class="pack-grid"></div>
-      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" style="font-size:22px">Direct Buy</div><div class="sec-sub">Live demand-driven pricing</div></div></div>
+      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" data-kicker="Walk-in" style="font-size:26px">Direct Buy</div><div class="sec-sub">Live demand-driven pricing</div></div></div>
       <div class="ticker-bar"><span class="rt-dot"></span><span class="ticker-text" id="ticker-text">Loading...</span></div>
       <div class="filter-bar">
         <input class="filter-search" id="mkt-search" placeholder="Search..." oninput="renderMarket()">
@@ -809,7 +812,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- AUCTION -->
     <div class="section" id="tab-auction">
-      <div class="sec-head"><div><div class="sec-title">Auction House</div><div class="sec-sub">Live bidding · 5% seller fee</div></div><div class="sec-actions"><button class="btn btn-gold btn-lg" onclick="openListModal()">+ List Car</button></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Live Bidding">Auction House</div><div class="sec-sub">Live bidding · 5% seller fee</div></div><div class="sec-actions"><button class="btn btn-gold btn-lg" onclick="openListModal()">+ List Car</button></div></div>
       <div class="filter-bar">
         <button class="filter-btn active" data-evt="all" onclick="setAuctFilter(this)">All</button>
         <button class="filter-btn" data-evt="hypercar" onclick="setAuctFilter(this)">Hypercar</button>
@@ -908,7 +911,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- CHALLENGES -->
     <div class="section" id="tab-challenges">
-      <div class="sec-head"><div><div class="sec-title">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Daily Hustle">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
       <div class="grid-2">
         <div><div class="panel" style="margin-bottom:16px"><h3>📅 Daily Challenges</h3><div id="daily-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div><div class="panel"><h3>📋 Weekly Missions</h3><div id="weekly-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div></div>
         <div class="panel"><h3>🏅 Achievements</h3><div id="achievements-grid" class="ach-grid"></div></div>
@@ -916,7 +919,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- LEADERBOARD -->
     <div class="section" id="tab-leaderboard">
-      <div class="sec-head"><div><div class="sec-title">Leaderboard</div><div class="sec-sub">Top drivers worldwide</div></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Standings">Leaderboard</div><div class="sec-sub">Top drivers worldwide</div></div></div>
       <div class="grid-2">
         <div class="panel"><h3>🏆 Top Racers</h3><table class="lb-table" id="lb-wins"></table></div>
         <div class="panel"><h3>💰 Richest</h3><table class="lb-table" id="lb-cash"></table></div>
@@ -926,7 +929,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- CREW -->
     <div class="section" id="tab-crew">
-      <div class="sec-head"><div><div class="sec-title">Crew</div><div class="sec-sub">Run together · climb the crew board</div></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Your Squad">Crew</div><div class="sec-sub">Run together · climb the crew board</div></div></div>
       <div id="crew-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
     <!-- PROFILE -->
@@ -948,11 +951,11 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- ADMIN -->
     <div class="section" id="tab-modforms">
-      <div class="sec-head"><div><div class="sec-title" style="color:var(--amber2)">📝 Application Review</div><div class="sec-sub">moderator access · review and act on player applications</div></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Moderator" style="color:var(--amber2)">Application Review</div><div class="sec-sub">moderator access · review and act on player applications</div></div></div>
       <div id="modforms-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
     <div class="section" id="tab-admin">
-      <div class="sec-head"><div><div class="sec-title" style="color:var(--red2)">⚙ Admin Panel</div><div class="sec-sub">system control · restricted</div></div><span id="admin-role-badge" class="role-badge"></span></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Restricted" style="color:var(--red2)">Admin Panel</div><div class="sec-sub">system control · restricted</div></div><span id="admin-role-badge" class="role-badge"></span></div>
       <div class="admin-shell">
       <div class="admin-topbar-wrap">
         <div class="admin-topbar">
