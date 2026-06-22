@@ -327,14 +327,14 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .race-track{background:linear-gradient(180deg,#1a0f3d,#0a0820);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
 .track-header{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
 .track-inner{padding:16px 14px;display:flex;flex-direction:column;gap:14px;}
-.track-lane{position:relative;height:52px;background:linear-gradient(90deg,rgba(255,46,139,.04),rgba(0,229,255,.05),rgba(255,46,139,.04));border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.track-lane{position:relative;height:52px;background:#0a0a0a;border-radius:4px;overflow:hidden;border:1px solid var(--border2);}
 .lane-road{position:absolute;inset:0;overflow:hidden;}
 .road-stripe{position:absolute;top:50%;width:40px;height:2px;background:linear-gradient(90deg,rgba(255,46,139,.5),rgba(0,229,255,.5));border-radius:1px;transform:translateY(-50%);animation:roadAnim .6s linear infinite;}
 @keyframes roadAnim{from{left:110%;}to{left:-10%;}}
 .lane-label{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:9px;color:var(--text3);z-index:3;text-transform:uppercase;letter-spacing:1px;}
-.lane-car{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;left:3%;line-height:1;filter:drop-shadow(0 0 8px rgba(255,46,139,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);}
-.lane-car.opp{transition-duration:2.8s;filter:drop-shadow(0 0 8px rgba(0,229,255,.5));}
-.lane-finish{position:absolute;right:0;top:0;bottom:0;width:24px;background:repeating-conic-gradient(rgba(255,46,139,.18) 0% 25%,rgba(0,229,255,.1) 0% 50%) 0 0/12px 12px;z-index:2;}
+.lane-car{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;left:3%;line-height:1;filter:none;transition:left 2.4s cubic-bezier(.2,.6,.3,1);}
+.lane-car.opp{transition-duration:2.8s;filter:none;}
+.lane-finish{position:absolute;right:0;top:0;bottom:0;width:24px;background:repeating-conic-gradient(#fff 0% 25%,#000 0% 50%) 0 0/12px 12px;z-index:2;opacity:.85;}
 .launch-gauge{padding:12px;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:12px;text-align:center;}
 .td-race-wrap{padding:10px;background:var(--panel2);border:2px solid var(--border2);border-radius:var(--r2);margin-bottom:12px;text-align:center;}
 .td-race-hud{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;margin-bottom:8px;background:var(--bg3);border-radius:var(--r);}
@@ -367,8 +367,8 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .speed-score{color:var(--text3);}
 .speed-track-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
 .speed-fill{height:100%;border-radius:3px;width:0%;transition:width 2.4s cubic-bezier(.2,.6,.3,1);}
-.fill-p{background:linear-gradient(90deg,var(--amber),var(--amber2));}
-.fill-o{background:linear-gradient(90deg,#7a1450,var(--red2));}
+.fill-p{background:var(--red);}
+.fill-o{background:#e8e8e8;}
 .result-box{border-radius:0;padding:28px;display:none;text-align:center;position:absolute;inset:0;overflow-y:auto;z-index:3;background:var(--bg2);display:none;flex-direction:column;align-items:center;justify-content:center;}
 .result-box[style*="block"]{display:flex!important;}
 .result-win{background:linear-gradient(135deg,rgba(37,128,53,.08),rgba(255,122,61,.04));border:1px solid rgba(37,128,53,.3);}
@@ -745,6 +745,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </aside>
     <div class="main-col">
       <header class="header">
+        <a href="https://redline.lat" target="_blank" rel="noopener" id="site-domain" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--disp);font-size:18px;letter-spacing:2px;color:var(--red2);text-decoration:none;pointer-events:auto;z-index:1;white-space:nowrap;">redline.lat</a>
         <div class="hud">
           <div class="hud-pill" onclick="showTab('profile')" style="cursor:pointer"><div class="lbl">Cash</div><div class="val val-cash">$<span id="hud-cash">0</span></div></div>
           <div class="hud-pill" onclick="openHeatModal()" style="cursor:pointer" id="hud-heat-pill"><div class="lbl">Heat</div><div class="val" id="hud-heat">🚨 0</div></div>
@@ -896,7 +897,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
                 <div class="track-header"><span id="p-lane-name">PLAYER</span><span id="opp-lane-name">OPPONENT</span><span>FINISH</span></div>
                 <div class="track-inner">
                   <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.1s"></div><div class="road-stripe" style="animation-delay:-.4s;left:55%"></div><div class="road-stripe" style="animation-delay:-.7s;left:25%"></div></div><div class="lane-label" id="player-lane-lbl">YOU</div><div class="lane-car" id="r-player" style="left:3%">🚗</div><div class="lane-finish"></div></div>
-                  <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.25s;animation-duration:.65s"></div><div class="road-stripe" style="animation-delay:-.55s;animation-duration:.65s;left:60%"></div></div><div class="lane-label" id="opp-lane-label">CPU</div><div class="lane-car opp" id="r-opp" style="left:3%">🏎️</div><div class="lane-finish"></div></div>
+                  <div class="track-lane"><div class="lane-road"><div class="road-stripe" style="animation-delay:-.25s;animation-duration:.65s;background:#666"></div><div class="road-stripe" style="animation-delay:-.55s;animation-duration:.65s;left:60%;background:#666"></div></div><div class="lane-label" id="opp-lane-label">CPU</div><div class="lane-car opp" id="r-opp" style="left:3%">🏎️</div><div class="lane-finish"></div></div>
                 </div>
               </div>
             </div>
@@ -2524,8 +2525,8 @@ async function startRace(rid){
   await sleep(100);
   document.getElementById('p-fill').style.cssText=`transition:width 2.4s cubic-bezier(.2,.6,.3,1);width:${pp}%`;
   document.getElementById('o-fill').style.cssText=`transition:width 2.8s cubic-bezier(.2,.6,.3,1);width:${op}%`;
-  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(255,46,139,.5));transition:left 2.4s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
-  document.getElementById('r-opp').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(0,229,255,.5));transition:left 2.8s cubic-bezier(.2,.6,.3,1);left:${op}%`;
+  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:none;transition:left 2.4s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
+  document.getElementById('r-opp').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:none;transition:left 2.8s cubic-bezier(.2,.6,.3,1);left:${op}%`;
   document.getElementById('p-score').textContent='Score: '+Math.round(myScore);
   document.getElementById('o-score').textContent='Score: '+Math.round(oppScore);
   await sleep(2900);
@@ -2664,7 +2665,7 @@ async function startStoryRace(stageIdx){
   await sleep(100);
   document.getElementById('p-fill').style.cssText=`transition:width 2.6s cubic-bezier(.2,.6,.3,1);width:${pp}%`;
   document.getElementById('o-fill').style.cssText=`transition:width 2.8s cubic-bezier(.2,.6,.3,1);width:${op}%`;
-  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(255,46,139,.5));transition:left 2.6s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
+  document.getElementById('r-player').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:none;transition:left 2.6s cubic-bezier(.2,.6,.3,1);left:${pp}%`;
   document.getElementById('r-opp').style.cssText=`position:absolute;top:50%;transform:translateY(-50%);font-size:28px;z-index:4;line-height:1;filter:drop-shadow(0 0 8px rgba(138,43,232,.6));transition:left 2.8s cubic-bezier(.2,.6,.3,1);left:${op}%`;
   document.getElementById('p-score').textContent='Score: '+Math.round(myScore);
   document.getElementById('o-score').textContent='Score: '+Math.round(oppScore);
