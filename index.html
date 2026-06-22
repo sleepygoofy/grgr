@@ -2485,13 +2485,10 @@ async function startRace(rid){
   }
   ph.style.display='none';
 
-  const launchRes=await runLaunchPhase();
-
-  ph.style.display='block';ph.textContent='GO!';ph.className='phase-display phase-go';
-  ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
-  await sleep(500);ph.style.display='none';
   setArenaBadge('racing','RACING');
-  const mashRes=await runMashPhase();
+  const tdRes=await runTopDownRace(r.oppName,s,r.diff);
+  const launchRes={quality:tdRes.quality,label:tdRes.won?'CLEAN RACE':'TOUGH ONE'};
+  const mashRes={factor:tdRes.quality,count:Math.round(tdRes.time)};
 
   const skillMult=Math.max(0.55,launchRes.quality*0.5+mashRes.factor*0.65);
 
@@ -2631,11 +2628,10 @@ async function startStoryRace(stageIdx){
   setArenaBadge('countdown','COUNTDOWN');
   for(const txt of ['3','2','1']){await sleep(650);ph.textContent=txt;ph.className='phase-display phase-cd';ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';}
   ph.style.display='none';
-  const launchRes=await runLaunchPhase();
-  ph.style.display='block';ph.textContent='GO!';ph.className='phase-display phase-go';ph.style.animation='none';void ph.offsetWidth;ph.style.animation='';
-  await sleep(500);ph.style.display='none';
   setArenaBadge('racing','DRIFT');
-  const mashRes=await runMashPhase();
+  const tdRes=await runTopDownRace(stage.rival,s,'hard');
+  const launchRes={quality:tdRes.quality,label:tdRes.won?'CLEAN':'TOUGH'};
+  const mashRes={factor:tdRes.quality,count:Math.round(tdRes.time)};
   const skillMult=Math.max(0.55,launchRes.quality*0.5+mashRes.factor*0.65);
 
   const baseScore=s.handling*15+s.braking*5+s.power*0.12;
