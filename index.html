@@ -123,9 +123,16 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 }
 .section{display:none;}
 .section.active{display:block;}
-.sec-head{margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
-.sec-title{font-family:var(--disp);font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:3px;line-height:1;color:var(--steel);}
-.sec-sub{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1.5px;margin-top:4px;text-transform:uppercase;}
+.sec-head{margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;padding:10px 0 10px 18px;}
+.sec-head::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:5px;background:var(--red);border-radius:3px;}
+.sec-title{font-family:var(--disp);font-size:30px;line-height:.95;color:var(--text);text-transform:none;letter-spacing:0;}
+.sec-sub{font-family:var(--body);font-size:13px;color:var(--text2);letter-spacing:0;margin-top:4px;text-transform:none;font-style:italic;font-weight:500;}
+.sec-head .sec-actions{display:flex;gap:8px;flex-shrink:0;}
+.tag{display:inline-block;font-family:var(--body);font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--panel2);color:var(--text);border:1.5px solid var(--border2);}
+.tag-red{background:var(--red);color:#fff;border-color:var(--red);}
+.tag-amber{background:var(--amber);color:#000;border-color:var(--amber);}
+.tag-green{background:var(--green);color:#000;border-color:var(--green);}
+.tag-ghost{background:transparent;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 .grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;}
@@ -508,7 +515,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .broadcast-from{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
 .broadcast-close{background:transparent;border:1px solid var(--border2);color:var(--text2);cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:14px;flex-shrink:0;transition:.15s;display:flex;align-items:center;justify-content:center;}
 .broadcast-close:hover{color:var(--text);border-color:var(--text2);background:var(--panel3);}
-.rt-dot{width:6px;height:6px;border-radius:50%;background:var(--red2);display:inline-block;margin-right:5px;animation:rtPulse 2s infinite;}
+.rt-dot{display:inline-block;width:7px;height:7px;background:var(--red2);margin-right:6px;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);animation:rtPulse 2s infinite;}
 @keyframes rtPulse{0%,100%{opacity:1;}50%{opacity:.2;}}
 .xp-pop{position:fixed;top:70px;right:20px;z-index:8000;font-family:var(--disp);font-size:16px;font-weight:700;color:var(--amber2);pointer-events:none;animation:xpFloat 2s ease forwards;}
 @keyframes xpFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-50px);}}
@@ -739,7 +746,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       <main class="main">
         <!-- GARAGE -->
         <div class="section active" id="tab-garage">
-          <div class="sec-head"><div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div style="display:flex;gap:8px"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
+          <div class="sec-head"><div><div class="sec-title">Your Stable</div><div class="sec-sub">Everything you&rsquo;ve earned, won, or pulled.</div></div><div class="sec-actions"><span class="tag tag-ghost"><span id="garage-count">0</span> owned</span><button class="btn btn-steel btn-lg" onclick="openListModal()">Sell at Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">Buy More &rarr;</button></div></div>
           <div class="garage-layout">
             <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
             <div id="garage-sidebar" style="display:none">
@@ -759,9 +766,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- MARKET -->
     <div class="section" id="tab-market">
-      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub"><span class="rt-dot"></span>open packs or buy direct</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">The Market</div><div class="sec-sub">Pull from packs or shop direct &mdash; demand swings the prices</div></div><span class="tag tag-red"><span class="rt-dot"></span>LIVE</span></div>
       <div id="pack-grid" class="pack-grid"></div>
-      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" style="font-size:18px">Direct Buy</div><div class="sec-sub">live demand-driven pricing</div></div></div>
+      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" style="font-size:22px">Walk-In Showroom</div><div class="sec-sub">Cash on the spot. Prices move with the market.</div></div></div>
       <div class="ticker-bar"><span class="rt-dot"></span><span class="ticker-text" id="ticker-text">Loading...</span></div>
       <div class="filter-bar">
         <input class="filter-search" id="mkt-search" placeholder="Search..." oninput="renderMarket()">
@@ -777,7 +784,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- AUCTION -->
     <div class="section" id="tab-auction">
-      <div class="sec-head"><div><div class="sec-title">Auction House</div><div class="sec-sub"><span class="rt-dot"></span>live bidding · 5% seller fee</div></div><button class="btn btn-gold btn-lg" onclick="openListModal()">+ List Car</button></div>
+      <div class="sec-head"><div><div class="sec-title">Block Party</div><div class="sec-sub">The auction floor &mdash; bid fast, sellers pay a 5% cut</div></div><div class="sec-actions"><span class="tag tag-red"><span class="rt-dot"></span>LIVE</span><button class="btn btn-gold btn-lg" onclick="openListModal()">List Your Car &rarr;</button></div></div>
       <div class="filter-bar">
         <button class="filter-btn active" data-evt="all" onclick="setAuctFilter(this)">All</button>
         <button class="filter-btn" data-evt="hypercar" onclick="setAuctFilter(this)">Hypercar</button>
@@ -868,7 +875,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- CHALLENGES -->
     <div class="section" id="tab-challenges">
-      <div class="sec-head"><div><div class="sec-title">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">Daily Hustle</div><div class="sec-sub">Tasks reset at midnight. Achievements stick forever.</div></div><span class="tag tag-amber">REWARDS</span></div>
       <div class="grid-2">
         <div><div class="panel" style="margin-bottom:16px"><h3>📅 Daily Challenges</h3><div id="daily-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div><div class="panel"><h3>📋 Weekly Missions</h3><div id="weekly-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div></div>
         <div class="panel"><h3>🏅 Achievements</h3><div id="achievements-grid" class="ach-grid"></div></div>
@@ -876,7 +883,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- LEADERBOARD -->
     <div class="section" id="tab-leaderboard">
-      <div class="sec-head"><div><div class="sec-title">Leaderboard</div><div class="sec-sub">Top drivers worldwide</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">The Standings</div><div class="sec-sub">Who&rsquo;s actually winning out there.</div></div></div>
       <div class="grid-2">
         <div class="panel"><h3>🏆 Top Racers</h3><table class="lb-table" id="lb-wins"></table></div>
         <div class="panel"><h3>💰 Richest</h3><table class="lb-table" id="lb-cash"></table></div>
@@ -886,7 +893,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- CREW -->
     <div class="section" id="tab-crew">
-      <div class="sec-head"><div><div class="sec-title">Crew</div><div class="sec-sub">Run together. Climb the crew board.</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">Your Crew</div><div class="sec-sub">Roll deep. Crew wins stack on the team board.</div></div></div>
       <div id="crew-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
     <!-- PROFILE -->
