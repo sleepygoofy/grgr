@@ -336,6 +336,15 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .lane-car.opp{transition-duration:2.8s;filter:drop-shadow(0 0 8px rgba(0,229,255,.5));}
 .lane-finish{position:absolute;right:0;top:0;bottom:0;width:24px;background:repeating-conic-gradient(rgba(255,46,139,.18) 0% 25%,rgba(0,229,255,.1) 0% 50%) 0 0/12px 12px;z-index:2;}
 .launch-gauge{padding:12px;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r2);margin-bottom:12px;text-align:center;}
+.td-race-wrap{padding:10px;background:var(--panel2);border:2px solid var(--border2);border-radius:var(--r2);margin-bottom:12px;text-align:center;}
+.td-race-hud{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;margin-bottom:8px;background:var(--bg3);border-radius:var(--r);}
+.td-hud-side{display:flex;flex-direction:column;align-items:flex-start;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);}
+.td-hud-side:last-child{align-items:flex-end;}
+.td-hud-lbl{font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:600;}
+.td-hud-mid{font-family:var(--disp);font-size:22px;color:var(--red2);}
+#td-race-canvas{display:block;margin:0 auto;border-radius:var(--r);background:#0a0a0a;max-width:100%;height:auto;image-rendering:pixelated;}
+.td-controls{font-family:var(--body);font-size:11px;color:var(--text3);margin-top:8px;letter-spacing:.3px;}
+.td-controls strong{color:var(--text);font-weight:700;}
 .launch-gauge-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--steel2);margin-bottom:12px;text-transform:uppercase;}
 .launch-gauge-track{position:relative;height:22px;background:var(--bg3);border-radius:11px;overflow:hidden;border:1px solid var(--border2);margin-bottom:10px;}
 .launch-zone-red,.launch-zone-yellow,.launch-zone-green{position:absolute;top:0;bottom:0;}
@@ -746,7 +755,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       <main class="main">
         <!-- GARAGE -->
         <div class="section active" id="tab-garage">
-          <div class="sec-head"><div><div class="sec-title">Your Stable</div><div class="sec-sub">Everything you&rsquo;ve earned, won, or pulled.</div></div><div class="sec-actions"><span class="tag tag-ghost"><span id="garage-count">0</span> owned</span><button class="btn btn-steel btn-lg" onclick="openListModal()">Sell at Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">Buy More &rarr;</button></div></div>
+          <div class="sec-head"><div><div class="sec-title">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div class="sec-actions"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
           <div class="garage-layout">
             <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
             <div id="garage-sidebar" style="display:none">
@@ -766,9 +775,9 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- MARKET -->
     <div class="section" id="tab-market">
-      <div class="sec-head"><div><div class="sec-title">The Market</div><div class="sec-sub">Pull from packs or shop direct &mdash; demand swings the prices</div></div><span class="tag tag-red"><span class="rt-dot"></span>LIVE</span></div>
+      <div class="sec-head"><div><div class="sec-title">Car Market</div><div class="sec-sub">Open packs or buy direct</div></div></div>
       <div id="pack-grid" class="pack-grid"></div>
-      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" style="font-size:22px">Walk-In Showroom</div><div class="sec-sub">Cash on the spot. Prices move with the market.</div></div></div>
+      <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" style="font-size:22px">Direct Buy</div><div class="sec-sub">Live demand-driven pricing</div></div></div>
       <div class="ticker-bar"><span class="rt-dot"></span><span class="ticker-text" id="ticker-text">Loading...</span></div>
       <div class="filter-bar">
         <input class="filter-search" id="mkt-search" placeholder="Search..." oninput="renderMarket()">
@@ -784,7 +793,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- AUCTION -->
     <div class="section" id="tab-auction">
-      <div class="sec-head"><div><div class="sec-title">Block Party</div><div class="sec-sub">The auction floor &mdash; bid fast, sellers pay a 5% cut</div></div><div class="sec-actions"><span class="tag tag-red"><span class="rt-dot"></span>LIVE</span><button class="btn btn-gold btn-lg" onclick="openListModal()">List Your Car &rarr;</button></div></div>
+      <div class="sec-head"><div><div class="sec-title">Auction House</div><div class="sec-sub">Live bidding · 5% seller fee</div></div><div class="sec-actions"><button class="btn btn-gold btn-lg" onclick="openListModal()">+ List Car</button></div></div>
       <div class="filter-bar">
         <button class="filter-btn active" data-evt="all" onclick="setAuctFilter(this)">All</button>
         <button class="filter-btn" data-evt="hypercar" onclick="setAuctFilter(this)">Hypercar</button>
@@ -831,7 +840,15 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
             <div class="arena-header"><div class="arena-title" id="arena-title">Race</div><div class="arena-badge ready" id="arena-badge">READY</div></div>
             <div class="arena-body">
               <div class="phase-display" id="phase-disp"></div>
-              <!-- LAUNCH TIMING GAUGE -->
+              <div class="td-race-wrap" id="td-race-wrap" style="display:none">
+                <div class="td-race-hud">
+                  <div class="td-hud-side"><span class="td-hud-lbl">LAP</span><span id="td-lap">1/2</span></div>
+                  <div class="td-hud-mid"><span id="td-pos">P2</span></div>
+                  <div class="td-hud-side"><span class="td-hud-lbl">SPEED</span><span id="td-speed">0</span></div>
+                </div>
+                <canvas id="td-race-canvas" width="520" height="360"></canvas>
+                <div class="td-controls">Arrow keys or WASD &middot; <strong>Up</strong> accelerate &middot; <strong>Down</strong> brake &middot; <strong>Left/Right</strong> turn</div>
+              </div>
               <div class="launch-gauge" id="launch-gauge" style="display:none">
                 <div class="launch-gauge-label">⏱ HIT GAS IN THE GREEN ZONE</div>
                 <div class="launch-gauge-track">
@@ -875,7 +892,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- CHALLENGES -->
     <div class="section" id="tab-challenges">
-      <div class="sec-head"><div><div class="sec-title">Daily Hustle</div><div class="sec-sub">Tasks reset at midnight. Achievements stick forever.</div></div><span class="tag tag-amber">REWARDS</span></div>
+      <div class="sec-head"><div><div class="sec-title">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
       <div class="grid-2">
         <div><div class="panel" style="margin-bottom:16px"><h3>📅 Daily Challenges</h3><div id="daily-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div><div class="panel"><h3>📋 Weekly Missions</h3><div id="weekly-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div></div>
         <div class="panel"><h3>🏅 Achievements</h3><div id="achievements-grid" class="ach-grid"></div></div>
@@ -883,7 +900,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- LEADERBOARD -->
     <div class="section" id="tab-leaderboard">
-      <div class="sec-head"><div><div class="sec-title">The Standings</div><div class="sec-sub">Who&rsquo;s actually winning out there.</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">Leaderboard</div><div class="sec-sub">Top drivers worldwide</div></div></div>
       <div class="grid-2">
         <div class="panel"><h3>🏆 Top Racers</h3><table class="lb-table" id="lb-wins"></table></div>
         <div class="panel"><h3>💰 Richest</h3><table class="lb-table" id="lb-cash"></table></div>
@@ -893,7 +910,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- CREW -->
     <div class="section" id="tab-crew">
-      <div class="sec-head"><div><div class="sec-title">Your Crew</div><div class="sec-sub">Roll deep. Crew wins stack on the team board.</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">Crew</div><div class="sec-sub">Run together · climb the crew board</div></div></div>
       <div id="crew-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
     <!-- PROFILE -->
@@ -2680,6 +2697,162 @@ async function startStoryRace(stageIdx){
     toast(`Lost to ${stage.rival}. Try again!`,'t-error');
   }
   isRacing=false;
+}
+
+function runTopDownRace(opp,playerStats,difficulty){
+  return new Promise(resolve=>{
+    const wrap=document.getElementById('td-race-wrap');
+    const canvas=document.getElementById('td-race-canvas');
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    wrap.style.display='block';
+
+    const cx=W/2,cy=H/2;
+    const outerRX=W*0.42,outerRY=H*0.38;
+    const trackWidth=58;
+    const innerRX=outerRX-trackWidth,innerRY=outerRY-trackWidth;
+    const midRX=(outerRX+innerRX)/2,midRY=(outerRY+innerRY)/2;
+
+    const startAngle=Math.PI/2;
+    const totalLaps=2;
+
+    function trackCenterAt(a){return{x:cx+Math.cos(a)*midRX,y:cy+Math.sin(a)*midRY};}
+    function onTrack(x,y){
+      const dx=(x-cx),dy=(y-cy);
+      const outer=(dx*dx)/(outerRX*outerRX)+(dy*dy)/(outerRY*outerRY);
+      const inner=(dx*dx)/(innerRX*innerRX)+(dy*dy)/(innerRY*innerRY);
+      return outer<=1&&inner>=1;
+    }
+
+    const sp=trackCenterAt(startAngle);
+    const player={x:sp.x-12,y:sp.y,angle:0,vx:0,vy:0,speed:0,laps:0,prevAngle:startAngle,lapProgress:0};
+    const npc={x:sp.x+12,y:sp.y,angle:0,vx:0,vy:0,speed:0,laps:0,prevAngle:startAngle,lapProgress:0,aimAngle:startAngle};
+
+    const baseTop=2.6+Math.min(1.2,(playerStats.top_speed||150)/200);
+    const baseAccel=0.06+Math.min(0.04,(playerStats.acceleration||60)/2000);
+    const baseHandle=0.04+Math.min(0.03,(playerStats.handling||60)/2400);
+    const diffMult={easy:0.88,medium:0.96,hard:1.02,elite:1.08}[difficulty]||0.96;
+    const npcTop=baseTop*diffMult*(0.96+Math.random()*0.08);
+    const npcAccel=baseAccel*diffMult;
+
+    const keys={up:false,down:false,left:false,right:false};
+    const keyDown=e=>{const k=e.key.toLowerCase();if(k==='arrowup'||k==='w'){keys.up=true;e.preventDefault();}else if(k==='arrowdown'||k==='s'){keys.down=true;e.preventDefault();}else if(k==='arrowleft'||k==='a'){keys.left=true;e.preventDefault();}else if(k==='arrowright'||k==='d'){keys.right=true;e.preventDefault();}};
+    const keyUp=e=>{const k=e.key.toLowerCase();if(k==='arrowup'||k==='w')keys.up=false;else if(k==='arrowdown'||k==='s')keys.down=false;else if(k==='arrowleft'||k==='a')keys.left=false;else if(k==='arrowright'||k==='d')keys.right=false;};
+    addEventListener('keydown',keyDown);
+    addEventListener('keyup',keyUp);
+
+    let running=true,startTime=performance.now(),raceTimer=0,raceFinished=false,winner=null;
+
+    function updatePlayer(dt){
+      if(keys.up)player.speed=Math.min(baseTop,player.speed+baseAccel*dt*60);
+      else if(keys.down)player.speed=Math.max(-0.6,player.speed-baseAccel*1.4*dt*60);
+      else player.speed*=Math.pow(0.985,dt*60);
+      const onRoad=onTrack(player.x,player.y);
+      if(!onRoad)player.speed*=Math.pow(0.92,dt*60);
+      const turnSpeed=baseHandle*(0.5+Math.min(1,Math.abs(player.speed)/baseTop));
+      if(keys.left)player.angle-=turnSpeed*dt*60;
+      if(keys.right)player.angle+=turnSpeed*dt*60;
+      player.x+=Math.cos(player.angle)*player.speed;
+      player.y+=Math.sin(player.angle)*player.speed;
+    }
+
+    function updateNPC(dt){
+      let bestA=npc.aimAngle,bestDist=Infinity;
+      for(let i=0;i<7;i++){
+        const a=npc.aimAngle+0.18+i*0.04;
+        const t=trackCenterAt(a);
+        const d=Math.hypot(t.x-npc.x,t.y-npc.y);
+        if(d<bestDist){bestDist=d;bestA=a;}
+      }
+      npc.aimAngle=bestA;
+      const target=trackCenterAt(npc.aimAngle+0.22);
+      const desired=Math.atan2(target.y-npc.y,target.x-npc.x);
+      let diff=desired-npc.angle;
+      while(diff>Math.PI)diff-=Math.PI*2;
+      while(diff<-Math.PI)diff+=Math.PI*2;
+      npc.angle+=Math.max(-baseHandle*1.4*dt*60,Math.min(baseHandle*1.4*dt*60,diff));
+      npc.speed=Math.min(npcTop,npc.speed+npcAccel*dt*60);
+      if(!onTrack(npc.x,npc.y))npc.speed*=Math.pow(0.94,dt*60);
+      npc.x+=Math.cos(npc.angle)*npc.speed;
+      npc.y+=Math.sin(npc.angle)*npc.speed;
+    }
+
+    function updateLaps(car){
+      const a=Math.atan2(car.y-cy,car.x-cx);
+      let prev=car.prevAngle,curr=a;
+      let delta=curr-prev;
+      if(delta>Math.PI)delta-=Math.PI*2;
+      if(delta<-Math.PI)delta+=Math.PI*2;
+      car.lapProgress+=delta;
+      car.prevAngle=curr;
+      if(car.lapProgress>=Math.PI*2){car.lapProgress-=Math.PI*2;car.laps++;}
+    }
+
+    function drawTrack(){
+      ctx.fillStyle='#0d1208';ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#1a2410';
+      for(let i=0;i<40;i++){const gx=(i*73)%W,gy=(i*131)%H;ctx.fillRect(gx,gy,2,2);}
+      ctx.fillStyle='#3a3a3a';
+      ctx.beginPath();ctx.ellipse(cx,cy,outerRX,outerRY,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#0d1208';
+      ctx.beginPath();ctx.ellipse(cx,cy,innerRX,innerRY,0,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.setLineDash([8,8]);
+      ctx.beginPath();ctx.ellipse(cx,cy,midRX,midRY,0,0,Math.PI*2);ctx.stroke();
+      ctx.setLineDash([]);
+      const sp2=trackCenterAt(startAngle);
+      ctx.save();ctx.translate(sp2.x,sp2.y);
+      const tan=Math.atan2(midRY*Math.cos(startAngle),-midRX*Math.sin(startAngle));
+      ctx.rotate(tan);
+      for(let i=-3;i<=3;i++){for(let j=0;j<2;j++){ctx.fillStyle=(i+j)%2===0?'#fff':'#000';ctx.fillRect(j*5-2,i*8,5,8);}}
+      ctx.restore();
+    }
+    function drawCar(car,color,isPlayer){
+      ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);
+      ctx.fillStyle=color;ctx.fillRect(-9,-5,18,10);
+      ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(0,-4,5,8);
+      ctx.fillStyle='#fff';ctx.fillRect(7,-4,2,2);ctx.fillRect(7,2,2,2);
+      ctx.restore();
+      if(isPlayer&&car.speed>1.5){
+        ctx.fillStyle='rgba(230,0,35,0.4)';
+        ctx.fillRect(car.x-Math.cos(car.angle)*14-1,car.y-Math.sin(car.angle)*14-1,3,3);
+      }
+    }
+
+    function frame(now){
+      if(!running)return;
+      const dt=Math.min(0.05,(now-startTime)/1000);
+      startTime=now;raceTimer+=dt;
+      updatePlayer(dt);updateNPC(dt);
+      updateLaps(player);updateLaps(npc);
+      if(!raceFinished){
+        if(player.laps>=totalLaps){raceFinished=true;winner='player';}
+        else if(npc.laps>=totalLaps){raceFinished=true;winner='npc';}
+        else if(raceTimer>45){raceFinished=true;winner=(player.laps>npc.laps||(player.laps===npc.laps&&player.lapProgress>npc.lapProgress))?'player':'npc';}
+      }
+      drawTrack();drawCar(npc,'#e8e8e8',false);drawCar(player,'#e60023',true);
+      document.getElementById('td-lap').textContent=Math.min(totalLaps,player.laps+1)+'/'+totalLaps;
+      document.getElementById('td-speed').textContent=Math.round(player.speed*45);
+      const ahead=(player.laps>npc.laps)||(player.laps===npc.laps&&player.lapProgress>npc.lapProgress);
+      document.getElementById('td-pos').textContent=ahead?'P1':'P2';
+      if(raceFinished){
+        running=false;
+        removeEventListener('keydown',keyDown);
+        removeEventListener('keyup',keyUp);
+        ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,0,W,H);
+        ctx.fillStyle=winner==='player'?'#3df27d':'#e60023';
+        ctx.font='bold 38px "Luckiest Guy", sans-serif';ctx.textAlign='center';
+        ctx.fillText(winner==='player'?'YOU WIN':'YOU LOSE',W/2,H/2);
+        setTimeout(()=>{
+          wrap.style.display='none';
+          const closeness=Math.abs(player.lapProgress-npc.lapProgress)/(Math.PI*2);
+          resolve({won:winner==='player',quality:winner==='player'?Math.max(0.7,1.2-closeness):0.4+closeness*0.3,time:raceTimer,closeness});
+        },1200);
+        return;
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
 }
 
 function runLaunchPhase(){
