@@ -142,8 +142,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 @media(max-width:900px){.grid-2{grid-template-columns:1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
 @media(max-width:600px){.grid-3{grid-template-columns:1fr;}}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:12px;position:relative;box-shadow:inset 1px 1px 0 rgba(255,255,255,.04),inset -1px -1px 0 rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.3);}
-.panel::before{content:'';position:absolute;top:8px;left:10px;width:6px;height:6px;border-radius:50%;background:#ff5f57;box-shadow:10px 0 0 #febc2e, 20px 0 0 #28c840;opacity:.55;}
-.panel > h3:first-child,.panel > .modal-title:first-child{padding-left:42px;}
 #crt-overlay{position:fixed;inset:0;z-index:9990;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,0.015) 0,rgba(255,255,255,0.015) 1px,transparent 1px,transparent 3px);mix-blend-mode:overlay;}
 .panel>h3:first-child{margin:-18px -18px 16px;padding:8px 14px;background:linear-gradient(90deg,var(--panel3),var(--panel2));border-bottom:1px solid var(--border2);border-radius:var(--r2) var(--r2) 0 0;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:8px;position:relative;}
 .panel>h3:first-child::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--red2);box-shadow:14px 0 0 var(--amber2),28px 0 0 var(--green2);flex-shrink:0;margin-right:30px;}
@@ -762,6 +760,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
               <div class="hud-menu-item" onclick="showDailyBonus()">🎁 Daily Bonus</div>
               <div class="hud-menu-item" onclick="dailySpin()">🎰 Daily Spin</div>
               <div class="hud-menu-item" onclick="replayTutorial()">❓ Replay Tutorial</div>
+              <div class="hud-menu-item" onclick="openApplyModal()">📝 Contact Staff</div>
               <div class="hud-menu-divider"></div>
               <div class="hud-menu-item danger" onclick="doLogout()">⏻ Sign Out</div>
             </div>
@@ -1052,24 +1051,22 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
   <div id="modal-story-dialog-body"></div>
 </div></div>
 <div class="modal-overlay" id="modal-apply"><div class="modal" style="max-width:540px">
-  <div class="modal-title">🔐 Entry Application</div>
-  <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:10px">Quick questions before you join. Mods review and approve new players — usually within a day. You'll see your status here when you check back.</div>
-  <div class="adm-row"><label>Age</label><input class="form-input" id="apply-age" type="number" min="10" max="120" placeholder="How old are you?"></div>
-  <div class="adm-row"><label>Found us via</label><select class="form-input" id="apply-source">
-    <option value="">Pick one…</option>
-    <option value="friend">A friend invited me</option>
-    <option value="discord">Discord server</option>
-    <option value="tiktok">TikTok</option>
-    <option value="youtube">YouTube</option>
-    <option value="reddit">Reddit</option>
-    <option value="search">Search engine</option>
-    <option value="other">Other</option>
+  <button class="modal-close" onclick="closeModal('modal-apply')">✕</button>
+  <div class="modal-title">📝 Submit Application</div>
+  <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:14px">Reach out to staff. Apply for a role, report a bug, or send feedback.</div>
+  <div class="adm-row"><label>Type</label><select class="form-input" id="apply-type">
+    <option value="staff">Staff Application</option>
+    <option value="partner">Partner / Creator</option>
+    <option value="appeal">Ban Appeal</option>
+    <option value="bug">Bug Report</option>
+    <option value="other">Other / Feedback</option>
   </select></div>
-  <div class="adm-row"><label>Referred by</label><input class="form-input" id="apply-ref" maxlength="40" placeholder="Friend's username (optional)"></div>
-  <div style="margin:10px 0"><label class="form-label">Why do you want to play?</label><textarea class="form-input" id="apply-body" rows="4" maxlength="500" placeholder="A sentence or two — what's drawing you in?" style="resize:vertical;font-family:var(--body);width:100%"></textarea></div>
-  <div style="margin:10px 0;padding:10px;background:var(--panel3);border-radius:var(--r);font-size:11px;color:var(--text2)">By submitting, you agree to keep it cool in chat: no slurs, harassment, cheating, or sharing real personal info. Violations = ban.</div>
-  <button class="btn btn-red btn-lg" style="width:100%" onclick="submitApplication()">Submit Application</button>
-  <div id="apply-status-msg" style="margin-top:14px"></div>
+  <div class="adm-row"><label>Subject</label><input class="form-input" id="apply-subject" maxlength="80" placeholder="Short summary"></div>
+  <div style="margin:10px 0"><label class="form-label">Details</label><textarea class="form-input" id="apply-body" rows="6" maxlength="2000" placeholder="Tell us why, what happened, or what you'd like us to know..." style="resize:vertical;font-family:var(--body);width:100%"></textarea></div>
+  <button class="btn btn-red btn-lg" style="width:100%" onclick="submitApplication()">Send to Staff</button>
+  <div id="apply-status-msg" style="margin-top:10px"></div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:14px">Your past submissions:</div>
+  <div id="apply-history"></div>
 </div></div>
 <div class="toast" id="toast"></div>
 <script>
@@ -1444,20 +1441,13 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('auth-screen').style.display='none';
     await initGame();
     if(isPanicLocked()){showMaintenanceScreen();return;}
-    const status=await checkEntryGate();
-    if(status==='approved'){
-      hideEntryGateScreen();
-      showModeSelect();
-    }else{
-      showEntryGateScreen(status==='unknown'?'none':status);
-    }
+    showModeSelect();
   }else{
     currentUser=null;profile=null;playerCars=[];raceHistLoaded=false;
     document.getElementById('auth-screen').style.display='flex';
     document.getElementById('game').style.display='none';
     document.getElementById('mode-screen').style.display='none';
     document.getElementById('story-screen').style.display='none';
-    hideEntryGateScreen();
     auctUnsubs.forEach(u=>u());auctUnsubs=[];
     clearInterval(window._mktTick);clearInterval(window._auctTick);clearInterval(window._cdTick);
     clearInterval(window._npcTick);clearInterval(window._npcSpawn);clearInterval(window._npcChatTick);
@@ -4299,95 +4289,61 @@ async function liftPanic(){
     toast('Emergency lifted','t-success');
   }catch(e){toast('Failed: '+e.message,'t-error');console.error(e);}
 }
+const APP_TYPE_LABEL={staff:'🛡️ Staff',partner:'⭐ Partner',appeal:'⚖️ Ban Appeal',bug:'🐛 Bug Report',other:'💬 Other'};
 const APP_STATUS_COLOR={pending:'var(--amber2)',approved:'var(--green2)',rejected:'var(--red2)'};
-const SOURCE_LABEL={friend:'Friend invite',discord:'Discord',tiktok:'TikTok',youtube:'YouTube',reddit:'Reddit',search:'Search engine',other:'Other'};
-
-async function checkEntryGate(){
-  if(!currentUser||!profile)return 'unknown';
-  if(['owner','admin','moderator'].includes(profile.role))return 'approved';
-  if(Array.isArray(profile.roles)&&profile.roles.some(r=>['owner','admin','moderator'].includes(r)))return 'approved';
-  try{
-    const snap=await db.collection('applications').where('user_id','==',currentUser.uid).limit(5).get();
-    if(snap.empty)return 'none';
-    const apps=snap.docs.map(d=>d.data()).sort((a,b)=>(b.created_at?.toDate?.()?.getTime()||0)-(a.created_at?.toDate?.()?.getTime()||0));
-    const latest=apps[0];
-    return latest.status||'pending';
-  }catch(e){console.warn('gate check failed',e);return 'unknown';}
-}
-
-function showEntryGateScreen(status){
-  document.getElementById('mode-screen').style.display='none';
-  document.getElementById('game').style.display='none';
-  document.getElementById('story-screen').style.display='none';
-  let g=document.getElementById('gate-screen');
-  if(!g){
-    g=document.createElement('div');
-    g.id='gate-screen';
-    g.style.cssText='position:fixed;inset:0;z-index:9996;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;background:radial-gradient(ellipse at 50% 0%,rgba(230,0,35,.14),transparent 60%),var(--bg);overflow-y:auto;';
-    document.body.appendChild(g);
-  }
-  g.style.display='flex';
-  let inner='';
-  if(status==='none'){
-    inner=`<div style="text-align:center;margin-bottom:6px"><div class="logo" style="font-size:42px">REDLINE</div><div class="logo-sub" style="font-size:12px;letter-spacing:6px">STREET RACING</div></div>
-      <div style="color:var(--text2);max-width:440px;text-align:center;margin:18px 0 24px;line-height:1.6;font-size:14px">This is a closed beta — fill out a quick application and a mod will let you in. Takes a sec.</div>
-      <button class="btn btn-red btn-lg" onclick="openApplyModal()">📝 Fill out application</button>
-      <button class="btn-ghost-sm" style="margin-top:18px" onclick="doLogout()">Sign out</button>`;
-  }else if(status==='pending'){
-    inner=`<div style="text-align:center;margin-bottom:6px"><div style="font-size:54px">⏳</div><div class="logo" style="font-size:28px;margin-top:8px">PENDING REVIEW</div></div>
-      <div style="color:var(--text2);max-width:440px;text-align:center;margin:18px 0 24px;line-height:1.6;font-size:14px">Your application is in the queue. A mod will get to it soon — check back later.</div>
-      <button class="btn btn-ghost" onclick="auth.signOut().then(()=>location.reload())">↻ Refresh / Sign out</button>`;
-  }else if(status==='rejected'){
-    inner=`<div style="text-align:center;margin-bottom:6px"><div style="font-size:54px">⛔</div><div class="logo" style="font-size:28px;margin-top:8px;color:var(--red2)">NOT APPROVED</div></div>
-      <div style="color:var(--text2);max-width:440px;text-align:center;margin:18px 0 24px;line-height:1.6;font-size:14px">Your application wasn't accepted at this time. You can submit a new one if something's changed.</div>
-      <button class="btn btn-red" onclick="openApplyModal()">📝 Submit a new application</button>
-      <button class="btn-ghost-sm" style="margin-top:18px" onclick="doLogout()">Sign out</button>`;
-  }
-  g.innerHTML=inner;
-}
-
-function hideEntryGateScreen(){
-  const g=document.getElementById('gate-screen');if(g)g.style.display='none';
-}
 
 async function openApplyModal(){
   document.getElementById('hud-menu')?.classList.remove('open');
-  document.getElementById('apply-age').value='';
-  document.getElementById('apply-source').value='';
-  document.getElementById('apply-ref').value='';
+  document.getElementById('apply-type').value='staff';
+  document.getElementById('apply-subject').value='';
   document.getElementById('apply-body').value='';
   document.getElementById('apply-status-msg').innerHTML='';
   openModal('modal-apply');
+  loadApplyHistory();
+}
+
+async function loadApplyHistory(){
+  const el=document.getElementById('apply-history');if(!el||!currentUser)return;
+  el.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0">Loading…</div>';
+  try{
+    const snap=await db.collection('applications').where('user_id','==',currentUser.uid).limit(20).get();
+    const apps=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created_at?.toDate?.()?.getTime()||0)-(a.created_at?.toDate?.()?.getTime()||0));
+    if(!apps.length){el.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0">No past submissions.</div>';return;}
+    el.innerHTML=apps.slice(0,8).map(a=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600">${APP_TYPE_LABEL[a.type]||a.type} · ${escapeHtml(a.subject||'(no subject)')}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">${timeAgo(a.created_at?.toDate?.())}</div>
+        ${a.response?`<div style="font-size:11px;color:var(--text2);margin-top:4px;padding:6px 8px;background:var(--panel3);border-radius:var(--r)"><strong style="color:var(--text)">Staff:</strong> ${escapeHtml(a.response)}</div>`:''}
+      </div>
+      <span style="font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:${APP_STATUS_COLOR[a.status]||'var(--text3)'};white-space:nowrap">${a.status||'pending'}</span>
+    </div>`).join('');
+  }catch(e){el.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--red2);padding:6px 0">'+escapeHtml(e.message)+'</div>';}
 }
 
 async function submitApplication(){
   if(!currentUser||!profile){toast('Sign in first','t-error');return;}
-  const age=parseInt(document.getElementById('apply-age').value);
-  const source=document.getElementById('apply-source').value;
-  const ref=document.getElementById('apply-ref').value.trim();
+  const type=document.getElementById('apply-type').value;
+  const subject=document.getElementById('apply-subject').value.trim();
   const body=document.getElementById('apply-body').value.trim();
   const msg=document.getElementById('apply-status-msg');
-  if(!age||age<10||age>120){msg.innerHTML='<div style="color:var(--red2);font-size:12px">Enter a real age (10-120).</div>';return;}
-  if(!source){msg.innerHTML='<div style="color:var(--red2);font-size:12px">Pick how you found us.</div>';return;}
-  if(body.length<15){msg.innerHTML='<div style="color:var(--red2);font-size:12px">Tell us a bit more (at least 15 characters).</div>';return;}
+  if(subject.length<3){msg.innerHTML='<div style="color:var(--red2);font-size:12px">Subject too short.</div>';return;}
+  if(body.length<10){msg.innerHTML='<div style="color:var(--red2);font-size:12px">Tell us more (at least 10 characters).</div>';return;}
   try{
     await db.collection('applications').add({
       user_id:currentUser.uid,
       username:profile.username,
-      type:'entry',
-      age,
-      source,
-      referred_by:ref||null,
-      body,
+      type,subject,body,
       status:'pending',
       response:null,
       reviewed_by:null,
       reviewed_at:null,
       created_at:firebase.firestore.FieldValue.serverTimestamp()
     });
-    msg.innerHTML='<div style="color:var(--green2);font-size:13px;padding:10px;background:var(--green3);border-radius:var(--r)">✓ Submitted. A mod will review it — check back soon.</div>';
-    logActivity('apply_submit',{age,source}).catch(()=>{});
-    setTimeout(()=>{closeModal('modal-apply');showEntryGateScreen('pending');},1400);
+    msg.innerHTML='<div style="color:var(--green2);font-size:13px;padding:10px;background:var(--green3);border-radius:var(--r)">✓ Submitted. Staff will review it.</div>';
+    logActivity('apply_submit',{type,subject}).catch(()=>{});
+    document.getElementById('apply-subject').value='';
+    document.getElementById('apply-body').value='';
+    loadApplyHistory();
   }catch(e){msg.innerHTML='<div style="color:var(--red2);font-size:12px">Failed: '+escapeHtml(e.message)+'</div>';}
 }
 
@@ -4441,8 +4397,8 @@ async function loadModForms(){
   const el=document.getElementById('modforms-content');if(!el)return;
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
   if(typeof formsFilter==='undefined')window.formsFilter='pending';
-  el.innerHTML=`<div class="panel"><h3>📝 Player Applications</h3>
-  <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">Review entry applications and approve or reject them.</p>
+  el.innerHTML=`<div class="panel"><h3>📝 Staff Applications</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">Review submissions and respond.</p>
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
     ${['pending','approved','rejected','all'].map(f=>`<button class="btn btn-sm ${formsFilter===f?'btn-red':'btn-ghost'}" onclick="setModFormsFilter('${f}')">${f.toUpperCase()}</button>`).join('')}
   </div>
@@ -4453,8 +4409,8 @@ async function loadModForms(){
 function setModFormsFilter(f){formsFilter=f;loadModForms();}
 
 async function adminForms(el){
-  el.innerHTML=`<div class="panel"><h3>📝 Entry Applications</h3>
-  <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">New player gate. Approve to let them in, reject to bounce them.</p>
+  el.innerHTML=`<div class="panel"><h3>📝 Staff Applications</h3>
+  <p style="color:var(--text2);font-size:13px;margin:6px 0 12px">Review submissions and respond.</p>
   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
     ${['pending','approved','rejected','all'].map(f=>`<button class="btn btn-sm ${formsFilter===f?'btn-red':'btn-ghost'}" onclick="setFormsFilter('${f}')">${f.toUpperCase()}</button>`).join('')}
   </div>
@@ -4463,6 +4419,7 @@ async function adminForms(el){
   loadFormsList();
 }
 function setFormsFilter(f){formsFilter=f;adminForms(document.getElementById('admin-content'));}
+
 async function loadFormsList(){
   const el=document.getElementById('forms-list');if(!el)return;
   try{
@@ -4474,23 +4431,18 @@ async function loadFormsList(){
     el.innerHTML=apps.map(a=>{
       const status=a.status||'pending';
       const acted=status!=='pending';
-      return `<div style="background:var(--panel2);border:1px solid var(--border);border-left:3px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);padding:12px 14px;margin-bottom:10px">
+      return `<div style="background:var(--panel2);border:1px solid var(--border);border-left:3px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
           <div style="flex:1;min-width:200px">
-            <div style="font-family:var(--disp);font-size:13px;letter-spacing:1px;color:var(--steel)">${escapeHtml(a.username||'?')}</div>
-            <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px">${timeAgo(a.created_at?.toDate?.())}</div>
+            <div style="font-family:var(--disp);font-size:13px;letter-spacing:1px;color:var(--steel)">${APP_TYPE_LABEL[a.type]||a.type} · ${escapeHtml(a.subject||'(no subject)')}</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px">from <strong style="color:var(--text2)">${escapeHtml(a.username||'?')}</strong> · ${timeAgo(a.created_at?.toDate?.())}</div>
           </div>
           <span style="font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${APP_STATUS_COLOR[status]};padding:3px 8px;border:1px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);white-space:nowrap">${status}</span>
         </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;font-size:12px">
-          <div><span style="color:var(--text3);font-family:var(--mono);font-size:10px">AGE</span> <strong>${a.age||'?'}</strong></div>
-          <div><span style="color:var(--text3);font-family:var(--mono);font-size:10px">FROM</span> <strong>${SOURCE_LABEL[a.source]||a.source||'?'}</strong></div>
-          ${a.referred_by?`<div><span style="color:var(--text3);font-family:var(--mono);font-size:10px">REF BY</span> <strong>${escapeHtml(a.referred_by)}</strong></div>`:''}
-        </div>
-        <div style="padding:10px;background:var(--bg3);border-radius:var(--r);font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap">${escapeHtml(a.body||'')}</div>
-        ${a.response?`<div style="margin-top:8px;padding:8px 10px;background:var(--panel3);border-left:2px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);font-size:11px"><strong style="color:var(--text)">${escapeHtml(a.reviewed_by||'staff')}:</strong> ${escapeHtml(a.response)}</div>`:''}
-        ${!acted?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
-          <input class="form-input" id="rsp-${a.id}" placeholder="Optional note to the player" style="flex:1;min-width:180px;font-size:12px">
+        <div style="margin:10px 0;padding:10px;background:var(--bg3);border-radius:var(--r);font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap">${escapeHtml(a.body||'')}</div>
+        ${a.response?`<div style="padding:8px 10px;background:var(--panel3);border-left:2px solid ${APP_STATUS_COLOR[status]};border-radius:var(--r);font-size:11px;margin-bottom:8px"><strong style="color:var(--text)">Response from ${escapeHtml(a.reviewed_by||'staff')}:</strong> ${escapeHtml(a.response)}</div>`:''}
+        ${!acted?`<div style="display:flex;gap:6px;flex-wrap:wrap">
+          <input class="form-input" id="rsp-${a.id}" placeholder="Response message (optional)" style="flex:1;min-width:180px;font-size:12px">
           <button class="btn btn-sm btn-red" onclick="reviewApplication('${a.id}','approved')">✓ Approve</button>
           <button class="btn btn-sm btn-ghost" onclick="reviewApplication('${a.id}','rejected')">✕ Reject</button>
         </div>`:''}
