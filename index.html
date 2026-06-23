@@ -655,6 +655,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <div style="background:#000;display:flex;align-items:center;justify-content:center;padding:40px 36px;position:relative;">
       <div style="width:100%;max-width:360px;">
+        <div style="width:54px;height:54px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;margin:0 auto 18px;box-shadow:0 0 18px rgba(255,31,107,.45);"></div>
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--red2);margin-bottom:6px;text-transform:uppercase;">/ Access</div>
         <div style="font-family:var(--disp);font-size:38px;line-height:1;margin-bottom:24px;color:var(--text);">Hop in.</div>
         <div style="display:flex;margin-bottom:18px;border-bottom:1px solid var(--border2);">
@@ -718,7 +719,10 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
   <div style="width:100%;max-width:680px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin:6px 0 18px;">
       <button class="btn-ghost-sm" onclick="backToModeSelect()">← Modes</button>
-      <div class="logo" style="font-size:26px;">ROAD TO TOKYO</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:30px;height:30px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;flex-shrink:0;box-shadow:0 0 12px rgba(255,31,107,.45);"></div>
+        <div class="logo" style="font-size:26px;">ROAD TO TOKYO</div>
+      </div>
       <button class="btn-ghost-sm" onclick="enterMode('free')">Free Mode →</button>
     </div>
     <div id="story-stages"></div>
