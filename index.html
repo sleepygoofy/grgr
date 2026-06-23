@@ -585,13 +585,19 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .pack-price{font-family:var(--disp);font-size:18px;color:var(--amber2);}
 .pack-rates{font-family:var(--mono);font-size:10px;color:var(--blue2);cursor:pointer;}
 .pack-rates:hover{text-decoration:underline;}
+.pack-scrap{border-top:3px solid var(--text3);}
 .pack-starter{border-top:3px solid var(--text2);}
 .pack-street{border-top:3px solid var(--green2);}
 .pack-exotic{border-top:3px solid var(--purple2);}
 .pack-hyper{border-top:3px solid var(--amber2);}
-.reveal-spin{display:flex;align-items:center;justify-content:center;height:140px;}
-.reveal-spin-emoji{font-size:72px;}
-@keyframes packShake{0%{transform:rotate(-8deg) scale(1);}50%{transform:rotate(8deg) scale(1.08);}100%{transform:rotate(-8deg) scale(1);}}
+.pack-mythic{border-top:3px solid var(--red2);}
+.reveal-spin{position:relative;display:flex;align-items:center;justify-content:center;height:140px;}
+.reveal-spin-glow{position:absolute;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(255,180,70,.4),transparent 70%);animation:glowPulse 1.1s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:.4;transform:scale(.85);}50%{opacity:1;transform:scale(1.2);}}
+.reveal-spin-emoji{font-size:72px;position:relative;z-index:1;animation:packShake .45s ease-in-out infinite;transform-origin:50% 70%;}
+@keyframes packShake{0%,100%{transform:rotate(-8deg) scale(1);}50%{transform:rotate(8deg) scale(1.08);}}
+.reveal-burst{width:140px;height:140px;border-radius:50%;margin:30px auto;background:radial-gradient(circle,var(--rc),transparent 72%);animation:burstPop .35s cubic-bezier(.2,.9,.3,1) forwards;}
+@keyframes burstPop{0%{transform:scale(.15);opacity:0;}55%{transform:scale(1.35);opacity:1;}100%{transform:scale(1.7);opacity:0;}}
 .reveal-label{font-family:var(--mono);font-size:12px;color:var(--text2);letter-spacing:2px;margin-top:8px;}
 .reveal-card{animation:revealPop .5s cubic-bezier(.2,1.3,.4,1);padding:10px;border-radius:14px;border:2px solid var(--rc);box-shadow:0 0 30px -4px var(--rc);background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 70%);}
 @keyframes revealPop{0%{transform:scale(.5) rotate(-6deg);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1) rotate(0);opacity:1;}}
@@ -2043,6 +2049,8 @@ async function buyUpgrade(key,lvl,cost,pb,hb,sb){
 }
 
 const PACKS=[
+  {id:'scrap',name:'Scrap Crate',emoji:'🔧',price:2000,desc:'Bottom of the barrel. Nearly all commons, but it\'s a start.',
+    weights:{Common:85,Uncommon:13,Rare:2}},
   {id:'starter',name:'Starter Crate',emoji:'📦',price:8000,desc:'Cheap and cheerful. Mostly commons, a slim shot at something rare.',
     weights:{Common:62,Uncommon:25,Rare:10,Epic:2.7,Legendary:0.3}},
   {id:'street',name:'Street Pack',emoji:'🏙️',price:25000,desc:'Solid mid-tier pulls. Where most builds really start.',
@@ -2051,6 +2059,8 @@ const PACKS=[
     weights:{Uncommon:30,Rare:42,Epic:21,Legendary:7}},
   {id:'hyper',name:'Hypercar Vault',emoji:'🏆',price:200000,desc:'Top-shelf only. Every pull stings the wallet but the floor is high.',
     weights:{Rare:34,Epic:46,Legendary:20}},
+  {id:'mythic',name:'Mythic Reserve',emoji:'🔥',price:500000,desc:'The deepest cut. Nothing below Epic, and Legendary is the coin flip.',
+    weights:{Epic:38,Legendary:62}},
 ];
 
 function carTier(c){
@@ -2168,10 +2178,12 @@ async function buyPack(id){
 
   const stage=document.getElementById('reveal-stage');
   openModal('modal-reveal');
-  stage.innerHTML=`<div class="reveal-spin"><div class="reveal-spin-emoji">${p.emoji}</div></div><div class="reveal-label">Opening ${p.name}…</div>`;
+  stage.innerHTML=`<div class="reveal-spin"><div class="reveal-spin-glow"></div><div class="reveal-spin-emoji">${p.emoji}</div></div><div class="reveal-label">Opening ${p.name}…</div>`;
   await sleep(1500);
-  const tierColor={Common:'#8ba0b8',Uncommon:'#46ff9c',Rare:'#3ae6ff',Epic:'#cc6bff',Legendary:'#ffc757',Mythic:'#ffc757'};
+  const tierColor={Common:'#8ba0b8',Uncommon:'#46ff9c',Rare:'#5b9dff',Epic:'#cc6bff',Legendary:'#ffc757',Mythic:'#ffc757'};
   const col=tierColor[car.rarity]||'#8ba0b8';
+  stage.innerHTML=`<div class="reveal-burst" style="--rc:${col}"></div>`;
+  await sleep(280);
   stage.innerHTML=`
     <div class="reveal-card" style="--rc:${col}">
       <div class="reveal-rarity" style="color:${col}">${car.rarity.toUpperCase()}</div>
