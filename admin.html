@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REDLINE: Vice Streets</title>
+<title>REDLINE: Vice Streets — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -760,7 +760,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <div><div class="logo">Redline</div><span class="logo-sub"></span></div>
       </div>
       <nav class="sidebar-nav">
-        <a class="side-tab active" href="dashboard.html"><span class="side-ico">🏠</span><span class="side-label">Garage</span></a>
+        <a class="side-tab" href="dashboard.html"><span class="side-ico">🏠</span><span class="side-label">Garage</span></a>
         <a class="side-tab" href="market.html"><span class="side-ico">🏪</span><span class="side-label">Market</span></a>
         <a class="side-tab" href="auction.html"><span class="side-ico">🔨</span><span class="side-label">Auction</span></a>
         <a class="side-tab" href="race.html"><span class="side-ico">🏁</span><span class="side-label">Race</span></a>
@@ -806,7 +806,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       </div>
       <main class="main">
         <!-- GARAGE -->
-        <div class="section active" id="tab-garage">
+        <div class="section" id="tab-garage">
           <div class="sec-head"><div><div class="sec-title" data-kicker="Your Stable">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div class="sec-actions"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
           <div class="garage-layout">
             <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
@@ -998,7 +998,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       <div class="sec-head"><div><div class="sec-title" data-kicker="Moderator" style="color:var(--amber2)">Application Review</div><div class="sec-sub">moderator access · review and act on player applications</div></div></div>
       <div id="modforms-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
-    <div class="section" id="tab-admin">
+    <div class="section active" id="tab-admin">
       <div class="sec-head"><div><div class="sec-title" data-kicker="Restricted" style="color:var(--red2)">Admin Panel</div><div class="sec-sub">system control · restricted</div></div><span id="admin-role-badge" class="role-badge"></span></div>
       <div class="admin-shell">
       <div class="admin-topbar-wrap">

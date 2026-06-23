@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REDLINE: Vice Streets</title>
+<title>REDLINE: Vice Streets — Challenges</title>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -760,11 +760,11 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <div><div class="logo">Redline</div><span class="logo-sub"></span></div>
       </div>
       <nav class="sidebar-nav">
-        <a class="side-tab active" href="dashboard.html"><span class="side-ico">🏠</span><span class="side-label">Garage</span></a>
+        <a class="side-tab" href="dashboard.html"><span class="side-ico">🏠</span><span class="side-label">Garage</span></a>
         <a class="side-tab" href="market.html"><span class="side-ico">🏪</span><span class="side-label">Market</span></a>
         <a class="side-tab" href="auction.html"><span class="side-ico">🔨</span><span class="side-label">Auction</span></a>
         <a class="side-tab" href="race.html"><span class="side-ico">🏁</span><span class="side-label">Race</span></a>
-        <a class="side-tab" href="challenges.html"><span class="side-ico">🎯</span><span class="side-label">Goals</span></a>
+        <a class="side-tab active" href="challenges.html"><span class="side-ico">🎯</span><span class="side-label">Goals</span></a>
         <a class="side-tab" href="leaderboard.html"><span class="side-ico">🏆</span><span class="side-label">Board</span></a>
         <a class="side-tab" href="crew.html"><span class="side-ico">🤝</span><span class="side-label">Crew</span></a>
         <a class="side-tab" href="chat.html"><span class="side-ico">🗨️</span><span class="side-label">Chat</span></a>
@@ -806,7 +806,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       </div>
       <main class="main">
         <!-- GARAGE -->
-        <div class="section active" id="tab-garage">
+        <div class="section" id="tab-garage">
           <div class="sec-head"><div><div class="sec-title" data-kicker="Your Stable">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div class="sec-actions"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
           <div class="garage-layout">
             <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
@@ -943,7 +943,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       </div>
     </div>
     <!-- CHALLENGES -->
-    <div class="section" id="tab-challenges">
+    <div class="section active" id="tab-challenges">
       <div class="sec-head"><div><div class="sec-title" data-kicker="Daily Hustle">Challenges</div><div class="sec-sub">Daily tasks · achievements · rewards</div></div></div>
       <div class="grid-2">
         <div><div class="panel" style="margin-bottom:16px"><h3>📅 Daily Challenges</h3><div id="daily-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div><div class="panel"><h3>📋 Weekly Missions</h3><div id="weekly-challenges"><div class="loading-screen"><div class="spinner"></div></div></div></div></div>
