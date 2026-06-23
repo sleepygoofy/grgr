@@ -102,8 +102,13 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .val-cash{color:var(--amber2);}
 .val-level{color:var(--steel);}
 .val-wins{color:var(--green2);}
-.hud-avatar{width:32px;height:32px;border-radius:50%;background:var(--red3);border:1px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:13px;color:var(--red2);cursor:pointer;position:relative;transition:all .15s;margin-left:4px;}
-.hud-avatar:hover{box-shadow:var(--glow-red);}
+.hud-avatar{width:32px;height:32px;border-radius:50%;background:var(--red3);border:1px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;font-size:13px;color:var(--red2);cursor:pointer;position:relative;transition:all .15s;margin-left:4px;transform:rotate(-4deg);box-shadow:0 0 0 2px var(--bg),0 0 0 3px rgba(230,0,35,.5),1px 2px 0 rgba(0,0,0,.5);}
+.hud-avatar::before{content:'';position:absolute;inset:-9px;z-index:-1;opacity:.55;background:
+  radial-gradient(circle at 25% 30%,rgba(230,0,35,.6) 0 3px,transparent 4px),
+  radial-gradient(circle at 70% 20%,rgba(230,0,35,.4) 0 2px,transparent 3px),
+  radial-gradient(circle at 80% 65%,rgba(230,0,35,.5) 0 3px,transparent 4px),
+  radial-gradient(circle at 30% 78%,rgba(230,0,35,.35) 0 2px,transparent 3px);}
+.hud-avatar:hover{box-shadow:0 0 0 2px var(--bg),0 0 0 3px var(--red),var(--glow-red);}
 .hud-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel2);border:1px solid var(--border2);border-radius:var(--r2);min-width:200px;z-index:300;display:none;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.6);}
 .hud-menu.open{display:block;}
 .hud-menu-top{padding:12px 14px 10px;border-bottom:1px solid var(--border);background:var(--panel3);}
@@ -401,7 +406,12 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .lb-rank{font-family:var(--disp);font-size:14px;font-weight:700;width:36px;color:var(--text3);}
 .profile-hero{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;flex-wrap:wrap;}
 .profile-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);}
-.prof-avatar{width:68px;height:68px;border-radius:50%;background:var(--red3);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:26px;color:var(--red2);flex-shrink:0;}
+.prof-avatar{width:68px;height:68px;border-radius:50%;background:var(--red3);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:26px;color:var(--red2);flex-shrink:0;position:relative;transform:rotate(-3deg);box-shadow:0 0 0 3px var(--bg),0 0 0 4px rgba(230,0,35,.5),2px 3px 0 rgba(0,0,0,.5);}
+.prof-avatar::before{content:'';position:absolute;inset:-14px;z-index:-1;opacity:.55;background:
+  radial-gradient(circle at 25% 30%,rgba(230,0,35,.6) 0 4px,transparent 6px),
+  radial-gradient(circle at 72% 22%,rgba(230,0,35,.4) 0 3px,transparent 5px),
+  radial-gradient(circle at 80% 68%,rgba(230,0,35,.5) 0 4px,transparent 6px),
+  radial-gradient(circle at 28% 76%,rgba(230,0,35,.35) 0 3px,transparent 5px);}
 .prof-name-big{font-family:var(--disp);font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:3px;color:var(--steel);}
 .xp-bar-wrap{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:8px;width:200px;}
 .xp-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px;transition:width .6s;}
@@ -712,13 +722,13 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
   <div style="color:var(--text2);margin:14px 0 30px;font-size:14px;">Choose your road, <span id="mode-username" style="color:var(--red2);font-weight:700;">racer</span></div>
   <div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;max-width:760px;">
     <div class="mode-card" onclick="enterMode('free')">
-      <div class="mode-ico">🌆</div>
+      <div class="mode-ico">🌃</div>
       <div class="mode-title">FREE MODE</div>
       <div class="mode-desc">The open city. Buy cars, race for cash, climb the leaderboard, run with a crew. No limits.</div>
       <div class="mode-go">ENTER CITY →</div>
     </div>
     <div class="mode-card story" onclick="enterMode('story')">
-      <div class="mode-ico">🏯</div>
+      <div class="mode-ico">🗻</div>
       <div class="mode-title">STORY MODE</div>
       <div class="mode-desc">The Road to Tokyo. Earn your way through drift legends, collect the cars, and challenge the DK in the final mountain battle.</div>
       <div class="mode-go" id="story-progress-label">START JOURNEY →</div>
