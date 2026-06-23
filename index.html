@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REDLINE: Vice Streets</title>
+<title>67</title>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -603,6 +603,8 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .reveal-new{margin-top:12px;font-family:var(--disp);font-size:16px;color:var(--amber2);letter-spacing:2px;}
 @keyframes newPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.12);opacity:.85;}}
 .reveal-dupe{margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--green2);}
+.confetti-piece{position:absolute;top:-24px;width:11px;height:18px;border-radius:2px;animation:confettiFall 2.4s ease-in forwards;animation-fill-mode:backwards;z-index:10000;pointer-events:none;}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg);}85%{opacity:1;}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -724,7 +726,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="sidebar-mark">🏁</div>
-        <div><div class="logo">REDLINE</div><span class="logo-sub">Street Racing</span></div>
+        <div><div class="logo">Redline</div><span class="logo-sub"></span></div>
       </div>
       <nav class="sidebar-nav">
         <button class="side-tab active" onclick="showTab('garage',this)"><span class="side-ico">🏠</span><span class="side-label">Garage</span></button>
@@ -2138,6 +2140,19 @@ function openPackInfo(id){
     <button class="btn btn-gold btn-lg" style="width:100%;margin-top:16px" onclick="closeModal('modal-pack');buyPack('${p.id}')">Open for $${fmtCash(p.price)}</button>`;
   openModal('modal-pack');
 }
+function spawnConfetti(container,colors){
+  if(!container)return;
+  for(let i=0;i<50;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left=Math.random()*100+'%';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay=(Math.random()*0.5)+'s';
+    p.style.animationDuration=(1.8+Math.random()*0.8)+'s';
+    container.appendChild(p);
+    setTimeout(()=>p.remove(),3200);
+  }
+}
 let _packBusy=false;
 async function buyPack(id){
   if(panicBlock('Pack opening'))return;
@@ -2166,6 +2181,7 @@ async function buyPack(id){
       ${already?'<div class="reveal-dupe">DUPLICATE · +$'+fmtCash(Math.round(car.base_price*0.4))+' refund</div>':'<div class="reveal-new">★ NEW! ★</div>'}
       <button class="btn btn-gold btn-lg" style="margin-top:16px;width:100%" onclick="closeModal('modal-reveal')">${already?'Collect Refund':'Add to Garage'}</button>
     </div>`;
+  spawnConfetti(document.getElementById('modal-reveal'),[col,'#ffffff','#ff2e8b']);
 
   if(already){
     const refund=Math.round(car.base_price*0.4);
