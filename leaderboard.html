@@ -760,17 +760,17 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <div><div class="logo">Redline</div><span class="logo-sub"></span></div>
       </div>
       <nav class="sidebar-nav">
-        <a class="side-tab" href="dashboard.html"><span class="side-ico">🏠</span><span class="side-label">Garage</span></a>
-        <a class="side-tab" href="market.html"><span class="side-ico">🏪</span><span class="side-label">Market</span></a>
-        <a class="side-tab" href="auction.html"><span class="side-ico">🔨</span><span class="side-label">Auction</span></a>
-        <a class="side-tab" href="race.html"><span class="side-ico">🏁</span><span class="side-label">Race</span></a>
-        <a class="side-tab" href="challenges.html"><span class="side-ico">🎯</span><span class="side-label">Goals</span></a>
-        <a class="side-tab active" href="leaderboard.html"><span class="side-ico">🏆</span><span class="side-label">Board</span></a>
-        <a class="side-tab" href="crew.html"><span class="side-ico">🤝</span><span class="side-label">Crew</span></a>
-        <a class="side-tab" href="chat.html"><span class="side-ico">🗨️</span><span class="side-label">Chat</span></a>
-        <a class="side-tab" href="profile.html"><span class="side-ico">👤</span><span class="side-label">Profile</span></a>
-        <a class="side-tab" id="admin-nav-tab" style="display:none" href="admin.html"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></a>
-        <a class="side-tab" id="modforms-nav-tab" style="display:none" href="modforms.html"><span class="side-ico">📝</span><span class="side-label">Forms</span></a>
+        <a class="side-tab" href="/dashboard"><span class="side-ico">🏠</span><span class="side-label">Garage</span></a>
+        <a class="side-tab" href="/market"><span class="side-ico">🏪</span><span class="side-label">Market</span></a>
+        <a class="side-tab" href="/auction"><span class="side-ico">🔨</span><span class="side-label">Auction</span></a>
+        <a class="side-tab" href="/race"><span class="side-ico">🏁</span><span class="side-label">Race</span></a>
+        <a class="side-tab" href="/challenges"><span class="side-ico">🎯</span><span class="side-label">Goals</span></a>
+        <a class="side-tab active" href="/leaderboard"><span class="side-ico">🏆</span><span class="side-label">Board</span></a>
+        <a class="side-tab" href="/crew"><span class="side-ico">🤝</span><span class="side-label">Crew</span></a>
+        <a class="side-tab" href="/chat"><span class="side-ico">🗨️</span><span class="side-label">Chat</span></a>
+        <a class="side-tab" href="/profile"><span class="side-ico">👤</span><span class="side-label">Profile</span></a>
+        <a class="side-tab" id="admin-nav-tab" style="display:none" href="/admin"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></a>
+        <a class="side-tab" id="modforms-nav-tab" style="display:none" href="/modforms"><span class="side-ico">📝</span><span class="side-label">Forms</span></a>
       </nav>
       <div class="sidebar-foot">
         <button class="side-tab" onclick="showModeSelect()"><span class="side-ico">🗺️</span><span class="side-label">Modes</span></button>
@@ -1195,11 +1195,16 @@ function showModeSelect(){
   else lbl.textContent='BEGIN THE STORY →';
 }
 function backToModeSelect(){showModeSelect();}
-function enterMode(mode){
+function resumeMode(mode){
   activeMode=mode;
   document.getElementById('mode-screen').style.display='none';
   if(mode==='story'){renderStoryMap();document.getElementById('story-screen').style.display='flex';}
-  else{document.getElementById('story-screen').style.display='none';document.getElementById('game').style.display='block';showTab('garage');}
+  else{document.getElementById('story-screen').style.display='none';document.getElementById('game').style.display='block';}
+}
+function enterMode(mode){
+  try{localStorage.setItem('redline_mode',mode);}catch{}
+  resumeMode(mode);
+  if(mode==='free')showTab('garage');
 }
 function renderStoryMap(){
   const st=profile?.story?.stage||0;
@@ -1478,7 +1483,7 @@ function setMsg(msg,type='err'){
   el.textContent=msg;el.style.display=msg?'block':'none';
   el.className='auth-msg'+(type==='ok'?' ok':type===''?' ':' err');
 }
-async function doLogout(){try{await logActivity('logout',{});}catch{}await auth.signOut();}
+async function doLogout(){try{await logActivity('logout',{});}catch{}try{localStorage.removeItem('redline_mode');}catch{}await auth.signOut();}
 
 auth.onAuthStateChanged(async user=>{
   if(user){
@@ -1486,7 +1491,8 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('auth-screen').style.display='none';
     await initGame();
     if(isPanicLocked()){showMaintenanceScreen();return;}
-    showModeSelect();
+    let savedMode=null;try{savedMode=localStorage.getItem('redline_mode');}catch{}
+    if(savedMode)resumeMode(savedMode);else showModeSelect();
   }else{
     currentUser=null;profile=null;playerCars=[];raceHistLoaded=false;
     document.getElementById('auth-screen').style.display='flex';

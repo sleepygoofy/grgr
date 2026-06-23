@@ -7,24 +7,24 @@ const SRC = path.join(__dirname, 'index.html');
 const DEFAULT_TAB = 'garage';
 
 const PAGES = [
-  { file: 'dashboard.html',  tab: 'garage',      title: 'Dashboard' },
-  { file: 'market.html',     tab: 'market',      title: 'Market' },
-  { file: 'auction.html',    tab: 'auction',     title: 'Auction' },
-  { file: 'race.html',       tab: 'race',        title: 'Race' },
-  { file: 'challenges.html', tab: 'challenges',  title: 'Challenges' },
-  { file: 'leaderboard.html',tab: 'leaderboard', title: 'Leaderboard' },
-  { file: 'crew.html',       tab: 'crew',        title: 'Crew' },
-  { file: 'chat.html',       tab: 'chat',        title: 'Chat' },
-  { file: 'profile.html',    tab: 'profile',     title: 'Profile' },
-  { file: 'admin.html',      tab: 'admin',       title: 'Admin' },
-  { file: 'modforms.html',   tab: 'modforms',    title: 'Mod Forms' },
+  { file: 'dashboard.html',  href: '/dashboard',  tab: 'garage',      title: 'Dashboard' },
+  { file: 'market.html',     href: '/market',     tab: 'market',      title: 'Market' },
+  { file: 'auction.html',    href: '/auction',    tab: 'auction',     title: 'Auction' },
+  { file: 'race.html',       href: '/race',       tab: 'race',        title: 'Race' },
+  { file: 'challenges.html', href: '/challenges', tab: 'challenges',  title: 'Challenges' },
+  { file: 'leaderboard.html',href: '/leaderboard',tab: 'leaderboard', title: 'Leaderboard' },
+  { file: 'crew.html',       href: '/crew',       tab: 'crew',        title: 'Crew' },
+  { file: 'chat.html',       href: '/chat',       tab: 'chat',        title: 'Chat' },
+  { file: 'profile.html',    href: '/profile',    tab: 'profile',     title: 'Profile' },
+  { file: 'admin.html',      href: '/admin',      tab: 'admin',       title: 'Admin' },
+  { file: 'modforms.html',   href: '/modforms',   tab: 'modforms',    title: 'Mod Forms' },
 ];
 
 const template = fs.readFileSync(SRC, 'utf8');
 
 function hrefFor(tab) {
   const page = PAGES.find(p => p.tab === tab);
-  return page ? page.file : null;
+  return page ? page.href : null;
 }
 
 for (const page of PAGES) {
