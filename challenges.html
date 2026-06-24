@@ -655,47 +655,57 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 <canvas id="bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
 
 <!-- AUTH -->
-<div id="auth-screen" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:stretch;justify-content:stretch;">
-  <div style="display:grid;grid-template-columns:1fr 1fr;width:100%;min-height:100%;">
-    <div style="position:relative;background:#0a0a0a;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 36px;border-right:3px solid var(--red);">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:38px;height:38px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;"></div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;">EST. 2026 / NIGHT CIRCUIT</div>
-      </div>
-      <div>
-        <div style="font-family:var(--disp);font-size:90px;line-height:.85;color:var(--text);margin-bottom:6px;">REDLINE</div>
-        <div style="height:6px;width:140px;background:var(--red);margin:14px 0 18px;"></div>
-        <div style="font-family:var(--body);font-size:18px;color:var(--text2);font-weight:500;max-width:340px;line-height:1.45;">Run the streets after dark. Build the garage everyone talks about. Don&rsquo;t get caught.</div>
-      </div>
-      <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;">
-        <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">300+</span>Cars</div>
-        <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">8</span>Chapters</div>
-        <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">24/7</span>Open Lobby</div>
-      </div>
+<div id="auth-screen" style="position:fixed;inset:0;z-index:9999;overflow:hidden;background:#000;">
+  <div class="spray-splat" style="position:absolute;width:900px;height:900px;left:65%;top:50%;opacity:.4;"></div>
+
+  <div style="position:absolute;top:24px;left:28px;display:flex;align-items:center;gap:10px;z-index:2;">
+    <div style="width:38px;height:38px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;"></div>
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;">EST. 2026 / NIGHT CIRCUIT</div>
+  </div>
+
+  <div style="position:absolute;top:20px;right:28px;display:flex;gap:10px;z-index:2;">
+    <button class="btn-ghost-sm" onclick="openAuthForm('login')">Login</button>
+    <button class="btn-red" style="border-radius:var(--r);padding:6px 16px;font-size:12px;font-family:var(--body);font-weight:700;cursor:pointer;" onclick="openAuthForm('signup')">Register</button>
+  </div>
+
+  <div style="position:absolute;top:50%;left:6%;transform:translateY(-50%);max-width:520px;z-index:2;">
+    <div style="font-family:var(--disp);font-size:90px;line-height:.85;color:var(--text);margin-bottom:6px;">REDLINE</div>
+    <div style="height:6px;width:140px;background:var(--red);margin:14px 0 18px;"></div>
+    <div style="font-family:var(--body);font-size:18px;color:var(--text2);font-weight:500;max-width:380px;line-height:1.45;">Run the streets after dark. Build the garage everyone talks about. Don&rsquo;t get caught.</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;">
+      <button class="btn-red" style="border-radius:var(--r);padding:12px 26px;font-size:15px;font-family:var(--disp);letter-spacing:1px;cursor:pointer;" onclick="openAuthForm('signup')">Get Started &rarr;</button>
+      <a href="#" id="discord-link-auth" target="_blank" rel="noopener" class="btn-ghost-sm" style="display:none;padding:12px 22px;font-size:14px;">Discord Server</a>
     </div>
-    <div style="background:#000;display:flex;align-items:center;justify-content:center;padding:40px 36px;position:relative;">
-      <div style="width:100%;max-width:360px;">
-        <div style="position:relative;width:54px;height:54px;margin:0 auto 18px;"><div class="spray-splat"></div><div style="position:relative;width:54px;height:54px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;box-shadow:0 0 18px rgba(255,31,107,.45);"></div></div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--red2);margin-bottom:6px;text-transform:uppercase;">/ Access</div>
-        <div style="font-family:var(--disp);font-size:38px;line-height:1;margin-bottom:24px;color:var(--text);">Hop in.</div>
-        <div style="display:flex;margin-bottom:18px;border-bottom:1px solid var(--border2);">
-          <button class="auth-tab active" onclick="switchAuthTab('login',this)" style="flex:1;padding:10px 0;font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--text);border:none;border-bottom:2px solid var(--red);margin-bottom:-1px;">Sign in</button>
-          <button class="auth-tab" onclick="switchAuthTab('signup',this)" style="flex:1;padding:10px 0;font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;background:none;color:var(--text3);border:none;border-bottom:2px solid transparent;margin-bottom:-1px;">New here</button>
-        </div>
-        <div id="auth-login">
-          <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Username</label><input class="form-input" id="login-user" placeholder="your tag" autocomplete="username"></div>
-          <div style="margin-bottom:18px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-          <button class="btn-auth" onclick="doLogin()">Sign in &rarr;</button>
-        </div>
-        <div id="auth-signup" style="display:none">
-          <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Pick a tag</label><input class="form-input" id="su-user" placeholder="your tag" maxlength="20"></div>
-          <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Email</label><input class="form-input" type="email" id="su-email" placeholder="you@somewhere"></div>
-          <div style="margin-bottom:18px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Password</label><input class="form-input" type="password" id="su-pass" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignup()"></div>
-          <button class="btn-auth" onclick="doSignup()">Create account &rarr;</button>
-        </div>
-        <div class="auth-msg" id="auth-msg"></div>
-        <div style="text-align:center;margin-top:20px;font-family:var(--mono);font-size:9px;color:var(--text4);letter-spacing:2px;">v2.0 / 2026</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-top:30px;">
+      <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">300+</span>Cars</div>
+      <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">8</span>Chapters</div>
+      <div><span style="color:var(--red2);font-size:18px;font-family:var(--disp);display:block;line-height:1;">24/7</span>Open Lobby</div>
+    </div>
+  </div>
+
+  <div id="auth-form-overlay" style="display:none;position:fixed;inset:0;z-index:3;background:rgba(0,0,0,.7);align-items:center;justify-content:center;" onclick="if(event.target===this)closeAuthForm()">
+    <div class="auth-box" style="width:100%;max-width:360px;">
+      <button class="btn-ghost-sm" style="position:absolute;top:14px;right:14px;padding:4px 9px;" onclick="closeAuthForm()">✕</button>
+      <div style="position:relative;width:54px;height:54px;margin:0 auto 18px;"><div class="spray-splat"></div><div style="position:relative;width:54px;height:54px;border-radius:50%;background-image:var(--logo);background-size:cover;background-position:center;box-shadow:0 0 18px rgba(255,31,107,.45);"></div></div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--red2);margin-bottom:6px;text-transform:uppercase;">/ Access</div>
+      <div style="font-family:var(--disp);font-size:38px;line-height:1;margin-bottom:24px;color:var(--text);">Hop in.</div>
+      <div style="display:flex;margin-bottom:18px;border-bottom:1px solid var(--border2);">
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)" style="flex:1;padding:10px 0;font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--text);border:none;border-bottom:2px solid var(--red);margin-bottom:-1px;">Sign in</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup',this)" style="flex:1;padding:10px 0;font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;background:none;color:var(--text3);border:none;border-bottom:2px solid transparent;margin-bottom:-1px;">New here</button>
       </div>
+      <div id="auth-login">
+        <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Username</label><input class="form-input" id="login-user" placeholder="your tag" autocomplete="username"></div>
+        <div style="margin-bottom:18px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn-auth" onclick="doLogin()">Sign in &rarr;</button>
+      </div>
+      <div id="auth-signup" style="display:none">
+        <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Pick a tag</label><input class="form-input" id="su-user" placeholder="your tag" maxlength="20"></div>
+        <div style="margin-bottom:12px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Email</label><input class="form-input" type="email" id="su-email" placeholder="you@somewhere"></div>
+        <div style="margin-bottom:18px;"><label style="font-family:var(--body);font-size:11px;color:var(--text2);display:block;margin-bottom:6px;font-weight:600;">Password</label><input class="form-input" type="password" id="su-pass" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignup()"></div>
+        <button class="btn-auth" onclick="doSignup()">Create account &rarr;</button>
+      </div>
+      <div class="auth-msg" id="auth-msg"></div>
+      <div style="text-align:center;margin-top:20px;font-family:var(--mono);font-size:9px;color:var(--text4);letter-spacing:2px;">v2.0 / 2026</div>
     </div>
   </div>
 </div>
@@ -1442,6 +1452,13 @@ document.addEventListener('click',e=>{
   if(ab&&!ab.contains(e.target))document.getElementById('hud-menu')?.classList.remove('open');
 });
 
+function openAuthForm(tab){
+  const overlay=document.getElementById('auth-form-overlay');
+  overlay.style.display='flex';
+  const btn=[...document.querySelectorAll('.auth-tab')].find(b=>b.textContent.toLowerCase().includes(tab==='login'?'sign in':'new here'));
+  if(btn)switchAuthTab(tab,btn);
+}
+function closeAuthForm(){document.getElementById('auth-form-overlay').style.display='none';}
 function switchAuthTab(t,el){
   document.querySelectorAll('.auth-tab').forEach(b=>{b.classList.remove('active');b.style.background='transparent';b.style.color='var(--text3)';});
   el.classList.add('active');el.style.background='var(--red)';el.style.color='#fff';
@@ -1629,8 +1646,10 @@ async function loadActiveEvent(){
     }
     panicMode=!!data.panic;
 
-    const dEl=document.getElementById('discord-link');
-    if(dEl){if(data.discord_url){dEl.href=data.discord_url;dEl.style.display='';}else dEl.style.display='none';}
+    [document.getElementById('discord-link'),document.getElementById('discord-link-auth')].forEach(dEl=>{
+      if(!dEl)return;
+      if(data.discord_url){dEl.href=data.discord_url;dEl.style.display='';}else dEl.style.display='none';
+    });
 
     bustThreshold=typeof data.bust_threshold==='number'?data.bust_threshold:70;
     bustMultiplier=typeof data.bust_multiplier==='number'?data.bust_multiplier:1;
