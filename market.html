@@ -818,6 +818,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <!-- GARAGE -->
         <div class="section" id="tab-garage">
           <div class="sec-head"><div><div class="sec-title" data-kicker="Your Stable">My Garage</div><div class="sec-sub"><span id="garage-count">0</span> cars owned</div></div><div class="sec-actions"><button class="btn btn-steel btn-lg" onclick="openListModal()">🔨 Auction</button><button class="btn btn-gold btn-lg" onclick="showTab('market')">+ Buy Car</button></div></div>
+          <div class="panel" id="news-panel" style="margin-bottom:14px;display:none"><h3>📰 News</h3><div id="news-feed"></div></div>
           <div class="garage-layout">
             <div id="garage-grid" class="grid-cards"><div class="loading-screen"><div class="spinner"></div> Loading...</div></div>
             <div id="garage-sidebar" style="display:none">
@@ -837,7 +838,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
     </div>
     <!-- MARKET -->
     <div class="section active" id="tab-market">
-      <div class="sec-head"><div><div class="sec-title" data-kicker="Showroom">Car Market</div><div class="sec-sub">Open packs or buy direct</div></div></div>
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Showroom">Car Market</div><div class="sec-sub">Open packs or buy direct</div></div><div class="sec-actions"><button class="btn-ghost-sm" id="instant-open-btn" onclick="toggleInstantOpen()">Instant Open: Off</button></div></div>
       <div id="pack-grid" class="pack-grid"></div>
       <div class="sec-head" style="margin-top:8px"><div><div class="sec-title" data-kicker="Walk-in" style="font-size:26px">Direct Buy</div><div class="sec-sub">Live demand-driven pricing</div></div></div>
       <div class="ticker-bar"><span class="rt-dot"></span><span class="ticker-text" id="ticker-text">Loading...</span></div>
@@ -1063,6 +1064,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
           <button class="admin-tab" onclick="adminSec('heat',this)">🚨 Heat</button>
           <button class="admin-tab" onclick="adminSec('events',this)">🎉 Events</button>
           <button class="admin-tab" onclick="adminSec('broadcast',this)">📢 Broadcast</button>
+          <button class="admin-tab" onclick="adminSec('news',this)">📰 News</button>
           <button class="admin-tab" onclick="adminSec('giveaway',this)">🎁 Giveaway</button>
           <button class="admin-tab" onclick="adminSec('chatmod',this)">💬 Chat Mod</button>
           <span class="admin-tab-sep"></span>
@@ -1555,7 +1557,7 @@ auth.onAuthStateChanged(async user=>{
 async function initGame(){
   await Promise.all([loadProfile(),ensureMarketSeeded(),loadActiveEvent()]);
   await Promise.all([loadPlayerCars(),loadMarketPrices()]);
-  renderHUD();renderRaceEvents();renderPlayerCars();showActiveEventBanner();
+  renderHUD();renderRaceEvents();renderPlayerCars();showActiveEventBanner();loadNewsFeed();
   setupAuctionListener();startMarketTicker();setupChatListener();setupBroadcastListener();
 
   checkDailyBonus();
@@ -1920,7 +1922,7 @@ function showTab(t,el){
   if(el)el.classList.add('active');
   else document.querySelector(`.side-tab[href="${TAB_HREF[t]}"]`)?.classList.add('active');
   document.getElementById('hud-menu')?.classList.remove('open');
-  if(t==='garage')renderPlayerCars();
+  if(t==='garage'){renderPlayerCars();loadNewsFeed();}
   if(t==='market'){renderPacks();loadMarketPrices().then(renderMarket);runMarketTick();}
   if(t==='auction')renderAuctions();
   if(t==='leaderboard')loadLeaderboard();
@@ -2263,7 +2265,18 @@ function renderMarket(){
   }).join('');
 }
 function setMktFilter(btn){currentMktFilter=btn.dataset.cls;document.querySelectorAll('[data-cls]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMarket();}
+function toggleInstantOpen(){
+  const on=localStorage.getItem('redline_instant_open')==='true';
+  localStorage.setItem('redline_instant_open',(!on).toString());
+  updateInstantOpenBtn();
+}
+function updateInstantOpenBtn(){
+  const btn=document.getElementById('instant-open-btn');if(!btn)return;
+  const on=localStorage.getItem('redline_instant_open')==='true';
+  btn.textContent='Instant Open: '+(on?'On':'Off');
+}
 function renderPacks(){
+  updateInstantOpenBtn();
   const grid=document.getElementById('pack-grid');if(!grid)return;
   grid.innerHTML=PACKS.map(p=>{
     const afford=profile&&profile.cash>=p.price;
@@ -2321,14 +2334,19 @@ async function buyPack(id){
   const car=rollPack(p);
   const already=playerCars.some(pc=>pc.car_name===car.name);
 
+  const instant=localStorage.getItem('redline_instant_open')==='true';
   const stage=document.getElementById('reveal-stage');
   openModal('modal-reveal');
-  stage.innerHTML=`<div class="reveal-spin"><div class="reveal-spin-glow"></div><div class="reveal-spin-emoji">${p.emoji}</div></div><div class="reveal-label">Opening ${p.name}…</div>`;
-  await sleep(1500);
+  if(!instant){
+    stage.innerHTML=`<div class="reveal-spin"><div class="reveal-spin-glow"></div><div class="reveal-spin-emoji">${p.emoji}</div></div><div class="reveal-label">Opening ${p.name}…</div>`;
+    await sleep(1500);
+  }
   const tierColor={Common:'#8ba0b8',Uncommon:'#46ff9c',Rare:'#5b9dff',Epic:'#cc6bff',Legendary:'#ffc757',Mythic:'#ffc757'};
   const col=tierColor[car.rarity]||'#8ba0b8';
-  stage.innerHTML=`<div class="reveal-burst" style="--rc:${col}"></div>`;
-  await sleep(280);
+  if(!instant){
+    stage.innerHTML=`<div class="reveal-burst" style="--rc:${col}"></div>`;
+    await sleep(280);
+  }
   stage.innerHTML=`
     <div class="reveal-card" style="--rc:${col}">
       <div class="reveal-rarity" style="color:${col}">${car.rarity.toUpperCase()}</div>
@@ -3632,7 +3650,7 @@ async function loadAdminPanel(){
 async function loadAdminSec(sec){
   const el=document.getElementById('admin-content');
   el.innerHTML='<div class="loading-screen"><div class="spinner"></div></div>';
-  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects,forms:adminForms};
+  const fns={overview:adminOverview,analytics:adminAnalytics,users:adminUsers,npcs:adminNPCs,logs:adminLogs,market:adminMarket,auctions:adminAuctions,economy:adminEconomy,races:adminRaces,heat:adminHeat,events:adminEvents,broadcast:adminBroadcast,news:adminNews,giveaway:adminGiveaway,serverstats:adminServerStats,settings:adminSettings,cars:adminCars,carsAdd:adminCarsAdd,raceedit:adminRaceEdit,mail:adminMail,bans:adminBans,chatmod:adminChatMod,rng:adminRNG,story:adminStoryCtl,crews:adminCrewsMgr,backup:adminBackup,panic:adminPanic,suspects:adminSuspects,forms:adminForms};
   if(fns[sec])await fns[sec](el).catch(e=>{el.innerHTML='<div class="empty">Error: '+e.message+'</div>';});
 }
 async function adminOverview(el){
@@ -4137,6 +4155,40 @@ async function sendBroadcast(){
   logActivity('broadcast',{message:msg}).catch(()=>{});
   document.getElementById('bc-msg').value='';
   loadAdminSec('broadcast');
+}
+async function adminNews(el){
+  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+    <div><label class="form-label">Title</label><input class="form-input" id="news-title" placeholder="What's new..."></div>
+    <div><label class="form-label">Body</label><textarea class="form-input" id="news-body" rows="4" placeholder="Details..." style="resize:vertical;font-family:var(--body)"></textarea></div>
+    <button class="btn btn-red btn-lg" onclick="createNewsPost()">📰 Post News</button>
+    <div class="divider"></div>
+    <div id="news-admin-list"><div class="loading-screen"><div class="spinner"></div></div></div>
+  </div>`;
+  await renderAdminNewsList();
+}
+async function renderAdminNewsList(){
+  const snap=await db.collection('news').orderBy('created_at','desc').limit(20).get();
+  document.getElementById('news-admin-list').innerHTML=snap.empty?'<div class="empty">No news posts yet.</div>':snap.docs.map(d=>{const n=d.data();return `<div style="padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px"><div style="font-family:var(--disp);font-size:14px;color:var(--steel);margin-bottom:4px">${n.title}</div><div style="font-size:12px;color:var(--text2);margin-bottom:6px;white-space:pre-wrap">${n.body}</div><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-family:var(--mono);font-size:9px;color:var(--text3)">by ${n.author||'admin'} · ${timeAgo(n.created_at?.toDate())}</div><button class="btn-ghost-sm" onclick="deleteNewsPost('${d.id}')">Delete</button></div></div>`;}).join('');
+}
+async function createNewsPost(){
+  const title=document.getElementById('news-title').value.trim(),body=document.getElementById('news-body').value.trim();
+  if(!title||!body){toast('Title and body required','t-error');return;}
+  await db.collection('news').add({title,body,author:profile.username,created_at:firebase.firestore.FieldValue.serverTimestamp()});
+  logActivity('post_news',{title}).catch(()=>{});
+  document.getElementById('news-title').value='';document.getElementById('news-body').value='';
+  renderAdminNewsList();
+}
+async function deleteNewsPost(id){
+  await db.collection('news').doc(id).delete();
+  renderAdminNewsList();
+}
+async function loadNewsFeed(){
+  const panel=document.getElementById('news-panel'),feed=document.getElementById('news-feed');
+  if(!panel||!feed)return;
+  const snap=await db.collection('news').orderBy('created_at','desc').limit(3).get();
+  if(snap.empty){panel.style.display='none';return;}
+  panel.style.display='';
+  feed.innerHTML=snap.docs.map(d=>{const n=d.data();return `<div style="padding:8px 0;border-bottom:1px solid var(--border)"><div style="font-family:var(--disp);font-size:13px;color:var(--steel)">${n.title}</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${n.body}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px">${timeAgo(n.created_at?.toDate())}</div></div>`;}).join('');
 }
 async function adminCars(el){
   const q=`<div class="adm-row"><label>Search</label><input class="admin-search" id="adm-car-q" placeholder="name or brand..." oninput="adminCars(document.getElementById('admin-content'))"></div>`;
