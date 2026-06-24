@@ -42,7 +42,6 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
 .auth-car-l{left:-56px;top:38%;transform:translateY(-50%);}
 .auth-car-r{right:-56px;top:54%;transform:translateY(-50%) scaleX(-1);animation-delay:.5s;}
 @keyframes floatCar{0%,100%{transform:translateY(-50%) translateX(0);}50%{transform:translateY(-60%) translateX(6px);}}
-.auth-car-r{0%,100%{transform:translateY(-50%) scaleX(-1) translateX(0);}50%{transform:translateY(-60%) scaleX(-1) translateX(-6px);}}
 .auth-box{background:rgba(10,11,20,.85);border:1px solid rgba(255,46,139,.32);border-radius:var(--r2);padding:38px;backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);box-shadow:0 0 0 1px rgba(255,46,139,.07),0 28px 72px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.03);position:relative;overflow:hidden;}
 .auth-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--amber),transparent);}
 .auth-box::after{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(255,46,139,.12) 0%,transparent 70%);pointer-events:none;border-radius:50%;}
@@ -779,6 +778,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <a class="side-tab" href="/crew"><span class="side-ico">🤝</span><span class="side-label">Crew</span></a>
         <a class="side-tab" href="/chat"><span class="side-ico">🗨️</span><span class="side-label">Chat</span></a>
         <a class="side-tab" href="/profile"><span class="side-ico">👤</span><span class="side-label">Profile</span></a>
+        <a class="side-tab" href="/settings"><span class="side-ico">⚙️</span><span class="side-label">Settings</span></a>
         <a class="side-tab" id="admin-nav-tab" style="display:none" href="/admin"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></a>
         <a class="side-tab" id="modforms-nav-tab" style="display:none" href="/modforms"><span class="side-ico">📝</span><span class="side-label">Forms</span></a>
       </nav>
@@ -1001,6 +1001,33 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       <div class="grid-3">
         <div class="panel" style="grid-column:1/3"><h3>Race History</h3><div id="race-hist"><div class="loading-screen"><div class="spinner"></div></div></div></div>
         <div><div class="panel" style="margin-bottom:16px"><h3>Stats</h3><div id="prof-stats-detail"></div></div><div class="panel"><h3>Daily Login</h3><div id="prof-daily-info"></div></div></div>
+      </div>
+    </div>
+    <!-- SETTINGS -->
+    <div class="section" id="tab-settings">
+      <div class="sec-head"><div><div class="sec-title" data-kicker="Account">Settings</div><div class="sec-sub">Manage your account</div></div></div>
+      <div class="grid-3">
+        <div class="panel">
+          <h3>Profile</h3>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--text2);line-height:2;">
+            <div>Username: <span id="set-username" style="color:var(--steel)">—</span></div>
+            <div>Role: <span id="set-role"></span></div>
+            <div>Joined: <span id="set-joined" style="color:var(--steel)">—</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Change Username</h3>
+          <input class="form-input" id="set-new-username" placeholder="new username" maxlength="20" style="margin-bottom:10px;">
+          <button class="btn-red btn-sm" onclick="changeUsername()">Update</button>
+          <div id="set-username-msg" style="margin-top:8px;font-family:var(--mono);font-size:11px;"></div>
+        </div>
+        <div class="panel">
+          <h3>Change Password</h3>
+          <input class="form-input" type="password" id="set-cur-pass" placeholder="current password" style="margin-bottom:8px;">
+          <input class="form-input" type="password" id="set-new-pass" placeholder="new password (6+ chars)" style="margin-bottom:10px;">
+          <button class="btn-red btn-sm" onclick="changePassword()">Update</button>
+          <div id="set-password-msg" style="margin-top:8px;font-family:var(--mono);font-size:11px;"></div>
+        </div>
       </div>
     </div>
     <!-- ADMIN -->
@@ -1883,12 +1910,15 @@ async function layLow(cost){
   logActivity('lay_low',{cost}).catch(()=>{});
 }
 
+const TAB_HREF={garage:'/dashboard',market:'/market',auction:'/auction',race:'/race',challenges:'/challenges',leaderboard:'/leaderboard',crew:'/crew',chat:'/chat',profile:'/profile',settings:'/settings',admin:'/admin',modforms:'/modforms'};
+const HREF_TAB=Object.fromEntries(Object.entries(TAB_HREF).map(([k,v])=>[v,k]));
+const TAB_TITLE={garage:'Dashboard',market:'Market',auction:'Auction',race:'Race',challenges:'Challenges',leaderboard:'Leaderboard',crew:'Crew',chat:'Chat',profile:'Profile',settings:'Settings',admin:'Admin',modforms:'Mod Forms'};
 function showTab(t,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.side-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+t)?.classList.add('active');
   if(el)el.classList.add('active');
-  else document.querySelector(`.side-tab[onclick*="showTab('${t}'"]`)?.classList.add('active');
+  else document.querySelector(`.side-tab[href="${TAB_HREF[t]}"]`)?.classList.add('active');
   document.getElementById('hud-menu')?.classList.remove('open');
   if(t==='garage')renderPlayerCars();
   if(t==='market'){renderPacks();loadMarketPrices().then(renderMarket);runMarketTick();}
@@ -1897,9 +1927,62 @@ function showTab(t,el){
   if(t==='crew')loadCrew();
   if(t==='modforms')loadModForms();
   if(t==='profile'){raceHistLoaded=false;renderProfile();}
+  if(t==='settings')renderSettings();
   if(t==='admin')loadAdminPanel();
   if(t==='challenges')renderChallenges();
 }
+function renderSettings(){
+  document.getElementById('set-username').textContent=profile?.username||'—';
+  document.getElementById('set-role').innerHTML=roleBadge(profile);
+  const d=profile?.created_at?.toDate?.();
+  document.getElementById('set-joined').textContent=d?d.toLocaleDateString():'—';
+}
+async function changeUsername(){
+  const el=document.getElementById('set-new-username');
+  const name=el.value.trim();
+  const msg=document.getElementById('set-username-msg');
+  if(!/^[a-zA-Z0-9_]{3,20}$/.test(name)){msg.textContent='3-20 chars, letters/numbers/_ only';msg.style.color='var(--red2)';return;}
+  msg.textContent='Checking...';msg.style.color='var(--text2)';
+  const taken=await db.collection('profiles').where('username','==',name).limit(1).get();
+  if(!taken.empty&&taken.docs[0].id!==currentUser.uid){msg.textContent='Username already taken';msg.style.color='var(--red2)';return;}
+  await db.collection('profiles').doc(currentUser.uid).update({username:name});
+  profile.username=name;
+  renderSettings();renderHUD();
+  el.value='';
+  msg.textContent='Username updated!';msg.style.color='var(--green2)';
+}
+async function changePassword(){
+  const cur=document.getElementById('set-cur-pass').value;
+  const next=document.getElementById('set-new-pass').value;
+  const msg=document.getElementById('set-password-msg');
+  if(next.length<6){msg.textContent='New password must be 6+ characters';msg.style.color='var(--red2)';return;}
+  try{
+    const cred=firebase.auth.EmailAuthProvider.credential(currentUser.email,cur);
+    await currentUser.reauthenticateWithCredential(cred);
+    await currentUser.updatePassword(next);
+    document.getElementById('set-cur-pass').value='';
+    document.getElementById('set-new-pass').value='';
+    msg.textContent='Password updated!';msg.style.color='var(--green2)';
+  }catch(e){msg.textContent=e.message;msg.style.color='var(--red2)';}
+}
+document.querySelectorAll('.sidebar-nav a.side-tab').forEach(a=>{
+  a.addEventListener('click',e=>{
+    if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return;
+    const href=a.getAttribute('href');
+    const tab=HREF_TAB[href];
+    if(!tab)return;
+    e.preventDefault();
+    if(location.pathname===href)return;
+    showTab(tab,a);
+    history.pushState({tab},'',href);
+    document.title=`REDLINE: Vice Streets — ${TAB_TITLE[tab]}`;
+  });
+});
+window.addEventListener('popstate',()=>{
+  const tab=HREF_TAB[location.pathname]||'garage';
+  showTab(tab);
+  document.title=`REDLINE: Vice Streets — ${TAB_TITLE[tab]}`;
+});
 function toggleHudMenu(){document.getElementById('hud-menu')?.classList.toggle('open');}
 
 async function loadCrew(){

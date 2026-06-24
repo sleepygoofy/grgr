@@ -16,6 +16,7 @@ const PAGES = [
   { file: 'crew.html',       href: '/crew',       tab: 'crew',        title: 'Crew' },
   { file: 'chat.html',       href: '/chat',       tab: 'chat',        title: 'Chat' },
   { file: 'profile.html',    href: '/profile',    tab: 'profile',     title: 'Profile' },
+  { file: 'settings.html',   href: '/settings',   tab: 'settings',    title: 'Settings' },
   { file: 'admin.html',      href: '/admin',      tab: 'admin',       title: 'Admin' },
   { file: 'modforms.html',   href: '/modforms',   tab: 'modforms',    title: 'Mod Forms' },
 ];

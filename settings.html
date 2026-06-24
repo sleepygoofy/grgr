@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REDLINE: Vice Streets — Mod Forms</title>
+<title>REDLINE: Vice Streets — Settings</title>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -778,7 +778,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
         <a class="side-tab" href="/crew"><span class="side-ico">🤝</span><span class="side-label">Crew</span></a>
         <a class="side-tab" href="/chat"><span class="side-ico">🗨️</span><span class="side-label">Chat</span></a>
         <a class="side-tab" href="/profile"><span class="side-ico">👤</span><span class="side-label">Profile</span></a>
-        <a class="side-tab" href="/settings"><span class="side-ico">⚙️</span><span class="side-label">Settings</span></a>
+        <a class="side-tab active" href="/settings"><span class="side-ico">⚙️</span><span class="side-label">Settings</span></a>
         <a class="side-tab" id="admin-nav-tab" style="display:none" href="/admin"><span class="side-ico">🛡️</span><span class="side-label">Admin</span></a>
         <a class="side-tab" id="modforms-nav-tab" style="display:none" href="/modforms"><span class="side-ico">📝</span><span class="side-label">Forms</span></a>
       </nav>
@@ -1004,7 +1004,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       </div>
     </div>
     <!-- SETTINGS -->
-    <div class="section" id="tab-settings">
+    <div class="section active" id="tab-settings">
       <div class="sec-head"><div><div class="sec-title" data-kicker="Account">Settings</div><div class="sec-sub">Manage your account</div></div></div>
       <div class="grid-3">
         <div class="panel">
@@ -1031,7 +1031,7 @@ canvas#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;display:bl
       </div>
     </div>
     <!-- ADMIN -->
-    <div class="section active" id="tab-modforms">
+    <div class="section" id="tab-modforms">
       <div class="sec-head"><div><div class="sec-title" data-kicker="Moderator" style="color:var(--amber2)">Application Review</div><div class="sec-sub">moderator access · review and act on player applications</div></div></div>
       <div id="modforms-content"><div class="loading-screen"><div class="spinner"></div></div></div>
     </div>
